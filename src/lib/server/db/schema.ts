@@ -38,3 +38,22 @@ export const entry = pgTable('entry', {
 		.references(() => user.id)
 		.notNull()
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+	participations: many(entry)
+}));
+
+export const competitionRelations = relations(competition, ({ many }) => ({
+	participations: many(entry)
+}));
+
+export const participationRelations = relations(entry, ({ one }) => ({
+	user: one(user, {
+		fields: [entry.userId],
+		references: [user.id]
+	}),
+	competition: one(competition, {
+		fields: [entry.competitionId],
+		references: [competition.id]
+	})
+}));

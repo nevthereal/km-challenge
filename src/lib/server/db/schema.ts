@@ -5,7 +5,7 @@ const UUID = text()
 	.$defaultFn(() => crypto.randomUUID())
 	.primaryKey();
 
-export const wettbewerb = pgTable('wettbewerb', {
+export const competition = pgTable('competition', {
 	id: UUID,
 	name: text().notNull(),
 	startsAt: timestamp().notNull(),
@@ -13,11 +13,11 @@ export const wettbewerb = pgTable('wettbewerb', {
 	creatorId: text().references(() => user.id)
 });
 
-export const disziplin = pgTable('disziplin', {
+export const discipline = pgTable('discipline', {
 	id: UUID,
 	name: text().notNull(),
-	faktor: integer().notNull(),
-	wettbewerbId: text().references(() => wettbewerb.id)
+	factor: integer().notNull(),
+	competitionId: text().references(() => competition.id)
 });
 
 export const user = pgTable('user', {
@@ -28,24 +28,13 @@ export const user = pgTable('user', {
 
 export const entry = pgTable('entry', {
 	id: UUID,
-	disziplinId: text()
-		.references(() => disziplin.id)
+	disciplineId: text()
+		.references(() => discipline.id)
 		.notNull(),
-	wettbewerbId: text()
-		.references(() => wettbewerb.id)
+	competitionId: text()
+		.references(() => competition.id)
 		.notNull(),
 	userId: text()
 		.references(() => user.id)
 		.notNull()
 });
-
-export const wettbewerbRel = relations(wettbewerb, ({ many, one }) => ({
-	teilnehmer: many(user),
-	diszipline: many(disziplin),
-	entries: many(entry)
-}));
-
-export const userRel = relations(user, ({ many }) => ({
-	entries: many(entry),
-	wettbewerbe: many(wettbewerb)
-}));

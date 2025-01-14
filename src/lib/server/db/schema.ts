@@ -1,4 +1,4 @@
-import { generateCode } from '@nevthereal/random-utils';
+import { generateCode, generateNumber } from '@nevthereal/random-utils';
 import { relations } from 'drizzle-orm';
 import { pgTable, text, integer, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
@@ -9,7 +9,9 @@ export const competition = pgTable('competition', {
 	name: text().notNull(),
 	startsAt: timestamp().notNull(),
 	endsAt: timestamp().notNull(),
-	creatorId: text().references(() => user.id)
+	creatorId: text()
+		.references(() => user.id)
+		.notNull()
 });
 
 export const discipline = pgTable('discipline', {
@@ -51,7 +53,7 @@ export const entry = pgTable('entry', {
 export const code = pgTable('code', {
 	code: text()
 		.primaryKey()
-		.$defaultFn(() => generateCode(6)),
+		.$defaultFn(() => generateNumber(6)),
 	competitionId: text()
 		.notNull()
 		.references(() => competition.id)

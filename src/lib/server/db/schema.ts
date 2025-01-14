@@ -1,12 +1,11 @@
+import { generateCode } from '@nevthereal/random-utils';
 import { relations } from 'drizzle-orm';
-import { pgTable, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
-
-const UUID = text()
-	.$defaultFn(() => crypto.randomUUID())
-	.primaryKey();
+import { pgTable, text, integer, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
 export const competition = pgTable('competition', {
-	id: UUID,
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => generateCode(6)),
 	name: text().notNull(),
 	startsAt: timestamp().notNull(),
 	endsAt: timestamp().notNull(),
@@ -14,20 +13,29 @@ export const competition = pgTable('competition', {
 });
 
 export const discipline = pgTable('discipline', {
-	id: UUID,
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => generateCode(10)),
 	name: text().notNull(),
 	factor: integer().notNull(),
 	competitionId: text().references(() => competition.id)
 });
 
+export const roles = pgEnum('role', ['Coach', 'Athlet']);
+
 export const user = pgTable('user', {
-	id: UUID,
+	id: text()
+		.$defaultFn(() => crypto.randomUUID())
+		.primaryKey(),
 	username: text().notNull().unique(),
-	admin: boolean().default(false)
+	admin: boolean().default(false),
+	role: roles().notNull().default('Athlet')
 });
 
 export const entry = pgTable('entry', {
-	id: UUID,
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => generateCode(16)),
 	disciplineId: text()
 		.references(() => discipline.id)
 		.notNull(),
@@ -36,8 +44,25 @@ export const entry = pgTable('entry', {
 		.notNull(),
 	userId: text()
 		.references(() => user.id)
-		.notNull()
+		.notNull(),
+	createdAt: timestamp().notNull()
 });
+
+export const code = pgTable('code', {
+	code: text()
+		.primaryKey()
+		.$defaultFn(() => generateCode(6)),
+	competitionId: text()
+		.notNull()
+		.references(() => competition.id)
+});
+
+export const codeRelations = relations(code, ({ one }) => ({
+	competition: one(competition, {
+		fields: [code.competitionId],
+		references: [competition.id]
+	})
+}));
 
 export const userRelations = relations(user, ({ many }) => ({
 	participations: many(entry)

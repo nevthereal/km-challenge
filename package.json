@@ -42,6 +42,7 @@
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.4",
+		"@nevthereal/random-utils": "^1.0.1",
 		"@tailwindcss/typography": "^0.5.15",
 		"drizzle-orm": "^0.38.3"
 	}

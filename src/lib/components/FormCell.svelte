@@ -7,5 +7,7 @@
 
 <div class="flex flex-col gap-1">
 	<label class="text-sm" for={forAttr}>{label}</label>
-	{@render children()}
+	<div class="flex gap-2">
+		{@render children()}
+	</div>
 </div>

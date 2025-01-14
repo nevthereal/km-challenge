@@ -36,6 +36,20 @@
       "when": 1736835077064,
       "tag": "0004_complete_ego",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1736867806690,
+      "tag": "0005_crazy_maddog",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1736867915733,
+      "tag": "0006_rapid_ma_gnuci",
+      "breakpoints": true
     }
   ]
 }

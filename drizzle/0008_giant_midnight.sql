@@ -1,0 +1,1 @@
+ALTER TABLE "session" ALTER COLUMN "user_id" SET DATA TYPE text;

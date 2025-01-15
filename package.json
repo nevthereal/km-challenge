@@ -54,7 +54,10 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.4",
 		"@nevthereal/random-utils": "^1.0.11",
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
 		"@tailwindcss/typography": "^0.5.15",
+		"arctic": "^3.1.2",
 		"dayjs": "^1.11.13",
 		"drizzle-orm": "^0.38.3",
 		"drizzle-zod": "^0.6.1"

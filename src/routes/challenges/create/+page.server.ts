@@ -4,7 +4,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/server/db';
-import { competition } from '$lib/server/db/schema';
+import { competitionTable } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async () => {
 	const createForm = await superValidate(zod(createProjectSchema));
@@ -23,7 +23,7 @@ export const actions: Actions = {
 		const { endsAt, name, startsAt } = form.data;
 
 		const [{ id: challengeId }] = await db
-			.insert(competition)
+			.insert(competitionTable)
 			.values({
 				creatorId: 'hallol',
 				endsAt,

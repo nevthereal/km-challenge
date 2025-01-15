@@ -50,6 +50,20 @@
       "when": 1736867915733,
       "tag": "0006_rapid_ma_gnuci",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1736921785792,
+      "tag": "0007_elite_wildside",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1736921810422,
+      "tag": "0008_giant_midnight",
+      "breakpoints": true
     }
   ]
 }

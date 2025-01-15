@@ -3,13 +3,13 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { competition } from '$lib/db/schema';
 import { redirect } from '@sveltejs/kit';
-import { checkUser } from '$lib/utils';
+import { getUser } from '$lib/auth';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
-	const user = checkUser(locals);
+export const load: PageServerLoad = async ({ params, request }) => {
+	getUser(request);
 	const { id: paramId } = params;
 
-	const competition = await db.query.competitionTable.findFirst({
+	const qCompetition = await db.query.competition.findFirst({
 		where: eq(competition.id, paramId),
 		with: {
 			participations: true,
@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
-	if (!competition) return redirect(302, '/challenges');
+	if (!qCompetition) return redirect(302, '/challenges');
 
-	return { competition };
+	return { competition: qCompetition };
 };

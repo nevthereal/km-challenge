@@ -1,11 +1,31 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { prettyDate } from '$lib/utils';
+
 	let { data } = $props();
 
 	let { challenges } = data;
 </script>
 
-<a href="/challenges/create">Challenge erstellen</a>
+<Button href="/challenges/create">Challenge erstellen</Button>
 
-{#each challenges as challenge}
-	<a class="text-red-500" href={`/challenges/${challenge.id}`}>{challenge.name}</a>
-{/each}
+<div class="grid grid-cols-3 gap-4">
+	{#each challenges as challenge}
+		<a href={`/challenges/${challenge.id}`}>
+			<Card.Root>
+				<Card.Header>
+					<Card.Title>{challenge.name}</Card.Title>
+					<Card.Description
+						>{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}</Card.Description
+					>
+				</Card.Header>
+				<Card.Footer>
+					<p class="mt-4">
+						{challenge.participations.length} Teilnehmer
+					</p>
+				</Card.Footer>
+			</Card.Root>
+		</a>
+	{/each}
+</div>

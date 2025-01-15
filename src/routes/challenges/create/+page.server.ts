@@ -5,33 +5,41 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/server/db';
 import { competitionTable } from '$lib/server/db/schema';
+import { checkUser } from '$lib/utils';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+	const user = checkUser(locals);
+
+	if (!user.admin && user.role != 'Coach') return redirect(302, '/');
 	const createForm = await superValidate(zod(createProjectSchema));
 
 	return { createForm };
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(createProjectSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
+		const user = checkUser(locals);
+
+		if (!user.admin && user.role != 'Coach') return redirect(302, '/');
+
 		const { endsAt, name, startsAt } = form.data;
 
 		const [{ id: challengeId }] = await db
 			.insert(competitionTable)
 			.values({
-				creatorId: 'hallol',
+				creatorId: user.id,
 				endsAt,
 				name,
 				startsAt
 			})
 			.returning();
 
-		redirect(302, `challenges/${challengeId}`);
+		redirect(302, `/challenges/${challengeId}`);
 	}
 };

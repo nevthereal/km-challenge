@@ -1,3 +1,1 @@
-<script>
-	// import Calendar from '$lib/components/Calendar.svelte';
-</script>
+<a href="/challenges/create">Challenge erstellen</a>

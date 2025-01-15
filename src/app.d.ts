@@ -1,5 +1,4 @@
-import type { User } from '$lib/server/auth';
-import type { Session } from '$lib/server/auth';
+import type { User, Session } from '$lib/server/auth';
 
 declare global {
 	namespace App {

@@ -5,16 +5,16 @@ import { db } from '../db';
 import { eq } from 'drizzle-orm';
 import type { RequestEvent } from '@sveltejs/kit';
 import { Google } from 'arctic';
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
+import { BASE_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
 
 export const google = new Google(
 	GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET,
-	'http://localhost:5173/login/google/callback'
+	`${BASE_URL}/api/google/callback`
 );
 
-type Session = typeof sessionTable.$inferSelect;
-type User = typeof userTable.$inferSelect;
+export type Session = typeof sessionTable.$inferSelect;
+export type User = typeof userTable.$inferSelect;
 
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);

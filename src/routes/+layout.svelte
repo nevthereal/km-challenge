@@ -3,7 +3,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import { LogIn, LogOut } from 'lucide-svelte';
 	import '../app.css';
-	import { redirect } from '@sveltejs/kit';
 
 	let { children, data } = $props();
 
@@ -30,7 +29,13 @@
 		<div class="flex gap-2">
 			<Button
 				onclick={async () => {
-					await authClient.signOut();
+					await authClient.signOut({
+						fetchOptions: {
+							onSuccess: () => {
+								location.reload();
+							}
+						}
+					});
 					location.reload();
 				}}><LogOut />{session.user.name} Abmelden</Button
 			>

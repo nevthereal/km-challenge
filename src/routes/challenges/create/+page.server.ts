@@ -5,35 +5,35 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/db';
 import { competition } from '$lib/db/schema';
-import { checkUser } from '$lib/utils';
+import { getUser } from '$lib/auth';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = checkUser(locals);
+export const load: PageServerLoad = async ({ request }) => {
+	const session = await getUser(request);
 
-	if (!user.admin && user.role != 'Coach') return redirect(302, '/');
+	if (!session.user.admin && session.user.role != 'Coach') return redirect(302, '/');
 	const createForm = await superValidate(zod(createProjectSchema));
 
 	return { createForm };
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request }) => {
+		const session = await getUser(request);
+
 		const form = await superValidate(request, zod(createProjectSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		const user = checkUser(locals);
-
-		if (!user.admin && user.role != 'Coach') return redirect(302, '/');
+		if (!session.user.admin && session.user.role != 'Coach') return redirect(302, '/');
 
 		const { endsAt, name, startsAt } = form.data;
 
 		const [{ id: challengeId }] = await db
 			.insert(competition)
 			.values({
-				creatorId: user.id,
+				creatorId: session.user.id,
 				endsAt,
 				name,
 				startsAt

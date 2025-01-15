@@ -2,4 +2,8 @@
 
 - [x] Enum für Trainer, Athlet
 - [x] Einladungscode
-- [ ] Email & PW (auth)
+- [x] Google auth
+- [ ] Work out the challenge invitation stuff
+- [ ] Entry logic
+- [ ] Leaderboard
+- [ ] Check user logic on all routes

@@ -12,7 +12,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const competition = await db.query.competitionTable.findFirst({
 		where: eq(competitionTable.id, paramId),
 		with: {
-			participations: true
+			participations: true,
+			entries: true
 		}
 	});
 

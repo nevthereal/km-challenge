@@ -83,7 +83,8 @@ export const userRelations = relations(userTable, ({ many }) => ({
 }));
 
 export const competitionRelations = relations(competitionTable, ({ many }) => ({
-	participations: many(entryTable)
+	participations: many(entryTable),
+	entries: many(entryTable)
 }));
 
 export const participationRelations = relations(entryTable, ({ one }) => ({

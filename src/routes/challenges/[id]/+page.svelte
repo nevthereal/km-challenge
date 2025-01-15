@@ -4,4 +4,4 @@
 	const { competition } = data;
 </script>
 
-<h1>{competition.name}</h1>
+<h1 class="text-3xl">{competition.name}</h1>

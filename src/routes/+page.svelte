@@ -11,5 +11,5 @@
 	<h1>Sign in</h1>
 	<Button href="/api/google"><LogIn />Log in with Google</Button>
 {:else}
-	<p>Signed in</p>
+	<p>Signed in as {user.username}</p>
 {/if}

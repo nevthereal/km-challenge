@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth/client';
 	import { Button } from '$lib/components/ui/button';
-	import { LogIn } from 'lucide-svelte';
+	import { LogIn, LogOut } from 'lucide-svelte';
 	import '../app.css';
+	import { redirect } from '@sveltejs/kit';
 
 	let { children, data } = $props();
 
@@ -17,16 +18,23 @@
 		</div>
 	</div>
 	{#if !session}
-		<h1>Sign in</h1>
 		<Button
 			onclick={async () => {
 				await authClient.signIn.social({
-					provider: 'google'
+					provider: 'google',
+					callbackURL: '/'
 				});
 			}}><LogIn />Mit Google anmelden</Button
 		>
 	{:else}
-		<h1>Angemeldet als {session.user.name}</h1>
+		<div class="flex gap-2">
+			<Button
+				onclick={async () => {
+					await authClient.signOut();
+					location.reload();
+				}}><LogOut />{session.user.name} Abmelden</Button
+			>
+		</div>
 	{/if}
 </nav>
 <div class="mx-8 my-4">

@@ -14,23 +14,29 @@
 <form method="post" use:enhance class="flex max-w-xl flex-col gap-2">
 	<Form.Field {form} name="name">
 		<Form.Control>
-			<Form.Label>Name</Form.Label>
-			<Input name="name" bind:value={$formFields.name} />
+			{#snippet children({ props })}
+				<Form.Label>Name</Form.Label>
+				<Input {...props} bind:value={$formFields.name} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 	<div class="flex justify-between max-md:flex-col max-md:gap-2">
 		<Form.Field {form} name="startsAt" class="flex flex-col">
 			<Form.Control>
-				<Form.Label>Start der Challenge</Form.Label>
-				<DatePicker name="startsAt" bind:value={$formFields.startsAt} />
+				{#snippet children({ props })}
+					<Form.Label>Start der Challenge</Form.Label>
+					<DatePicker {...props} bind:value={$formFields.startsAt} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 		<Form.Field {form} name="endsAt" class="flex flex-col">
 			<Form.Control>
-				<Form.Label>Ende der Challenge</Form.Label>
-				<DatePicker name="endsAt" bind:value={$formFields.endsAt} />
+				{#snippet children({ props })}
+					<Form.Label>Ende der Challenge</Form.Label>
+					<DatePicker {...props} bind:value={$formFields.endsAt} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>

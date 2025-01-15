@@ -37,6 +37,7 @@
 			>
 				<CalendarIcon class="mr-2 size-4" />
 				{dateValue ? df.format(dateValue.toDate(getLocalTimeZone())) : 'Datum auswählen'}
+				<input hidden {value} {name} />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>
@@ -53,6 +54,5 @@
 				}
 			}}
 		/>
-		<input hidden value={dateValue?.toString() || ''} {name} />
 	</Popover.Content>
 </Popover.Root>

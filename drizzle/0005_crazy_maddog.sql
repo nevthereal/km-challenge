@@ -1,1 +1,0 @@
-ALTER TABLE "competition" ALTER COLUMN "creatorId" SET NOT NULL;

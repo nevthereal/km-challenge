@@ -3,8 +3,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { db } from '$lib/server/db';
-import { competitionTable } from '$lib/server/db/schema';
+import { db } from '$lib/db';
+import { competition } from '$lib/db/schema';
 import { checkUser } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -31,7 +31,7 @@ export const actions: Actions = {
 		const { endsAt, name, startsAt } = form.data;
 
 		const [{ id: challengeId }] = await db
-			.insert(competitionTable)
+			.insert(competition)
 			.values({
 				creatorId: user.id,
 				endsAt,

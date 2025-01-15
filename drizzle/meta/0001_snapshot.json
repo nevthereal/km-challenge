@@ -1,9 +1,153 @@
 {
-  "id": "946068c5-da95-4ecb-a6fb-5e41324fa5d3",
-  "prevId": "1c575b4a-69fb-4929-a8ce-5abc6ee5ef3f",
+  "id": "d5337641-9192-422a-a83a-1ac88e242349",
+  "prevId": "eb052e47-349c-40f0-b9d6-3384c69390b7",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.account": {
+      "name": "account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.code": {
+      "name": "code",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "competition_id": {
+          "name": "competition_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "code_competition_id_competition_id_fk": {
+          "name": "code_competition_id_competition_id_fk",
+          "tableFrom": "code",
+          "tableTo": "competition",
+          "columnsFrom": [
+            "competition_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.competition": {
       "name": "competition",
       "schema": "",
@@ -20,33 +164,33 @@
           "primaryKey": false,
           "notNull": true
         },
-        "startsAt": {
-          "name": "startsAt",
+        "starts_at": {
+          "name": "starts_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
-        "endsAt": {
-          "name": "endsAt",
+        "ends_at": {
+          "name": "ends_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
-        "creatorId": {
-          "name": "creatorId",
+        "creator_id": {
+          "name": "creator_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "competition_creatorId_user_id_fk": {
-          "name": "competition_creatorId_user_id_fk",
+        "competition_creator_id_user_id_fk": {
+          "name": "competition_creator_id_user_id_fk",
           "tableFrom": "competition",
           "tableTo": "user",
           "columnsFrom": [
-            "creatorId"
+            "creator_id"
           ],
           "columnsTo": [
             "id"
@@ -83,8 +227,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "competitionId": {
-          "name": "competitionId",
+        "competition_id": {
+          "name": "competition_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -92,12 +236,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "discipline_competitionId_competition_id_fk": {
-          "name": "discipline_competitionId_competition_id_fk",
+        "discipline_competition_id_competition_id_fk": {
+          "name": "discipline_competition_id_competition_id_fk",
           "tableFrom": "discipline",
           "tableTo": "competition",
           "columnsFrom": [
-            "competitionId"
+            "competition_id"
           ],
           "columnsTo": [
             "id"
@@ -122,33 +266,39 @@
           "primaryKey": true,
           "notNull": true
         },
-        "disciplineId": {
-          "name": "disciplineId",
+        "discipline_id": {
+          "name": "discipline_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "competitionId": {
-          "name": "competitionId",
+        "competition_id": {
+          "name": "competition_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "entry_disciplineId_discipline_id_fk": {
-          "name": "entry_disciplineId_discipline_id_fk",
+        "entry_discipline_id_discipline_id_fk": {
+          "name": "entry_discipline_id_discipline_id_fk",
           "tableFrom": "entry",
           "tableTo": "discipline",
           "columnsFrom": [
-            "disciplineId"
+            "discipline_id"
           ],
           "columnsTo": [
             "id"
@@ -156,12 +306,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "entry_competitionId_competition_id_fk": {
-          "name": "entry_competitionId_competition_id_fk",
+        "entry_competition_id_competition_id_fk": {
+          "name": "entry_competition_id_competition_id_fk",
           "tableFrom": "entry",
           "tableTo": "competition",
           "columnsFrom": [
-            "competitionId"
+            "competition_id"
           ],
           "columnsTo": [
             "id"
@@ -169,12 +319,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "entry_userId_user_id_fk": {
-          "name": "entry_userId_user_id_fk",
+        "entry_user_id_user_id_fk": {
+          "name": "entry_user_id_user_id_fk",
           "tableFrom": "entry",
           "tableTo": "user",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -189,6 +339,89 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "session_token_unique": {
+          "name": "session_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.user": {
       "name": "user",
       "schema": "",
@@ -199,11 +432,49 @@
           "primaryKey": true,
           "notNull": true
         },
-        "username": {
-          "name": "username",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Athlet'"
         },
         "admin": {
           "name": "admin",
@@ -217,20 +488,78 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "user_username_unique": {
-          "name": "user_username_unique",
+        "user_email_unique": {
+          "name": "user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "username"
+            "email"
           ]
         }
       },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
+    },
+    "public.verification": {
+      "name": "verification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "Coach",
+        "Athlet"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

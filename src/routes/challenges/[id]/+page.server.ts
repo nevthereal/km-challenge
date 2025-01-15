@@ -1,7 +1,7 @@
-import { db } from '$lib/server/db';
+import { db } from '$lib/db';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import { competitionTable } from '$lib/server/db/schema';
+import { competition } from '$lib/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { checkUser } from '$lib/utils';
 
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const { id: paramId } = params;
 
 	const competition = await db.query.competitionTable.findFirst({
-		where: eq(competitionTable.id, paramId),
+		where: eq(competition.id, paramId),
 		with: {
 			participations: true,
 			entries: true

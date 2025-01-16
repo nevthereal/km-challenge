@@ -15,6 +15,27 @@
       "when": 1736969259106,
       "tag": "0001_nervous_talos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737029733078,
+      "tag": "0002_gigantic_hawkeye",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1737029825354,
+      "tag": "0003_late_vin_gonzales",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1737029860923,
+      "tag": "0004_minor_toad",
+      "breakpoints": true
     }
   ]
 }

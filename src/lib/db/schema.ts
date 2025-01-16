@@ -49,7 +49,8 @@ export const user = pgTable('user', {
 	createdAt: timestamp().notNull(),
 	updatedAt: timestamp().notNull(),
 	role: roles(),
-	admin: boolean().default(false)
+	admin: boolean().default(false),
+	completedSetup: boolean().default(false)
 });
 
 export const session = pgTable('session', {

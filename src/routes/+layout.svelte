@@ -21,7 +21,8 @@
 			onclick={async () => {
 				await authClient.signIn.social({
 					provider: 'google',
-					callbackURL: '/'
+					callbackURL: '/',
+					newUserCallbackURL: '/profile/new'
 				});
 			}}><LogIn />Mit Google anmelden</Button
 		>

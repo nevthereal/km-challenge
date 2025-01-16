@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { roles } from './db/schema';
 
 export const createProjectSchema = z
 	.object({
@@ -10,3 +11,8 @@ export const createProjectSchema = z
 		message: 'endsAt must be after startsAt',
 		path: ['endsAt']
 	});
+
+export const userSetup = z.object({
+	username: z.string(),
+	role: z.enum(roles.enumValues, { message: 'Kategorie ungültig' })
+});

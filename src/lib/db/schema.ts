@@ -93,7 +93,7 @@ export const verification = pgTable('verification', {
 	updatedAt: timestamp()
 });
 
-export const code = pgTable('code', {
+export const inviteCode = pgTable('code', {
 	code: text()
 		.primaryKey()
 		.$defaultFn(() => generateNumber(6)),
@@ -102,23 +102,30 @@ export const code = pgTable('code', {
 		.references(() => competition.id)
 });
 
-export const codeRelations = relations(code, ({ one }) => ({
+export const codeRelations = relations(inviteCode, ({ one }) => ({
 	competition: one(competition, {
-		fields: [code.competitionId],
+		fields: [inviteCode.competitionId],
 		references: [competition.id]
 	})
 }));
 
 export const userRelations = relations(user, ({ many }) => ({
-	participations: many(entry)
-}));
-
-export const competitionRelations = relations(competition, ({ many }) => ({
 	participations: many(entry),
 	entries: many(entry)
 }));
 
-export const participationRelations = relations(entry, ({ one }) => ({
+export const competitionRelations = relations(competition, ({ many, one }) => ({
+	participations: many(entry),
+	entries: many(entry),
+	codes: many(inviteCode),
+	disciplines: many(discipline),
+	creator: one(user, {
+		fields: [competition.creatorId],
+		references: [user.id]
+	})
+}));
+
+export const entryRelation = relations(entry, ({ one }) => ({
 	user: one(user, {
 		fields: [entry.userId],
 		references: [user.id]
@@ -126,5 +133,9 @@ export const participationRelations = relations(entry, ({ one }) => ({
 	competition: one(competition, {
 		fields: [entry.competitionId],
 		references: [competition.id]
+	}),
+	discipline: one(discipline, {
+		fields: [entry.disciplineId],
+		references: [discipline.id]
 	})
 }));

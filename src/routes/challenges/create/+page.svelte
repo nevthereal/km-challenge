@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DatePicker from '$lib/components/DatePicker.svelte';
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	let { data } = $props();
@@ -21,25 +21,19 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<div class="flex justify-between max-md:flex-col max-md:gap-2">
-		<Form.Field {form} name="startsAt" class="flex flex-col">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Start der Challenge</Form.Label>
-					<DatePicker {...props} bind:value={$formFields.startsAt} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field {form} name="endsAt" class="flex flex-col">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Ende der Challenge</Form.Label>
-					<DatePicker {...props} bind:value={$formFields.endsAt} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
+	<Form.Field {form} name="startsAt" class="flex flex-col">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Start der Challenge</Form.Label>
+				<DatePicker
+					startName="startsAt"
+					endName="endsAt"
+					bind:startValue={$formFields.startsAt}
+					bind:endValue={$formFields.endsAt}
+				/>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
 	<Form.Button>Submit</Form.Button>
 </form>

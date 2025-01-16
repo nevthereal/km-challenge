@@ -17,7 +17,9 @@
 				<Card.Header>
 					<Card.Title>{challenge.name}</Card.Title>
 					<Card.Description
-						>{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}</Card.Description
+						>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
+							new Date(challenge.endsAt)
+						)}</Card.Description
 					>
 				</Card.Header>
 				<Card.Footer>

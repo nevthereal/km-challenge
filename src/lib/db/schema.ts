@@ -1,14 +1,13 @@
 import { generateCode, generateNumber } from '@nevthereal/random-utils';
-import { relations } from 'drizzle-orm';
-import { pgTable, text, integer, timestamp, boolean, pgEnum, date } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
-export const competition = pgTable('competition', {
+export const challenge = pgTable('challenge', {
 	id: text()
 		.primaryKey()
 		.$defaultFn(() => generateCode(6)),
 	name: text().notNull(),
-	startsAt: date().notNull(),
-	endsAt: date().notNull(),
+	startsAt: timestamp().notNull(),
+	endsAt: timestamp().notNull(),
 	creatorId: text()
 		.references(() => user.id)
 		.notNull()
@@ -20,7 +19,7 @@ export const discipline = pgTable('discipline', {
 		.$defaultFn(() => generateCode(10)),
 	name: text().notNull(),
 	factor: integer().notNull(),
-	competitionId: text().references(() => competition.id)
+	challengeId: text().references(() => challenge.id)
 });
 
 export const roles = pgEnum('role', ['Coach', 'U15', 'U17', 'U19']);
@@ -32,8 +31,8 @@ export const entry = pgTable('entry', {
 	disciplineId: text()
 		.references(() => discipline.id)
 		.notNull(),
-	competitionId: text()
-		.references(() => competition.id)
+	challengeId: text()
+		.references(() => challenge.id)
 		.notNull(),
 	userId: text()
 		.references(() => user.id)
@@ -97,54 +96,7 @@ export const inviteCode = pgTable('code', {
 	code: text()
 		.primaryKey()
 		.$defaultFn(() => generateNumber(6)),
-	competitionId: text()
+	challengeId: text()
 		.notNull()
-		.references(() => competition.id)
+		.references(() => challenge.id)
 });
-
-// RELATIONS
-export const codeRelation = relations(inviteCode, ({ one }) => ({
-	competition: one(competition, {
-		fields: [inviteCode.competitionId],
-		references: [competition.id]
-	})
-}));
-
-export const userRelation = relations(user, ({ many }) => ({
-	participations: many(entry),
-	entries: many(entry)
-}));
-
-export const competitionRelation = relations(competition, ({ many, one }) => ({
-	participations: many(entry),
-	entries: many(entry),
-	codes: many(inviteCode),
-	disciplines: many(discipline),
-	creator: one(user, {
-		fields: [competition.creatorId],
-		references: [user.id]
-	})
-}));
-
-export const entryRelation = relations(entry, ({ one }) => ({
-	user: one(user, {
-		fields: [entry.userId],
-		references: [user.id]
-	}),
-	competition: one(competition, {
-		fields: [entry.competitionId],
-		references: [competition.id]
-	}),
-	discipline: one(discipline, {
-		fields: [entry.disciplineId],
-		references: [discipline.id]
-	})
-}));
-
-export const disciplineRelation = relations(discipline, ({ one, many }) => ({
-	competition: one(competition, {
-		fields: [discipline.competitionId],
-		references: [competition.id]
-	}),
-	entries: many(entry)
-}));

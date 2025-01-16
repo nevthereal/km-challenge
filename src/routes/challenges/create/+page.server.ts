@@ -4,21 +4,21 @@ import type { PageServerLoad, Actions } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/db';
-import { competition } from '$lib/db/schema';
-import { getUser } from '$lib/auth';
+import { challenge } from '$lib/db/schema';
+import { getUser } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ request }) => {
-	const session = await getUser(request);
+export const load: PageServerLoad = async ({ locals }) => {
+	const user = getUser(locals);
 
-	if (!session.user.admin && session.user.role != 'Coach') return redirect(302, '/');
+	if (!user.admin && user.role != 'Coach') return redirect(302, '/');
 	const createForm = await superValidate(zod(createProjectSchema));
 
 	return { createForm };
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
-		const session = await getUser(request);
+	default: async ({ locals, request }) => {
+		const user = getUser(locals);
 
 		const form = await superValidate(request, zod(createProjectSchema));
 
@@ -27,19 +27,19 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		if (!session.user.admin && session.user.role != 'Coach') return redirect(302, '/');
+		if (!user.admin && user.role != 'Coach') return redirect(302, '/');
 
 		const { endsAt, name, startsAt } = form.data;
 
 		const [{ id: challengeId }] = await db
-			.insert(competition)
+			.insert(challenge)
 			.values({
-				creatorId: session.user.id,
-				endsAt,
 				name,
-				startsAt
+				startsAt,
+				endsAt,
+				creatorId: user.id
 			})
-			.returning();
+			.returning({ id: challenge.id });
 
 		redirect(302, `/challenges/${challengeId}`);
 	}

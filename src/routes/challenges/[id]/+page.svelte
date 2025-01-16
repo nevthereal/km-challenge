@@ -1,7 +1,7 @@
 <script lang="ts">
 	let { data } = $props();
 
-	const { competition } = data;
+	const { challenge } = data;
 </script>
 
-<h1 class="text-3xl">{competition.name}</h1>
+<h1 class="text-3xl">{challenge.name}</h1>

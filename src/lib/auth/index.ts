@@ -28,12 +28,5 @@ export const auth = betterAuth({
 	}
 });
 
-export async function getUser(request: Request) {
-	const session = await auth.api.getSession({
-		headers: request.headers
-	});
-
-	if (!session) redirect(302, '/');
-
-	return session;
-}
+export type User = typeof auth.$Infer.Session.user;
+export type Session = typeof auth.$Infer.Session.session;

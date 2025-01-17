@@ -5,9 +5,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSetup } from '$lib/zod';
 import type { Actions } from './$types';
-import { db } from '$lib/db';
-import { user as userTable } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { auth } from '$lib/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = getUser(locals);
@@ -38,15 +36,12 @@ export const actions: Actions = {
 
 		const { role, username: name } = form.data;
 
-		await db
-			.update(userTable)
-			.set({
+		await auth.api.updateUser({
+			headers: request.headers,
+			body: {
 				role,
-				name,
-				completedSetup: true
-			})
-			.where(eq(userTable.id, user.id));
-
-		return redirect(302, '/');
+				name
+			}
+		});
 	}
 };

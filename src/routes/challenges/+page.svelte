@@ -23,9 +23,9 @@
 					>
 				</Card.Header>
 				<Card.Footer>
-					<p class="mt-4">
-						{challenge.participations.length} Teilnehmer
-					</p>
+					<!-- <p class="mt-4">
+						{challenge} Teilnehmer
+					</p> -->
 				</Card.Footer>
 			</Card.Root>
 		</a>

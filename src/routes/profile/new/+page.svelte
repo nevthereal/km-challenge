@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/';
 	import * as Select from '$lib/components/ui/select';

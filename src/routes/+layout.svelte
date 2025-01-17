@@ -13,9 +13,9 @@
 <ModeWatcher defaultMode="dark" />
 <nav class="flex items-center justify-between p-6">
 	<div class="flex items-center gap-4">
-		<a href="/" class="text-4xl font-bold">Start</a>
+		<a href="/" class="text-4xl font-bold">Startseite</a>
 		<div class="contents">
-			<a href="/challenges">Challenges</a>
+			<a href="/clubs" class="text-lg font-semibold">Clubs</a>
 		</div>
 	</div>
 	{#if !session}

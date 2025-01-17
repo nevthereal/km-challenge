@@ -11,25 +11,36 @@
 
 <div class="mb-6 grid grid-cols-3 gap-6">
 	{#if data.superUser}
-		<a href="/clubs/create">
-			<Card.Root>
+		<Card.Root>
+			<a href="/clubs/create">
 				<Card.Header>
 					<Card.Title class="text-center">Club erstellen</Card.Title>
 				</Card.Header>
 				<Card.Content class="flex justify-center">
 					<PlusCircle size={36} />
 				</Card.Content>
-			</Card.Root>
-		</a>
+			</a>
+		</Card.Root>
 	{/if}
+	{#each usersClubs as { club }}
+		<Card.Root>
+			<a href={`/clubs/${club.id}`}>
+				<Card.Header>
+					<Card.Title>
+						{club.name}
+					</Card.Title>
+				</Card.Header>
+				<Card.Content>
+					<p>{club.challenges.length || 'Keine'} Challenges</p>
+					<p>{club.members.length || 'Keine'} Mitglieder</p>
+				</Card.Content>
+			</a>
+		</Card.Root>
+	{:else}
+		<p>
+			Du bist momentan in keinem Club. Du kannst aber einem <a class="a" href="/clubs/join"
+				>beitreten.</a
+			>
+		</p>
+	{/each}
 </div>
-
-{#each usersClubs as { club }}
-	{club.name}
-{:else}
-	<p>
-		Du bist momentan in keinem Club. Du kannst aber einem <a class="a" href="/clubs/join"
-			>beitreten.</a
-		>
-	</p>
-{/each}

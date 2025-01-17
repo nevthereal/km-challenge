@@ -12,7 +12,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const usersClubs = await db.query.clubMember.findMany({
 		where: eq(clubMember.userId, user.id),
 		with: {
-			club: true
+			club: {
+				with: {
+					challenges: true,
+					members: true
+				}
+			}
 		}
 	});
 

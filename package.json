@@ -62,6 +62,7 @@
 		"dayjs": "^1.11.13",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^0.38.3",
-		"drizzle-zod": "^0.6.1"
+		"drizzle-zod": "^0.6.1",
+		"mode-watcher": "^0.5.0"
 	}
 }

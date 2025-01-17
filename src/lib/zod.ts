@@ -3,7 +3,7 @@ import { roles } from './db/schema';
 
 export const createProjectSchema = z
 	.object({
-		name: z.string(),
+		name: z.string().min(3),
 		startsAt: z.date(),
 		endsAt: z.date()
 	})

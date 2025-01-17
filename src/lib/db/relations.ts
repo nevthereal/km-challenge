@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { challenge, discipline, entry, inviteCode, user } from './schema';
+import { challenge, club, clubAdmin, discipline, entry, inviteCode, user } from './schema';
 
 export const codeRelation = relations(inviteCode, ({ one }) => ({
 	challenge: one(challenge, {
@@ -10,7 +10,8 @@ export const codeRelation = relations(inviteCode, ({ one }) => ({
 
 export const userRelation = relations(user, ({ many }) => ({
 	participations: many(entry),
-	entries: many(entry)
+	entries: many(entry),
+	adminOf: many(clubAdmin)
 }));
 
 export const challengeRelation = relations(challenge, ({ many, one }) => ({
@@ -21,6 +22,10 @@ export const challengeRelation = relations(challenge, ({ many, one }) => ({
 	creator: one(user, {
 		fields: [challenge.creatorId],
 		references: [user.id]
+	}),
+	club: one(club, {
+		fields: [challenge.clubId],
+		references: [club.id]
 	})
 }));
 
@@ -45,4 +50,20 @@ export const disciplineRelation = relations(discipline, ({ one, many }) => ({
 		references: [challenge.id]
 	}),
 	entries: many(entry)
+}));
+
+export const clubRelation = relations(club, ({ many }) => ({
+	challenges: many(challenge),
+	admins: many(clubAdmin)
+}));
+
+export const clubAdminRelation = relations(clubAdmin, ({ one }) => ({
+	club: one(club, {
+		fields: [clubAdmin.clubId],
+		references: [club.id]
+	}),
+	user: one(user, {
+		fields: [clubAdmin.userId],
+		references: [user.id]
+	})
 }));

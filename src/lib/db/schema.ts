@@ -9,7 +9,10 @@ export const challenge = pgTable('challenge', {
 	startsAt: timestamp().notNull(),
 	endsAt: timestamp().notNull(),
 	creatorId: text()
-		.references(() => user.id)
+		.references(() => user.id, { onDelete: 'cascade' })
+		.notNull(),
+	clubId: text()
+		.references(() => club.id, { onDelete: 'cascade' })
 		.notNull()
 });
 
@@ -19,7 +22,7 @@ export const discipline = pgTable('discipline', {
 		.$defaultFn(() => generateCode(10)),
 	name: text().notNull(),
 	factor: integer().notNull(),
-	challengeId: text().references(() => challenge.id)
+	challengeId: text().references(() => challenge.id, { onDelete: 'cascade' })
 });
 
 export const roles = pgEnum('role', ['Coach', 'U15', 'U17', 'U19']);
@@ -29,13 +32,13 @@ export const entry = pgTable('entry', {
 		.primaryKey()
 		.$defaultFn(() => generateCode(16)),
 	disciplineId: text()
-		.references(() => discipline.id)
+		.references(() => discipline.id, { onDelete: 'cascade' })
 		.notNull(),
 	challengeId: text()
-		.references(() => challenge.id)
+		.references(() => challenge.id, { onDelete: 'cascade' })
 		.notNull(),
 	userId: text()
-		.references(() => user.id)
+		.references(() => user.id, { onDelete: 'cascade' })
 		.notNull(),
 	createdAt: timestamp().notNull()
 });
@@ -63,7 +66,7 @@ export const session = pgTable('session', {
 	userAgent: text(),
 	userId: text()
 		.notNull()
-		.references(() => user.id)
+		.references(() => user.id, { onDelete: 'cascade' })
 });
 
 export const account = pgTable('account', {
@@ -72,7 +75,7 @@ export const account = pgTable('account', {
 	providerId: text().notNull(),
 	userId: text()
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onDelete: 'cascade' }),
 	accessToken: text(),
 	refreshToken: text(),
 	idToken: text(),
@@ -99,5 +102,25 @@ export const inviteCode = pgTable('code', {
 		.$defaultFn(() => generateNumber(6)),
 	challengeId: text()
 		.notNull()
-		.references(() => challenge.id)
+		.references(() => challenge.id, { onDelete: 'cascade' })
+});
+
+export const club = pgTable('club', {
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => generateCode(6)),
+	name: text().notNull()
+});
+
+export const clubAdmin = pgTable('club_admin', {
+	id: text()
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => generateCode(20)),
+	userId: text()
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	clubId: text()
+		.notNull()
+		.references(() => club.id, { onDelete: 'cascade' })
 });

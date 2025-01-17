@@ -3,12 +3,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import { LogIn, LogOut } from 'lucide-svelte';
 	import '../app.css';
+	import { ModeWatcher } from 'mode-watcher';
 
 	let { children, data } = $props();
 
 	let { session } = data;
 </script>
 
+<ModeWatcher defaultMode="dark" />
 <nav class="flex items-center justify-between p-6">
 	<div class="flex items-center gap-4">
 		<a href="/" class="text-4xl font-bold">Start</a>

@@ -5,12 +5,13 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/db';
 import { challenge } from '$lib/db/schema';
-import { getUser } from '$lib/utils';
+import { getUser, isSuperUser } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = getUser(locals);
 
-	if (!user.admin && user.role != 'Coach') return redirect(302, '/');
+	if (!isSuperUser(locals)) return redirect(302, '/');
+
 	const createForm = await superValidate(zod(createProjectSchema));
 
 	return { createForm };

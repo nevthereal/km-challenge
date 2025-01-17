@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DatePicker from '$lib/components/DatePicker.svelte';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	let { data } = $props();

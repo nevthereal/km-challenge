@@ -124,3 +124,29 @@ export const clubAdmin = pgTable('club_admin', {
 		.notNull()
 		.references(() => club.id, { onDelete: 'cascade' })
 });
+
+export const clubMember = pgTable('club_member', {
+	id: text()
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => generateCode(20)),
+	userId: text()
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	clubId: text()
+		.notNull()
+		.references(() => club.id, { onDelete: 'cascade' })
+});
+
+export const challengeMember = pgTable('challenge_member', {
+	id: text()
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => generateCode(20)),
+	userId: text()
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	challengeId: text()
+		.notNull()
+		.references(() => challenge.id, { onDelete: 'cascade' })
+});

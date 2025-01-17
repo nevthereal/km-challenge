@@ -1,5 +1,15 @@
 import { relations } from 'drizzle-orm';
-import { challenge, club, clubAdmin, discipline, entry, inviteCode, user } from './schema';
+import {
+	challenge,
+	club,
+	clubAdmin,
+	clubMember,
+	discipline,
+	entry,
+	inviteCode,
+	user,
+	challengeMember
+} from './schema';
 
 export const codeRelation = relations(inviteCode, ({ one }) => ({
 	challenge: one(challenge, {
@@ -11,14 +21,16 @@ export const codeRelation = relations(inviteCode, ({ one }) => ({
 export const userRelation = relations(user, ({ many }) => ({
 	participations: many(entry),
 	entries: many(entry),
-	adminOf: many(clubAdmin)
+	adminOf: many(clubAdmin),
+	memberOf: many(clubMember),
+	challenges: many(challengeMember)
 }));
 
 export const challengeRelation = relations(challenge, ({ many, one }) => ({
-	participations: many(entry),
 	entries: many(entry),
 	codes: many(inviteCode),
 	disciplines: many(discipline),
+	members: many(challengeMember),
 	creator: one(user, {
 		fields: [challenge.creatorId],
 		references: [user.id]
@@ -54,7 +66,8 @@ export const disciplineRelation = relations(discipline, ({ one, many }) => ({
 
 export const clubRelation = relations(club, ({ many }) => ({
 	challenges: many(challenge),
-	admins: many(clubAdmin)
+	admins: many(clubAdmin),
+	members: many(clubMember)
 }));
 
 export const clubAdminRelation = relations(clubAdmin, ({ one }) => ({
@@ -64,6 +77,28 @@ export const clubAdminRelation = relations(clubAdmin, ({ one }) => ({
 	}),
 	user: one(user, {
 		fields: [clubAdmin.userId],
+		references: [user.id]
+	})
+}));
+
+export const clubMemberRelation = relations(clubMember, ({ one }) => ({
+	club: one(club, {
+		fields: [clubMember.clubId],
+		references: [club.id]
+	}),
+	user: one(user, {
+		fields: [clubMember.userId],
+		references: [user.id]
+	})
+}));
+
+export const challengeMemberRelation = relations(challengeMember, ({ one }) => ({
+	challenge: one(challenge, {
+		fields: [challengeMember.challengeId],
+		references: [challenge.id]
+	}),
+	user: one(user, {
+		fields: [challengeMember.userId],
 		references: [user.id]
 	})
 }));

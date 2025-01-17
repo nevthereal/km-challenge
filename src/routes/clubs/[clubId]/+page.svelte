@@ -5,13 +5,13 @@
 
 	let { data } = $props();
 
-	let { challenges } = data;
+	let { qClub } = data;
 </script>
 
 <Button href="/challenges/create">Challenge erstellen</Button>
 
 <div class="grid grid-cols-3 gap-4">
-	{#each challenges as challenge}
+	{#each qClub.challenges as challenge}
 		<a href={`/challenges/${challenge.id}`}>
 			<Card.Root>
 				<Card.Header>

@@ -7,10 +7,10 @@ import { db } from '$lib/db';
 import { challenge } from '$lib/db/schema';
 import { getUser, isSuperUser } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = getUser(locals);
+export const load: PageServerLoad = async ({ locals, url }) => {
+	getUser(locals, url.pathname);
 
-	if (!isSuperUser(locals)) return redirect(302, '/');
+	if (!isSuperUser(locals, url.pathname)) return redirect(302, '/');
 
 	const createForm = await superValidate(zod(createProjectSchema));
 
@@ -18,8 +18,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, request }) => {
-		const user = getUser(locals);
+	default: async ({ locals, request, url, params }) => {
+		const user = getUser(locals, url.pathname);
 
 		const form = await superValidate(request, zod(createProjectSchema));
 
@@ -36,9 +36,10 @@ export const actions: Actions = {
 			.insert(challenge)
 			.values({
 				name,
-				startsAt,
-				endsAt,
-				creatorId: user.id
+				startsAt: new Date(startsAt),
+				endsAt: new Date(endsAt),
+				creatorId: user.id,
+				clubId: params.clubId
 			})
 			.returning({ id: challenge.id });
 

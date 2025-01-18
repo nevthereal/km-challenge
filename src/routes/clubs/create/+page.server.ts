@@ -11,10 +11,10 @@ const clubSchema = z.object({
 	name: z.string().min(5)
 });
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = getUser(locals);
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const user = getUser(locals, url.pathname);
 
-	const superUser = isSuperUser(locals);
+	const superUser = isSuperUser(locals, url.pathname);
 
 	if (!superUser) return redirect(302, '/clubs');
 
@@ -24,11 +24,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, request }) => {
-		console.log('hi');
-		const user = getUser(locals);
+	default: async ({ locals, request, url }) => {
+		const user = getUser(locals, url.pathname);
 
-		const superUser = isSuperUser(locals);
+		const superUser = isSuperUser(locals, url.pathname);
 
 		if (!superUser) return redirect(302, '/clubs');
 

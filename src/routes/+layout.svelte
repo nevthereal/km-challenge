@@ -4,6 +4,7 @@
 	import { LogIn, LogOut } from 'lucide-svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
+	import { page } from '$app/state';
 
 	let { children, data } = $props();
 
@@ -23,7 +24,7 @@
 			onclick={async () => {
 				await authClient.signIn.social({
 					provider: 'google',
-					callbackURL: '/',
+					callbackURL: page.url.pathname,
 					newUserCallbackURL: '/profile/new'
 				});
 			}}><LogIn />Mit Google anmelden</Button
@@ -40,8 +41,11 @@
 						}
 					});
 					location.reload();
-				}}><LogOut />{session.user.name} Abmelden</Button
-			>
+				}}
+				><LogOut /><span>
+					{session.user.name} Abmelden
+				</span>
+			</Button>
 		</div>
 	{/if}
 </nav>

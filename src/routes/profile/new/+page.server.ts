@@ -1,14 +1,14 @@
 import { getUser } from '$lib/utils';
 import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from '../$types';
+import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSetup } from '$lib/zod';
 import type { Actions } from './$types';
 import { auth } from '$lib/auth';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = getUser(locals);
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const user = getUser(locals, url.pathname);
 
 	const form = await superValidate(zod(userSetup), {
 		defaults: {
@@ -23,8 +23,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, request }) => {
-		const user = getUser(locals);
+	default: async ({ locals, request, url }) => {
+		const user = getUser(locals, url.pathname);
 
 		if (user.completedSetup) return redirect(302, '/');
 

@@ -4,10 +4,10 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { clubMember } from '$lib/db/schema';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = getUser(locals);
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const user = getUser(locals, url.pathname);
 
-	const superUser = isSuperUser(locals);
+	const superUser = isSuperUser(locals, url.pathname);
 
 	const usersClubs = await db.query.clubMember.findMany({
 		where: eq(clubMember.userId, user.id),

@@ -5,14 +5,14 @@ import { challenge } from '$lib/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
-	getUser(locals);
+export const load: PageServerLoad = async ({ params, locals, url }) => {
+	getUser(locals, url.pathname);
 	const { id: paramId } = params;
 
 	const qchallenge = await db.query.challenge.findFirst({
 		where: eq(challenge.id, paramId),
 		with: {
-			participations: true,
+			members: true,
 			entries: true
 		}
 	});

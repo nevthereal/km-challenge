@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { roles } from './db/schema';
+import { gender, roles } from './db/schema';
 
 export const createProjectSchema = z
 	.object({
@@ -14,5 +14,6 @@ export const createProjectSchema = z
 
 export const userSetup = z.object({
 	username: z.string(),
-	role: z.enum(roles.enumValues, { message: 'Kategorie ungültig' })
+	role: z.enum(roles.enumValues, { message: 'Kategorie ungültig' }),
+	gender: z.enum(gender.enumValues, { message: 'Geschlecht ungültig' })
 });

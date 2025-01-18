@@ -12,8 +12,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	const form = await superValidate(zod(userSetup), {
 		defaults: {
-			username: user.name,
-			role: user.role
+			gender: 'M',
+			role: 'U19',
+			username: user.name
 		}
 	});
 
@@ -40,8 +41,10 @@ export const actions: Actions = {
 			headers: request.headers,
 			body: {
 				role,
-				name
+				name,
+				completedSetup: true
 			}
 		});
+		return redirect(302, url.searchParams.get('redirect') || '/');
 	}
 };

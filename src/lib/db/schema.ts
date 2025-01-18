@@ -26,6 +26,7 @@ export const discipline = pgTable('discipline', {
 });
 
 export const roles = pgEnum('role', ['Coach', 'U15', 'U17', 'U19']);
+export const gender = pgEnum('gender', ['M', 'F']);
 
 export const entry = pgTable('entry', {
 	id: text()
@@ -52,6 +53,7 @@ export const user = pgTable('user', {
 	createdAt: timestamp().notNull(),
 	updatedAt: timestamp().notNull(),
 	role: roles(),
+	gender: gender(),
 	admin: boolean().default(false),
 	completedSetup: boolean().default(false)
 });

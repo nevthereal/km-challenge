@@ -3,7 +3,7 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/';
 	import * as Select from '$lib/components/ui/select';
-	import { roles } from '$lib/db/schema';
+	import { gender, roles } from '$lib/db/schema';
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	let { data } = $props();
@@ -38,6 +38,27 @@
 						<Select.Group>
 							{#each roles.enumValues as role}
 								<Select.Item value={role} label={role} />
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.Description />
+		<Form.FieldErrors />
+	</Form.Field>
+	<Form.Field {form} name="gender">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Kategorie</Form.Label>
+				<Select.Root type="single" bind:value={$formFields.gender} name={props.name}>
+					<Select.Trigger {...props}>
+						{$formFields.gender ? $formFields.gender : 'Auswählen'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							{#each gender.enumValues as val}
+								<Select.Item value={val} label={val} />
 							{/each}
 						</Select.Group>
 					</Select.Content>

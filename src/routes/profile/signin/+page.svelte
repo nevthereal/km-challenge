@@ -13,7 +13,7 @@
 		await authClient.signIn.social({
 			provider: 'google',
 			callbackURL: redirectUrl || '/',
-			newUserCallbackURL: '/profile/new'
+			newUserCallbackURL: `/profile/new${redirectUrl && `?redirect=${redirectUrl}`}`
 		});
 	}}><LogIn />Mit Google anmelden</Button
 >

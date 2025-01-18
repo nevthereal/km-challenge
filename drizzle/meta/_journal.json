@@ -78,6 +78,13 @@
       "when": 1737145724382,
       "tag": "0010_normal_jigsaw",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1737233898120,
+      "tag": "0011_wide_madame_masque",
+      "breakpoints": true
     }
   ]
 }

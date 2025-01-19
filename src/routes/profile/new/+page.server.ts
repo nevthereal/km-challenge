@@ -1,4 +1,4 @@
-import { getUser } from '$lib/utils';
+import { getUser, hasCompletedSetup } from '$lib/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
@@ -18,16 +18,16 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 	});
 
-	if (user.completedSetup) return redirect(302, '/');
+	if (hasCompletedSetup(locals, url.pathname)) return redirect(302, '/');
 
 	return { form };
 };
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
-		const user = getUser(locals, url.pathname);
+		getUser(locals, url.pathname);
 
-		if (user.completedSetup) return redirect(302, '/');
+		if (hasCompletedSetup(locals, url.pathname)) return redirect(302, '/');
 
 		const form = await superValidate(request, zod(userSetup));
 
@@ -35,14 +35,14 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const { role, username: name } = form.data;
+		const { role, username: name, gender } = form.data;
 
 		await auth.api.updateUser({
 			headers: request.headers,
 			body: {
 				role,
 				name,
-				completedSetup: true
+				gender
 			}
 		});
 		return redirect(302, url.searchParams.get('redirect') || '/');

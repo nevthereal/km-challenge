@@ -21,11 +21,12 @@ export const auth = betterAuth({
 			},
 			admin: {
 				type: 'boolean',
-				defaultValue: false
+				defaultValue: false,
+				input: false
 			},
-			completedSetup: {
-				type: 'boolean',
-				defaultValue: false
+			gender: {
+				type: 'string',
+				input: true
 			}
 		}
 	}

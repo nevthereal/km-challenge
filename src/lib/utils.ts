@@ -25,3 +25,8 @@ export function isSuperUser(locals: App.Locals, redirectUrl: string) {
 
 	return false;
 }
+
+export function hasCompletedSetup(locals: App.Locals, redirectUrl: string) {
+	const user = getUser(locals, redirectUrl);
+	return Boolean(user.gender && user.role);
+}

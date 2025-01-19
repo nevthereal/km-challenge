@@ -37,7 +37,6 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(createProjectSchema));
 
 		if (!form.valid) {
-			console.log(form.errors);
 			return fail(400, { form });
 		}
 
@@ -56,6 +55,6 @@ export const actions: Actions = {
 			})
 			.returning({ id: challenge.id });
 
-		redirect(302, `/challenges/${challengeId}`);
+		redirect(302, `/clubs/${params.clubId}/challenge/${challengeId}`);
 	}
 };

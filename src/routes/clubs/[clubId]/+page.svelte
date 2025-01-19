@@ -36,7 +36,7 @@
 					</Form.Field>
 					<Form.Field {form} name="startsAt" class="flex flex-col">
 						<Form.Control>
-							{#snippet children({ props })}
+							{#snippet children()}
 								<Form.Label>Start der Challenge</Form.Label>
 								<DatePicker
 									startName="startsAt"

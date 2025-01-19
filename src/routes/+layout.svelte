@@ -20,15 +20,7 @@
 		</div>
 	</div>
 	{#if !session}
-		<Button
-			onclick={async () => {
-				await authClient.signIn.social({
-					provider: 'google',
-					callbackURL: page.url.pathname,
-					newUserCallbackURL: '/profile/new'
-				});
-			}}><LogIn />Mit Google anmelden</Button
-		>
+		<Button href="/signin">Anmelden</Button>
 	{:else}
 		<div class="flex gap-2">
 			<Button

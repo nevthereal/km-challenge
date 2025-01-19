@@ -13,7 +13,7 @@ export function prettyDate(date: Date) {
 export function getUser(locals: App.Locals, redirectUrl: string) {
 	const { user } = locals;
 
-	if (!user) return redirect(302, `/profile/signin?redirect=${redirectUrl}`);
+	if (!user) return redirect(302, `/signin?redirect=${redirectUrl}`);
 
 	return user;
 }

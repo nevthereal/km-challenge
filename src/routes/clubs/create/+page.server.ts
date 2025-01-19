@@ -1,4 +1,4 @@
-import { getUser, isSuperUser } from '$lib/utils';
+import { getUser } from '$lib/utils';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, superValidate } from 'sveltekit-superforms';
@@ -14,7 +14,7 @@ const clubSchema = z.object({
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = getUser(locals, url.pathname);
 
-	const superUser = isSuperUser(locals, url.pathname);
+	const { superUser } = user;
 
 	if (!superUser) return redirect(302, '/clubs');
 
@@ -27,7 +27,7 @@ export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
 		const user = getUser(locals, url.pathname);
 
-		const superUser = isSuperUser(locals, url.pathname);
+		const { superUser } = user;
 
 		if (!superUser) return redirect(302, '/clubs');
 

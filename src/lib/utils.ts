@@ -15,15 +15,9 @@ export function getUser(locals: App.Locals, redirectUrl: string) {
 
 	if (!user) return redirect(302, `/signin?redirect=${redirectUrl}`);
 
-	return user;
-}
+	const superUser = user.admin || user.role === 'Coach';
 
-export function isSuperUser(locals: App.Locals, redirectUrl: string) {
-	const user = getUser(locals, redirectUrl);
-
-	if (user.admin || user.role === 'Coach') return true;
-
-	return false;
+	return { ...user, superUser };
 }
 
 export function hasCompletedSetup(locals: App.Locals, redirectUrl: string) {

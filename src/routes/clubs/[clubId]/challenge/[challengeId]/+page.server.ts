@@ -7,10 +7,10 @@ import { getUser } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
 	getUser(locals, url.pathname);
-	const { id: paramId } = params;
+	const { challengeId } = params;
 
 	const qchallenge = await db.query.challenge.findFirst({
-		where: eq(challenge.id, paramId),
+		where: eq(challenge.id, challengeId),
 		with: {
 			members: true,
 			entries: true

@@ -17,7 +17,8 @@ export const auth = betterAuth({
 		additionalFields: {
 			role: {
 				type: 'string',
-				input: true
+				input: true,
+				required: false
 			},
 			admin: {
 				type: 'boolean',
@@ -26,7 +27,8 @@ export const auth = betterAuth({
 			},
 			gender: {
 				type: 'string',
-				input: true
+				input: true,
+				required: false
 			}
 		}
 	}

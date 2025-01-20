@@ -16,11 +16,7 @@ export function getUser(locals: App.Locals, redirectUrl: string) {
 	if (!user) return redirect(302, `/signin?redirect=${redirectUrl}`);
 
 	const superUser = user.admin || user.role === 'Coach';
+	const completedProfile = user.role != null && user.gender != null;
 
-	return { ...user, superUser };
-}
-
-export function hasCompletedSetup(locals: App.Locals, redirectUrl: string) {
-	const user = getUser(locals, redirectUrl);
-	return Boolean(user.gender && user.role);
+	return { ...user, superUser, completedProfile };
 }

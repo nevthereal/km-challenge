@@ -17,3 +17,15 @@ export const userSetup = z.object({
 	role: z.enum(roles.enumValues, { message: 'Kategorie ungültig' }),
 	gender: z.enum(gender.enumValues, { message: 'Geschlecht ungültig' })
 });
+
+export const addDisciplines = z.object({
+	discipline: z
+		.object({
+			name: z.string(),
+			multiplier: z.number({
+				required_error: 'Der Multiplikator fehlt',
+				invalid_type_error: 'Der Multiplikator muss eine Zahl sein'
+			})
+		})
+		.array()
+});

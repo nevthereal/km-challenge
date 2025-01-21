@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { LogOut, User } from 'lucide-svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
@@ -25,10 +25,8 @@
 	{:else}
 		<div class="flex gap-2">
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger>
-					<Button>
-						<User />{session.user.name}
-					</Button>
+				<DropdownMenu.Trigger class={buttonVariants({ variant: 'default' })}>
+					<User />{session.user.name}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Group>

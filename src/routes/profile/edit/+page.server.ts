@@ -5,15 +5,17 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSetup } from '$lib/zod';
 import type { Actions } from './$types';
-import { auth } from '$lib/auth';
+import { db } from '$lib/db';
+import { user } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = getUser(locals, url.pathname);
 
 	const form = await superValidate(zod(userSetup), {
 		defaults: {
-			gender: 'M',
-			role: 'U19',
+			gender: user.gender as string | undefined,
+			role: user.role as string | undefined,
 			username: user.name
 		}
 	});
@@ -23,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
-		getUser(locals, url.pathname);
+		const currentUser = getUser(locals, url.pathname);
 
 		const form = await superValidate(request, zod(userSetup));
 
@@ -33,14 +35,17 @@ export const actions: Actions = {
 
 		const { role, username: name, gender } = form.data;
 
-		await auth.api.updateUser({
-			headers: request.headers,
-			body: {
+		await db
+			.update(user)
+			.set({
 				role,
 				name,
 				gender
-			}
-		});
-		return redirect(302, url.searchParams.get('redirect') || '/');
+			})
+			.where(eq(user.id, currentUser.id));
+
+		const redirectUrl = url.searchParams.get('redirect');
+
+		return redirect(302, redirectUrl || '/profile');
 	}
 };

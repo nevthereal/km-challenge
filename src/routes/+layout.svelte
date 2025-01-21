@@ -5,6 +5,7 @@
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
+	import { redirect } from '@sveltejs/kit';
 
 	let { children, data } = $props();
 
@@ -39,13 +40,7 @@
 							class="m-2"
 							variant="destructive"
 							onclick={async () => {
-								await authClient.signOut({
-									fetchOptions: {
-										onSuccess: () => {
-											location.reload();
-										}
-									}
-								});
+								await authClient.signOut();
 								location.reload();
 							}}
 							><LogOut /><span> Ausloggen </span>

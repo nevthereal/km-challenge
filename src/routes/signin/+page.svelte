@@ -8,12 +8,15 @@
 	const redirectUrl = page.url.searchParams.get('redirect');
 </script>
 
-<Button
-	onclick={async () => {
-		await authClient.signIn.social({
-			provider: 'google',
-			callbackURL: redirectUrl || '/',
-			newUserCallbackURL: `/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
-		});
-	}}><LogIn />Mit Google anmelden</Button
->
+<main class="flex h-[80vh] w-screen items-center justify-center">
+	<Button
+		size="lg"
+		onclick={async () => {
+			await authClient.signIn.social({
+				provider: 'google',
+				callbackURL: redirectUrl || '/',
+				newUserCallbackURL: `/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
+			});
+		}}><LogIn />Mit Google anmelden</Button
+	>
+</main>

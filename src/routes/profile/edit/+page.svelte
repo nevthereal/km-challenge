@@ -13,7 +13,7 @@
 	const { enhance, form: formFields } = form;
 </script>
 
-<h1 class="mb-8 text-5xl font-bold">Profil vervollständigen</h1>
+<h1 class="mb-8 text-5xl font-bold">Profil bearbeiten</h1>
 
 <form method="post" use:enhance class="max-w-sm">
 	<Form.Field {form} name="username">

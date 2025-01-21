@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { authClient } from '$lib/auth/client';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { LogIn, LogOut } from 'lucide-svelte';
+	import { LogOut, User } from 'lucide-svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import { page } from '$app/state';
+	import { authClient } from '$lib/auth/client';
 
 	let { children, data } = $props();
 
@@ -23,21 +23,36 @@
 		<Button href="/signin">Anmelden</Button>
 	{:else}
 		<div class="flex gap-2">
-			<Button
-				onclick={async () => {
-					await authClient.signOut({
-						fetchOptions: {
-							onSuccess: () => {
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Button>
+						<User />{session.user.name}
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.GroupHeading>Profil</DropdownMenu.GroupHeading>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item><a href="/profile">Übersicht</a></DropdownMenu.Item>
+						<DropdownMenu.Item><a href="/profile/edit">Bearbeiten</a></DropdownMenu.Item>
+						<Button
+							class="m-2"
+							variant="destructive"
+							onclick={async () => {
+								await authClient.signOut({
+									fetchOptions: {
+										onSuccess: () => {
+											location.reload();
+										}
+									}
+								});
 								location.reload();
-							}
-						}
-					});
-					location.reload();
-				}}
-				><LogOut /><span>
-					{session.user.name} Abmelden
-				</span>
-			</Button>
+							}}
+							><LogOut /><span> Ausloggen </span>
+						</Button>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		</div>
 	{/if}
 </nav>

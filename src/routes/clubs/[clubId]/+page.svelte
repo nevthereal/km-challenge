@@ -17,7 +17,7 @@
 	let { qClub } = data;
 </script>
 
-<h1>{qClub.name}</h1>
+<h1 class="h1">{qClub.name}</h1>
 
 {#if data.user.superUser}
 	<Sheet.Root>

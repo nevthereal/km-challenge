@@ -17,79 +17,87 @@
 	const { enhance: disciplineEnhance, form: disciplineData } = form;
 </script>
 
-<h1 class="h1">{challenge.name}</h1>
-<h2 class="h2">Diszipline:</h2>
-<ul>
-	{#each data.challenge.disciplines as d}
-		<li>
-			{d.name}: {d.factor}
-		</li>
-	{/each}
-</ul>
+<h1 class="h1">Challenge: {challenge.name}</h1>
+<div class="mt-6 flex p-6">
+	<div class="flex-grow">
+		<h2 class="h2">Einträge:</h2>
+	</div>
+	<div>
+		<h2 class="h2">Diszipline:</h2>
+		<ul>
+			{#each data.challenge.disciplines as d}
+				<li>
+					{d.name}: {d.factor}
+				</li>
+			{/each}
+		</ul>
 
-{#if data.user.superUser}
-	<Sheet.Root>
-		<Sheet.Trigger>
-			<Button>Diszipline hinzufügen</Button>
-		</Sheet.Trigger>
-		<Sheet.Content>
-			<Sheet.Header>
-				<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
-				<form method="post" use:disciplineEnhance>
-					<Form.Fieldset {form} name="discipline">
-						{#each $disciplineData.discipline as _, i}
-							<div class="flex">
-								<div class="flex gap-4">
-									<Form.Control>
-										{#snippet children({ props })}
-											<div class="flex flex-col gap-2">
-												<Form.Label>Name</Form.Label>
-												<Input
-													type="text"
-													{...props}
-													bind:value={$disciplineData.discipline[i].name}
-												/>
-											</div>
-										{/snippet}
-									</Form.Control>
+		{#if data.user.superUser}
+			<Sheet.Root>
+				<Sheet.Trigger class="mt-2">
+					<Button variant="link">Diszipline hinzufügen</Button>
+				</Sheet.Trigger>
+				<Sheet.Content>
+					<Sheet.Header>
+						<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
+						<form method="post" use:disciplineEnhance>
+							<Form.Fieldset {form} name="discipline">
+								{#each $disciplineData.discipline as _, i}
+									<div class="flex">
+										<div class="flex gap-4">
+											<Form.Control>
+												{#snippet children({ props })}
+													<div class="flex flex-col gap-2">
+														<Form.Label>Name</Form.Label>
+														<Input
+															type="text"
+															{...props}
+															bind:value={$disciplineData.discipline[i].name}
+														/>
+													</div>
+												{/snippet}
+											</Form.Control>
 
-									<Form.Control>
-										{#snippet children({ props })}
-											<div class="flex flex-col gap-2">
-												<Form.Label>Multiplikator</Form.Label>
-												<Input
-													type="number"
-													{...props}
-													bind:value={$disciplineData.discipline[i].multiplier}
-												/>
-											</div>
-										{/snippet}
-									</Form.Control>
-									<Form.FieldErrors />
-								</div>
+											<Form.Control>
+												{#snippet children({ props })}
+													<div class="flex flex-col gap-2">
+														<Form.Label>Multiplikator</Form.Label>
+														<Input
+															type="number"
+															step="0.1"
+															{...props}
+															bind:value={$disciplineData.discipline[i].multiplier}
+														/>
+													</div>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</div>
+										<Button
+											type="button"
+											variant="ghost"
+											class="mt-auto text-destructive"
+											onclick={() =>
+												($disciplineData.discipline = $disciplineData.discipline.splice(i - 1, 1))}
+											><MinusCircle /></Button
+										>
+									</div>
+								{/each}
 								<Button
 									type="button"
-									variant="ghost"
-									class="mt-auto text-destructive"
+									variant="outline"
 									onclick={() =>
-										($disciplineData.discipline = $disciplineData.discipline.splice(i - 1, 1))}
-									><MinusCircle /></Button
+										($disciplineData.discipline = [
+											...$disciplineData.discipline,
+											{ multiplier: 1, name: '' }
+										])}><PlusCircle /> Eine mehr</Button
 								>
-							</div>
-						{/each}
-						<Button
-							type="button"
-							variant="outline"
-							onclick={() =>
-								($disciplineData.discipline = [
-									...$disciplineData.discipline,
-									{ multiplier: 1, name: '' }
-								])}><PlusCircle /> Eine mehr</Button
-						>
-					</Form.Fieldset>
-					<Form.Button class="mt-4" type="submit">Speichern</Form.Button>
-				</form>
-			</Sheet.Header>
-		</Sheet.Content>
-	</Sheet.Root>
-{/if}
+							</Form.Fieldset>
+							<Form.Button class="mt-4" type="submit">Speichern</Form.Button>
+						</form>
+					</Sheet.Header>
+				</Sheet.Content>
+			</Sheet.Root>
+		{/if}
+	</div>
+</div>

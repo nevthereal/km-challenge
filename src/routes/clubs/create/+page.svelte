@@ -11,7 +11,7 @@
 	const { enhance, form: formFields } = form;
 </script>
 
-<h1 class="h1 mb-8">Club Erstellen</h1>
+<h1 class="h1">Club Erstellen</h1>
 <form method="POST" use:enhance class="max-w-sm">
 	<Form.Field {form} name="name">
 		<Form.Control>

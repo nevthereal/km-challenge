@@ -47,7 +47,7 @@ export const actions: Actions = {
 
 		for (const d of form.data.discipline) {
 			await db.insert(discipline).values({
-				factor: d.multiplier,
+				factor: d.multiplier.toString(),
 				name: d.name,
 				challengeId: params.challengeId
 			});

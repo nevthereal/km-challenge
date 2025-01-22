@@ -4,7 +4,7 @@
 	const { user } = data;
 </script>
 
-<h1 class="h1 mb-4">Übersicht</h1>
+<h1 class="h1">Übersicht</h1>
 <ul class="flex flex-col gap-1 md:text-lg">
 	<li>
 		<span class="font-medium">Name:</span>

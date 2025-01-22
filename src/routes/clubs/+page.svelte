@@ -7,7 +7,7 @@
 	const { usersClubs } = data;
 </script>
 
-<h1 class="h1 mb-4">Deine Clubs</h1>
+<h1 class="h1">Deine Clubs</h1>
 
 <div class="mb-6 grid grid-cols-3 gap-6">
 	{#if data.superUser}

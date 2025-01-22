@@ -1,5 +1,5 @@
 import { generateCode, generateNumber } from '@nevthereal/random-utils';
-import { pgTable, text, integer, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, pgEnum, numeric } from 'drizzle-orm/pg-core';
 
 export const challenge = pgTable('challenge', {
 	id: text()
@@ -21,7 +21,7 @@ export const discipline = pgTable('discipline', {
 		.primaryKey()
 		.$defaultFn(() => generateCode(10)),
 	name: text().notNull(),
-	factor: integer().notNull(),
+	factor: numeric({ scale: 1 }).notNull(),
 	challengeId: text().references(() => challenge.id, { onDelete: 'cascade' })
 });
 

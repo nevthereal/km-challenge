@@ -22,10 +22,12 @@ export const addDisciplines = z.object({
 	discipline: z
 		.object({
 			name: z.string(),
-			multiplier: z.number({
-				required_error: 'Der Multiplikator fehlt',
-				invalid_type_error: 'Der Multiplikator muss eine Zahl sein'
-			})
+			multiplier: z
+				.number({
+					required_error: 'Der Multiplikator fehlt',
+					invalid_type_error: 'Der Multiplikator muss eine Zahl sein'
+				})
+				.step(0.1)
 		})
 		.array()
 });

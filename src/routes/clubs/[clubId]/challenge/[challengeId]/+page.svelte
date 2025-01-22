@@ -75,11 +75,13 @@
 										</div>
 										<Button
 											type="button"
-											variant="ghost"
-											class="mt-auto text-destructive"
-											onclick={() =>
-												($disciplineData.discipline = $disciplineData.discipline.splice(i - 1, 1))}
-											><MinusCircle /></Button
+											variant="destructive"
+											class="mt-auto"
+											onclick={() => {
+												$disciplineData.discipline = $disciplineData.discipline.filter(
+													(_, index) => index !== i
+												);
+											}}><MinusCircle /></Button
 										>
 									</div>
 								{/each}

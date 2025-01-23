@@ -1,10 +1,11 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card/index.js';
+	import * as Card from '$lib/components/ui/card';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { MinusCircle, PlusCircle } from 'lucide-svelte';
 
 	let { data } = $props();
@@ -22,6 +23,20 @@
 <div class="mt-6 flex gap-8 p-6 max-md:flex-col-reverse">
 	<div class="flex-grow">
 		<h2 class="h2">Einträge:</h2>
+		<Dialog.Root>
+			<Dialog.Trigger class={buttonVariants({ variant: 'default' })}
+				><PlusCircle /> Neuer Eintrag</Dialog.Trigger
+			>
+			<Dialog.Content>
+				<Dialog.Header>
+					<Dialog.Title>Neuer Eintrag?</Dialog.Title>
+					<Dialog.Description>
+						This action cannot be undone. This will permanently delete your account and remove your
+						data from our servers.
+					</Dialog.Description>
+				</Dialog.Header>
+			</Dialog.Content>
+		</Dialog.Root>
 		<div>
 			{#each challenge.entries as entry}
 				<Card.Root>

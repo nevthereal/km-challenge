@@ -5,9 +5,10 @@
 - [x] Google auth
 - [x] Verein
 - [x] Discipline logic
-- [ ] Entry logic
-- [ ] Make all layouts
-- [ ] Work out the challenge invitation stuff
+- [x] Entry logic
+- [x] Entry logic
 - [ ] Leaderboard
+- [ ] Work out the challenge invitation stuff
+- [ ] Make all layouts
 - [ ] Check user logic on all routes
 - [ ] Responsiveness

@@ -31,3 +31,8 @@ export const addDisciplines = z.object({
 		})
 		.array()
 });
+
+export const newEntry = z.object({
+	disciplineId: z.string(),
+	amount: z.number().step(0.01)
+});

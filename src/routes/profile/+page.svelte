@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { prettyDate } from '$lib/utils';
+
 	let { data } = $props();
 
 	const { user } = data;
@@ -12,9 +14,7 @@
 	</li>
 	<li>
 		<span class="font-medium">Beigetreten:</span>
-		<span class="text-muted-foreground"
-			>{Intl.DateTimeFormat('de', { dateStyle: 'long' }).format(user.createdAt)}</span
-		>
+		<span class="text-muted-foreground">{prettyDate(user.createdAt)}</span>
 	</li>
 	<li class="flex items-center gap-2">
 		<span class="font-medium">Email:</span>

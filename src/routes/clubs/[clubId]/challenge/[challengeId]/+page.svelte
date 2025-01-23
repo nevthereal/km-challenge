@@ -7,41 +7,26 @@
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { MinusCircle, PlusCircle } from 'lucide-svelte';
+	import { prettyDate } from '$lib/utils.js';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
+	import EntryForm from '$lib/components/EntryForm.svelte';
 
 	let { data } = $props();
 
-	const { challenge } = data;
-
-	const form = superForm(data.addDisciplineForm, {
-		dataType: 'json'
-	});
-
-	const { enhance: disciplineEnhance, form: disciplineData } = form;
+	const { challenge } = $derived(data);
 </script>
 
 <h1 class="h1">Challenge: {challenge.name}</h1>
 <div class="mt-6 flex gap-8 p-6 max-md:flex-col-reverse">
 	<div class="flex-grow">
 		<h2 class="h2">Einträge:</h2>
-		<Dialog.Root>
-			<Dialog.Trigger class={buttonVariants({ variant: 'default' })}
-				><PlusCircle /> Neuer Eintrag</Dialog.Trigger
-			>
-			<Dialog.Content>
-				<Dialog.Header>
-					<Dialog.Title>Neuer Eintrag?</Dialog.Title>
-					<Dialog.Description>
-						This action cannot be undone. This will permanently delete your account and remove your
-						data from our servers.
-					</Dialog.Description>
-				</Dialog.Header>
-			</Dialog.Content>
-		</Dialog.Root>
+		<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
 		<div>
 			{#each challenge.entries as entry}
 				<Card.Root>
 					<Card.Header>
-						<Card.Title>asd</Card.Title>
+						<Card.Title>{entry.user.name} - {prettyDate(entry.createdAt)}</Card.Title>
 						<Card.Description>Card Description</Card.Description>
 					</Card.Header>
 					<Card.Content>
@@ -67,73 +52,7 @@
 		</ul>
 
 		{#if data.user.superUser}
-			<Sheet.Root>
-				<Sheet.Trigger class="mt-2">
-					<Button variant="link">Diszipline hinzufügen</Button>
-				</Sheet.Trigger>
-				<Sheet.Content>
-					<Sheet.Header>
-						<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
-						<form method="post" use:disciplineEnhance>
-							<Form.Fieldset {form} name="discipline">
-								{#each $disciplineData.discipline as _, i}
-									<div class="flex">
-										<div class="flex gap-4">
-											<Form.Control>
-												{#snippet children({ props })}
-													<div class="flex flex-col gap-2">
-														<Form.Label>Name</Form.Label>
-														<Input
-															type="text"
-															{...props}
-															bind:value={$disciplineData.discipline[i].name}
-														/>
-													</div>
-												{/snippet}
-											</Form.Control>
-
-											<Form.Control>
-												{#snippet children({ props })}
-													<div class="flex flex-col gap-2">
-														<Form.Label>Multiplikator</Form.Label>
-														<Input
-															type="number"
-															step="0.1"
-															{...props}
-															bind:value={$disciplineData.discipline[i].multiplier}
-														/>
-													</div>
-												{/snippet}
-											</Form.Control>
-											<Form.FieldErrors />
-										</div>
-										<Button
-											type="button"
-											variant="destructive"
-											class="mt-auto"
-											onclick={() => {
-												$disciplineData.discipline = $disciplineData.discipline.filter(
-													(_, index) => index !== i
-												);
-											}}><MinusCircle /></Button
-										>
-									</div>
-								{/each}
-								<Button
-									type="button"
-									variant="outline"
-									onclick={() =>
-										($disciplineData.discipline = [
-											...$disciplineData.discipline,
-											{ multiplier: 1, name: '' }
-										])}><PlusCircle /> Eine mehr</Button
-								>
-							</Form.Fieldset>
-							<Form.Button class="mt-4" type="submit">Speichern</Form.Button>
-						</form>
-					</Sheet.Header>
-				</Sheet.Content>
-			</Sheet.Root>
+			<DisciplineForm formData={data.addDisciplineForm} />
 		{/if}
 	</div>
 </div>

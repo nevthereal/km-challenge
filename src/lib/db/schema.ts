@@ -41,7 +41,8 @@ export const entry = pgTable('entry', {
 	userId: text()
 		.references(() => user.id, { onDelete: 'cascade' })
 		.notNull(),
-	createdAt: timestamp().notNull()
+	createdAt: timestamp().notNull(),
+	amount: numeric({ scale: 2 }).notNull()
 });
 
 export const user = pgTable('user', {

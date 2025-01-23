@@ -9,7 +9,7 @@
 
 <h1 class="h1">Deine Clubs</h1>
 
-<div class="mb-6 grid grid-cols-3 gap-6">
+<div class="mb-6 grid gap-6 md:grid-cols-3">
 	{#if data.superUser}
 		<Card.Root>
 			<a href="/clubs/create">

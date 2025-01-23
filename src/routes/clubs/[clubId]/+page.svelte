@@ -55,7 +55,7 @@
 	</Sheet.Root>
 {/if}
 
-<div class="grid grid-cols-3 gap-4">
+<div class="mt-6 grid gap-4 md:grid-cols-3">
 	{#each qClub.challenges as challenge}
 		<a href={`/clubs/${qClub.id}/challenge/${challenge.id}`}>
 			<Card.Root>

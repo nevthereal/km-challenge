@@ -1,5 +1,6 @@
 <script lang="ts">
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
@@ -18,17 +19,35 @@
 </script>
 
 <h1 class="h1">Challenge: {challenge.name}</h1>
-<div class="mt-6 flex p-6">
+<div class="mt-6 flex gap-8 p-6 max-md:flex-col-reverse">
 	<div class="flex-grow">
 		<h2 class="h2">Einträge:</h2>
+		<div>
+			{#each challenge.entries as entry}
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>asd</Card.Title>
+						<Card.Description>Card Description</Card.Description>
+					</Card.Header>
+					<Card.Content>
+						<p>Card Content</p>
+					</Card.Content>
+					<Card.Footer>
+						<p>Card Footer</p>
+					</Card.Footer>
+				</Card.Root>
+			{/each}
+		</div>
 	</div>
 	<div>
 		<h2 class="h2">Diszipline:</h2>
 		<ul>
-			{#each data.challenge.disciplines as d}
+			{#each challenge.disciplines as d}
 				<li>
 					{d.name}: {d.factor}
 				</li>
+			{:else}
+				<p class="text-destructive">Keine diszipline</p>
 			{/each}
 		</ul>
 

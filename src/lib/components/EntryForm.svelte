@@ -70,7 +70,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 
-					<Form.Field form={entryForm} name="date" class="flex flex-col">
+					<Form.Field form={entryForm} name="date">
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Datum</Form.Label>
@@ -91,8 +91,6 @@
 											type="single"
 											value={value as DateValue}
 											bind:placeholder
-											minValue={new CalendarDate(1900, 1, 1)}
-											maxValue={today(getLocalTimeZone())}
 											calendarLabel="Date of birth"
 											onValueChange={(v) => {
 												if (v) {

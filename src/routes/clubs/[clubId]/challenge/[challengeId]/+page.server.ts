@@ -18,7 +18,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 			members: true,
 			entries: {
 				with: {
-					user: true
+					user: true,
+					discipline: true
 				}
 			},
 			disciplines: true
@@ -75,7 +76,10 @@ export const actions: Actions = {
 
 		await db.insert(entry).values({
 			amount: form.data.amount.toString(),
-			challengeId: params.challengeId
+			challengeId: params.challengeId,
+			date: new Date(form.data.date),
+			disciplineId: form.data.disciplineId,
+			userId: user.id
 		});
 	}
 };

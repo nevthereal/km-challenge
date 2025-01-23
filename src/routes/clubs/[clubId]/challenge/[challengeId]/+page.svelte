@@ -1,14 +1,6 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import * as Sheet from '$lib/components/ui/sheet';
-	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { MinusCircle, PlusCircle } from 'lucide-svelte';
 	import { prettyDate } from '$lib/utils.js';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 
@@ -26,15 +18,19 @@
 			{#each challenge.entries as entry}
 				<Card.Root>
 					<Card.Header>
-						<Card.Title>{entry.user.name} - {prettyDate(entry.createdAt)}</Card.Title>
-						<Card.Description>Card Description</Card.Description>
+						<Card.Title>{entry.user.name} am {prettyDate(entry.date)}</Card.Title>
 					</Card.Header>
 					<Card.Content>
-						<p>Card Content</p>
+						<p>
+							<span class="font-bold">
+								{Number(entry.amount) * Number(entry.discipline.factor)} Punkte
+							</span>
+							<span class="text-muted-foreground">
+								({entry.discipline.name},
+								{entry.amount}km)
+							</span>
+						</p>
 					</Card.Content>
-					<Card.Footer>
-						<p>Card Footer</p>
-					</Card.Footer>
 				</Card.Root>
 			{/each}
 		</div>

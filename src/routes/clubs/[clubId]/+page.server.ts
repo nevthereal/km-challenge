@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		}
 	});
 
-	if (!qClub) return error(404);
+	if (!qClub) return error(404, 'Dieser Club existiert nicht');
 
 	const createForm = await superValidate(zod(createProjectSchema));
 

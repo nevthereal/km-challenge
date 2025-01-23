@@ -34,5 +34,6 @@ export const addDisciplines = z.object({
 
 export const newEntry = z.object({
 	disciplineId: z.string(),
-	amount: z.number().step(0.01)
+	amount: z.number().step(0.01).min(0.01),
+	date: z.string().date()
 });

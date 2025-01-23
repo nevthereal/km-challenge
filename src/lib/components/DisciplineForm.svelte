@@ -13,7 +13,7 @@
 		dataType: 'json'
 	});
 
-	const { enhance: disciplineEnhance, form: disciplineData } = disciplineForm;
+	const { enhance, form, constraints } = disciplineForm;
 </script>
 
 <Sheet.Root>
@@ -23,9 +23,9 @@
 	<Sheet.Content>
 		<Sheet.Header>
 			<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
-			<form method="post" action="?/addDiscipline" use:disciplineEnhance>
+			<form method="post" action="?/addDiscipline" use:enhance>
 				<Form.Fieldset form={disciplineForm} name="discipline">
-					{#each $disciplineData.discipline as _, i}
+					{#each $form.discipline as _, i}
 						<div class="flex">
 							<div class="flex gap-4">
 								<Form.Control>
@@ -33,9 +33,10 @@
 										<div class="flex flex-col gap-2">
 											<Form.Label>Name</Form.Label>
 											<Input
+												{...$constraints.discipline?.name}
 												type="text"
 												{...props}
-												bind:value={$disciplineData.discipline[i].name}
+												bind:value={$form.discipline[i].name}
 											/>
 										</div>
 									{/snippet}
@@ -46,10 +47,10 @@
 										<div class="flex flex-col gap-2">
 											<Form.Label>Multiplikator</Form.Label>
 											<Input
+												{...$constraints.discipline?.multiplier}
 												type="number"
-												step="0.1"
 												{...props}
-												bind:value={$disciplineData.discipline[i].multiplier}
+												bind:value={$form.discipline[i].multiplier}
 											/>
 										</div>
 									{/snippet}
@@ -61,9 +62,7 @@
 								variant="destructive"
 								class="mt-auto"
 								onclick={() => {
-									$disciplineData.discipline = $disciplineData.discipline.filter(
-										(_, index) => index !== i
-									);
+									$form.discipline = $form.discipline.filter((_, index) => index !== i);
 								}}><MinusCircle /></Button
 							>
 						</div>
@@ -71,11 +70,8 @@
 					<Button
 						type="button"
 						variant="outline"
-						onclick={() =>
-							($disciplineData.discipline = [
-								...$disciplineData.discipline,
-								{ multiplier: 1, name: '' }
-							])}><PlusCircle /> Eine mehr</Button
+						onclick={() => ($form.discipline = [...$form.discipline, { multiplier: 1, name: '' }])}
+						><PlusCircle /> Eine mehr</Button
 					>
 				</Form.Fieldset>
 				<Form.Button class="mt-4" type="submit">Speichern</Form.Button>

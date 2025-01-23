@@ -1,10 +1,10 @@
 import { db } from '$lib/db';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { challenge, discipline } from '$lib/db/schema';
+import { challenge, discipline, entry } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
-import { fail, superValidate } from 'sveltekit-superforms';
+import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
 
@@ -61,9 +61,21 @@ export const actions: Actions = {
 			});
 		}
 	},
-	newEntry: async ({ locals, request }) => {
-		console.log('hit');
+	newEntry: async ({ request, params, locals }) => {
+		const user = getUser(locals);
 		const form = await superValidate(request, zod(newEntry));
-		console.log(form.data);
+
+		if (!form.valid) return fail(400, { form });
+
+		const qDiscipline = await db.query.discipline.findFirst({
+			where: eq(discipline.id, form.data.disciplineId)
+		});
+
+		if (!qDiscipline) return setError(form, 'disciplineId', 'Disziplin wählen');
+
+		await db.insert(entry).values({
+			amount: form.data.amount.toString(),
+			challengeId: params.challengeId
+		});
 	}
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PlusCircle } from 'lucide-svelte';
+	import { CalendarIcon, PlusCircle } from 'lucide-svelte';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import * as Form from './ui/form';
@@ -8,6 +8,17 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { newEntry } from '$lib/zod';
 	import type { discipline } from '$lib/db/schema';
+	import * as Popover from './ui/popover';
+	import { cn } from '$lib/utils';
+	import {
+		CalendarDate,
+		DateFormatter,
+		getLocalTimeZone,
+		parseDate,
+		today,
+		type DateValue
+	} from '@internationalized/date';
+	import { Calendar } from './ui/calendar';
 
 	let {
 		formData,
@@ -19,7 +30,19 @@
 
 	const entryForm = superForm(formData);
 
-	const { enhance: entryEnhance, form: entryData } = entryForm;
+	const { enhance, form, constraints } = entryForm;
+
+	const df = new DateFormatter('de', {
+		dateStyle: 'long'
+	});
+
+	let value = $state<DateValue | undefined>();
+
+	$effect(() => {
+		value = $form.date ? parseDate($form.date.toString()) : undefined;
+	});
+
+	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
 </script>
 
 <Dialog.Root>
@@ -29,40 +52,85 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
-			<form use:entryEnhance action="?/newEntry" method="post">
+			<form use:enhance action="?/newEntry" method="post">
 				<div class="flex gap-4">
 					<Form.Field form={entryForm} name="amount">
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Kilometer</Form.Label>
-								<Input {...props} step="0.01" type="number" bind:value={$entryData.amount} />
+								<Input
+									{...props}
+									{...$constraints.amount}
+									step="0.01"
+									type="number"
+									bind:value={$form.amount}
+								/>
 							{/snippet}
 						</Form.Control>
-						<Form.Description />
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field form={entryForm} name="disciplineId">
+
+					<Form.Field form={entryForm} name="date" class="flex flex-col">
 						<Form.Control>
 							{#snippet children({ props })}
-								<Form.Label>Disziplin</Form.Label>
-								<Select.Root type="single" bind:value={$entryData.disciplineId} name={props.name}>
-									<Select.Trigger {...props}>
-										{$entryData.disciplineId
-											? disciplines.find((d) => d.id === $entryData.disciplineId)?.name
-											: 'Disziplin Wählen'}
-									</Select.Trigger>
-									<Select.Content>
-										{#each disciplines as discipline}
-											<Select.Item value={discipline.id} label={discipline.name} />
-										{/each}
-									</Select.Content>
-								</Select.Root>
+								<Form.Label>Datum</Form.Label>
+								<Popover.Root>
+									<Popover.Trigger
+										{...props}
+										class={cn(
+											buttonVariants({ variant: 'outline' }),
+											'w-[280px] justify-start pl-4 text-left font-normal',
+											!value && 'text-muted-foreground'
+										)}
+									>
+										{value ? df.format(value.toDate(getLocalTimeZone())) : 'Pick a date'}
+										<CalendarIcon class="ml-auto size-4 opacity-50" />
+									</Popover.Trigger>
+									<Popover.Content class="w-auto p-0" side="top">
+										<Calendar
+											type="single"
+											value={value as DateValue}
+											bind:placeholder
+											minValue={new CalendarDate(1900, 1, 1)}
+											maxValue={today(getLocalTimeZone())}
+											calendarLabel="Date of birth"
+											onValueChange={(v) => {
+												if (v) {
+													$form.date = v.toString();
+												} else {
+													$form.date = '';
+												}
+											}}
+										/>
+									</Popover.Content>
+								</Popover.Root>
+								<Form.FieldErrors />
+								<input hidden value={$form.date} name={props.name} />
 							{/snippet}
 						</Form.Control>
-						<Form.FieldErrors />
 					</Form.Field>
 				</div>
-				<Button class="mt-auto">Hinzufügen</Button>
+				<Form.Field form={entryForm} name="disciplineId">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Disziplin</Form.Label>
+							<Select.Root type="single" bind:value={$form.disciplineId} name={props.name}>
+								<Select.Trigger {...props}>
+									{$form.disciplineId
+										? disciplines.find((d) => d.id === $form.disciplineId)?.name
+										: 'Disziplin Wählen'}
+								</Select.Trigger>
+								<Select.Content>
+									{#each disciplines as discipline}
+										<Select.Item value={discipline.id} label={discipline.name} />
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Button type="submit" class="mt-auto">Hinzufügen</Button>
 			</form>
 		</Dialog.Header>
 	</Dialog.Content>

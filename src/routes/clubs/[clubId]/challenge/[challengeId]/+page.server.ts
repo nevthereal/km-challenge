@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { challenge, discipline, entry } from '$lib/db/schema';
+import { challenge, challengeMember, discipline, entry, user } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -9,7 +9,7 @@ import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const currentUser = getUser(locals, url.pathname);
 	const { challengeId } = params;
 
 	const qchallenge = await db.query.challenge.findFirst({
@@ -24,6 +24,13 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 			},
 			disciplines: true
 		}
+	});
+
+	const currentUserChallenge = await db.query.challengeMember.findFirst({
+		where: and(
+			eq(challengeMember.challengeId, challengeId),
+			eq(challengeMember.userId, currentUser.id)
+		)
 	});
 
 	if (!qchallenge) return redirect(302, '/challenges');
@@ -41,7 +48,13 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	const newEntryForm = await superValidate(zod(newEntry));
 
-	return { challenge: qchallenge, user, addDisciplineForm, newEntryForm };
+	return {
+		challenge: qchallenge,
+		user: currentUser,
+		addDisciplineForm,
+		newEntryForm,
+		currentUserChallenge
+	};
 };
 
 export const actions: Actions = {
@@ -79,6 +92,14 @@ export const actions: Actions = {
 			challengeId: params.challengeId,
 			date: new Date(form.data.date),
 			disciplineId: form.data.disciplineId,
+			userId: user.id
+		});
+	},
+	join: async ({ locals, params }) => {
+		const user = getUser(locals);
+
+		await db.insert(challengeMember).values({
+			challengeId: params.challengeId,
 			userId: user.id
 		});
 	}

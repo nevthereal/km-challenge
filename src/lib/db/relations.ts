@@ -12,9 +12,9 @@ import {
 } from './schema';
 
 export const codeRelation = relations(inviteCode, ({ one }) => ({
-	challenge: one(challenge, {
-		fields: [inviteCode.challengeId],
-		references: [challenge.id]
+	challenge: one(club, {
+		fields: [inviteCode.clubId],
+		references: [club.id]
 	})
 }));
 

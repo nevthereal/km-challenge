@@ -105,9 +105,9 @@ export const inviteCode = pgTable('code', {
 	code: text()
 		.primaryKey()
 		.$defaultFn(() => generateNumber(6)),
-	challengeId: text()
+	clubId: text()
 		.notNull()
-		.references(() => challenge.id, { onDelete: 'cascade' })
+		.references(() => club.id, { onDelete: 'cascade' })
 });
 
 export const club = pgTable('club', {

@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const leaderboard = await db
 		.select({
 			username: user.name,
-			score: sql<number>`sum(${entry.amount} * ${discipline.factor})`.as('score'),
+			score: sql<number>`round(sum(${entry.amount} * ${discipline.factor}), 2)`.as('score'),
 			totalEntries: sql<number>`count(${entry.id})`.as('total_entries'),
 			lastActivity: sql<Date>`max(${entry.date})`.as('last_activity'),
 			role: user.role,
@@ -64,14 +64,13 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		.groupBy(user.id)
 		.orderBy(desc(sql`score`));
 
-	console.log(leaderboard);
-
 	return {
 		challenge: qchallenge,
 		user: currentUser,
 		addDisciplineForm,
 		newEntryForm,
-		currentUserChallenge
+		currentUserChallenge,
+		leaderboard
 	};
 };
 

@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad, Actions } from './$types';
-import { club, challenge } from '$lib/db/schema';
+import { club, challenge, inviteCode } from '$lib/db/schema';
 import { error } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { createProjectSchema } from '$lib/zod';
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ locals, request, url, params }) => {
+	createChallenge: async ({ locals, request, url, params }) => {
 		const user = getUser(locals, url.pathname);
 
 		const form = await superValidate(request, zod(createProjectSchema));
@@ -56,5 +56,18 @@ export const actions: Actions = {
 			.returning({ id: challenge.id });
 
 		redirect(302, `/clubs/${params.clubId}/challenge/${challengeId}`);
+	},
+	getCode: async ({ locals, params, url }) => {
+		const user = getUser(locals, url.pathname);
+		if (!user.superUser) return error(401, 'Nicht erlaubt.');
+
+		const [{ code }] = await db
+			.insert(inviteCode)
+			.values({
+				clubId: params.clubId
+			})
+			.returning();
+
+		return { code };
 	}
 };

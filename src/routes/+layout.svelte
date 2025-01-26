@@ -5,12 +5,14 @@
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { children, data } = $props();
 
 	let { session } = data;
 </script>
 
+<Toaster />
 <ModeWatcher defaultMode="system" />
 <nav class="flex items-center justify-between p-6">
 	<div class="flex items-center gap-4">

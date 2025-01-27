@@ -90,10 +90,10 @@
 				<Button type="submit" form="generateForm" variant="outline"><Link /> Generieren</Button>
 			{:else}
 				<div class="flex gap-4">
-					<Input value={`${page.url.origin}/join/${inviteCode}`} readonly />
+					<Input value={`${page.url.origin}/clubs/join/${inviteCode}`} readonly />
 					<Button
 						onclick={async () => {
-							await navigator.clipboard.writeText(`${page.url.origin}/join/${inviteCode}`);
+							await navigator.clipboard.writeText(`${page.url.origin}/clubs/join/${inviteCode}`);
 							toast.success('Link in die Zwischenablage kopiert');
 							Dialog.Close;
 						}}

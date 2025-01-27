@@ -12,7 +12,7 @@ import {
 } from './schema';
 
 export const codeRelation = relations(inviteCode, ({ one }) => ({
-	challenge: one(club, {
+	club: one(club, {
 		fields: [inviteCode.clubId],
 		references: [club.id]
 	})
@@ -28,7 +28,6 @@ export const userRelation = relations(user, ({ many }) => ({
 
 export const challengeRelation = relations(challenge, ({ many, one }) => ({
 	entries: many(entry),
-	codes: many(inviteCode),
 	disciplines: many(discipline),
 	members: many(challengeMember),
 	creator: one(user, {
@@ -67,6 +66,7 @@ export const disciplineRelation = relations(discipline, ({ one, many }) => ({
 export const clubRelation = relations(club, ({ many }) => ({
 	challenges: many(challenge),
 	admins: many(clubAdmin),
+	codes: many(inviteCode),
 	members: many(clubMember)
 }));
 

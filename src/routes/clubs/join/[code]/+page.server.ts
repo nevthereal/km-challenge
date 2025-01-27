@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		where: eq(inviteCode.code, params.code)
 	});
 
-	if (!qClub) return error(404, 'Club existiert nicht');
+	if (!qClub) return error(404, 'Einladungscode ungültig');
 
 	const alreadyJoined = await db.query.clubMember.findFirst({
 		where: and(eq(clubMember.clubId, qClub.clubId), eq(clubMember.userId, user.id))

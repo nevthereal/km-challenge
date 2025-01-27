@@ -13,7 +13,8 @@
 {#if data.superUser}
 	<Button size="lg" href="/clubs/create" class="mb-2">Club erstellen</Button>
 {/if}
-<div class="mb-6 grid gap-6 md:grid-cols-3">
+
+<div class="mb-6 grid gap-6 md:grid-cols-4">
 	<Card.Root>
 		<a href="/clubs/join">
 			<Card.Header>

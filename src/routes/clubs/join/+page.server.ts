@@ -9,8 +9,8 @@ const schema = z.object({
 	code: z.string().min(6)
 });
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const user = getUser(locals);
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const user = getUser(locals, url.pathname);
 
 	const form = await superValidate(zod(schema));
 

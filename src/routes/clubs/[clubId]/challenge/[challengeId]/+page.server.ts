@@ -12,6 +12,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const currentUser = getUser(locals, url.pathname);
 	const { challengeId } = params;
 
+	if (!currentUser.completedProfile) return redirect(302, '/profile/edit');
+
 	const qchallenge = await db.query.challenge.findFirst({
 		where: eq(challenge.id, challengeId),
 		with: {
@@ -75,8 +77,8 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 };
 
 export const actions: Actions = {
-	addDiscipline: async ({ request, params, locals }) => {
-		const user = getUser(locals);
+	addDiscipline: async ({ request, params, locals, url }) => {
+		const user = getUser(locals, url.pathname);
 
 		if (!user.superUser) return error(401);
 
@@ -92,8 +94,8 @@ export const actions: Actions = {
 			});
 		}
 	},
-	newEntry: async ({ request, params, locals }) => {
-		const user = getUser(locals);
+	newEntry: async ({ request, params, locals, url }) => {
+		const user = getUser(locals, url.pathname);
 		const form = await superValidate(request, zod(newEntry));
 
 		if (!form.valid) return fail(400, { form });
@@ -112,8 +114,8 @@ export const actions: Actions = {
 			userId: user.id
 		});
 	},
-	join: async ({ locals, params }) => {
-		const user = getUser(locals);
+	join: async ({ locals, params, url }) => {
+		const user = getUser(locals, url.pathname);
 
 		await db.insert(challengeMember).values({
 			challengeId: params.challengeId,

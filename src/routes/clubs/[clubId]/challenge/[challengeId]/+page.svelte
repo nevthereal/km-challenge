@@ -1,6 +1,7 @@
 <script lang="ts">
+	import * as Table from '$lib/components/ui/table/index';
 	import * as Card from '$lib/components/ui/card';
-	import { prettyDate } from '$lib/utils.js';
+	import { prettyDate } from '$lib/utils';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -18,26 +19,28 @@
 		<div class="flex-grow">
 			<h2 class="h2">Einträge:</h2>
 			<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
-			<div>
-				{#each challenge.entries as entry}
-					<Card.Root>
-						<Card.Header>
-							<Card.Title>{entry.user.name} am {prettyDate(entry.date)}</Card.Title>
-						</Card.Header>
-						<Card.Content>
-							<p>
-								<span class="font-bold">
-									{Number(entry.amount) * Number(entry.discipline.factor)} Punkte
-								</span>
-								<span class="text-muted-foreground">
-									({entry.discipline.name},
-									{entry.amount}km)
-								</span>
-							</p>
-						</Card.Content>
-					</Card.Root>
-				{/each}
-			</div>
+			<Table.Root>
+				<Table.Header>
+					<Table.Row>
+						<Table.Head>Rang</Table.Head>
+						<Table.Head>Name</Table.Head>
+						<Table.Head>Punktzahl</Table.Head>
+						<Table.Head>Geschlecht / Kategorie</Table.Head>
+						<Table.Head>Zuletzt aktiv</Table.Head>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{#each data.leaderboard as competitor, idx}
+						<Table.Row>
+							<Table.Cell class="font-medium">{idx + 1}</Table.Cell>
+							<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
+							<Table.Cell>{competitor.score}</Table.Cell>
+							<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
+							<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
 		</div>
 		<div>
 			<h2 class="h2">Diszipline:</h2>

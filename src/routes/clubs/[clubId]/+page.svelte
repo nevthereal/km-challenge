@@ -34,6 +34,10 @@
 	];
 
 	let inviteCode = $derived(formData?.code);
+	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
+	const inviteText = $derived(
+		`Trete dem Club ${qClub.name} bei mit dem Code ${inviteCode} oder über diesen Link: ${inviteUrl}`
+	);
 </script>
 
 <h1 class="h1">{qClub.name}</h1>
@@ -90,10 +94,10 @@
 				<Button type="submit" form="generateForm" variant="outline"><Link /> Generieren</Button>
 			{:else}
 				<div class="flex gap-4">
-					<Input value={`${page.url.origin}/clubs/join/${inviteCode}`} readonly />
+					<Input value={inviteUrl} readonly />
 					<Button
 						onclick={async () => {
-							await navigator.clipboard.writeText(`${page.url.origin}/clubs/join/${inviteCode}`);
+							await navigator.clipboard.writeText(inviteText);
 							toast.success('Link in die Zwischenablage kopiert');
 							Dialog.Close;
 						}}

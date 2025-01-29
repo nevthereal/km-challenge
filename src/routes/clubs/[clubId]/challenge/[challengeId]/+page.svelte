@@ -68,7 +68,9 @@
 	<div>
 		<Button
 			onclick={async () => {
-				await fetch(`/api/join-club?id=${challenge.id}`);
+				await fetch(`/api/join-challenge?id=${challenge.id}`, {
+					method: 'post'
+				});
 				location.reload();
 			}}>Challenge beitreten</Button
 		>

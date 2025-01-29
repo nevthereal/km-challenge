@@ -40,7 +40,7 @@
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.2.6",
 		"prettier-plugin-tailwindcss": "^0.6.5",
-		"svelte": "^5.17.3",
+		"svelte": "^5.19.4",
 		"svelte-check": "^4.0.0",
 		"svelte-sonner": "^0.3.28",
 		"sveltekit-superforms": "^2.22.1",
@@ -63,7 +63,7 @@
 		"arctic": "^3.1.2",
 		"better-auth": "^1.1.13",
 		"dotenv": "^16.4.7",
-		"drizzle-orm": "^0.38.3",
+		"drizzle-orm": "^0.38.4",
 		"drizzle-zod": "^0.6.1"
 	}
 }

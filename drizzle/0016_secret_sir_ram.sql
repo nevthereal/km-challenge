@@ -1,0 +1,2 @@
+ALTER TABLE "challenge_member" ADD CONSTRAINT "challenge_member_userId_unique" UNIQUE("user_id");--> statement-breakpoint
+ALTER TABLE "club_member" ADD CONSTRAINT "club_member_userId_unique" UNIQUE("user_id");

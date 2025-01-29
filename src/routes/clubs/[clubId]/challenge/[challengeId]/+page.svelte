@@ -1,11 +1,10 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table/index';
-	import * as Card from '$lib/components/ui/card';
 	import { prettyDate } from '$lib/utils';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms';
 
 	let { data } = $props();
 
@@ -17,9 +16,9 @@
 {#if currentUserChallenge}
 	<div class="mt-6 flex gap-8 p-6 max-md:flex-col-reverse">
 		<div class="flex-grow">
-			<h2 class="h2">Einträge:</h2>
+			<h2 class="h2">Rangliste:</h2>
 			<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
-			<Table.Root>
+			<Table.Root class="mt-8">
 				<Table.Header>
 					<Table.Row>
 						<Table.Head>Rang</Table.Head>
@@ -38,6 +37,12 @@
 							<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
 							<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
 						</Table.Row>
+					{:else}
+						<Table.Row>
+							<Table.Cell colspan={5} class="text-center">
+								<p class="text-lg font-bold text-destructive">No entries yet</p>
+							</Table.Cell>
+						</Table.Row>
 					{/each}
 				</Table.Body>
 			</Table.Root>
@@ -50,7 +55,7 @@
 						{d.name}: {d.factor}
 					</li>
 				{:else}
-					<p class="text-destructive">Keine diszipline</p>
+					<p class="text-destructive font-medium">Keine diszipline</p>
 				{/each}
 			</ul>
 
@@ -61,8 +66,11 @@
 	</div>
 {:else}
 	<div>
-		<form action="?/join" use:enhance method="post">
-			<Button type="submit">Challenge beitreten</Button>
-		</form>
+		<Button
+			onclick={async () => {
+				await fetch(`/api/join-club?id=${challenge.id}`);
+				location.reload();
+			}}>Challenge beitreten</Button
+		>
 	</div>
 {/if}

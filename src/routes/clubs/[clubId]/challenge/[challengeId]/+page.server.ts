@@ -7,6 +7,7 @@ import { getUser } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const currentUser = getUser(locals, url.pathname);
@@ -111,14 +112,6 @@ export const actions: Actions = {
 			challengeId: params.challengeId,
 			date: new Date(form.data.date),
 			disciplineId: form.data.disciplineId,
-			userId: user.id
-		});
-	},
-	join: async ({ locals, params, url }) => {
-		const user = getUser(locals, url.pathname);
-
-		await db.insert(challengeMember).values({
-			challengeId: params.challengeId,
 			userId: user.id
 		});
 	}

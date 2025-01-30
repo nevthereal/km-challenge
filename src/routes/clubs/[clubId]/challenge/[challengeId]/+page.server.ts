@@ -7,7 +7,6 @@ import { getUser } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const currentUser = getUser(locals, url.pathname);

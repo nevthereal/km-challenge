@@ -11,7 +11,6 @@
 	import * as Popover from './ui/popover';
 	import { cn } from '$lib/utils';
 	import {
-		CalendarDate,
 		DateFormatter,
 		getLocalTimeZone,
 		parseDate,
@@ -19,6 +18,7 @@
 		type DateValue
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		formData,
@@ -28,7 +28,16 @@
 		disciplines: (typeof discipline.$inferSelect)[];
 	} = $props();
 
-	const entryForm = superForm(formData);
+	let dialogOpen = $state(false);
+
+	const entryForm = superForm(formData, {
+		onSubmit: () => {
+			dialogOpen = !dialogOpen;
+		},
+		onUpdated: () => {
+			toast.success('Eintrag hinzugefügt');
+		}
+	});
 
 	const { enhance, form, constraints } = entryForm;
 
@@ -43,9 +52,16 @@
 	});
 
 	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
+
+	function getDiscipline(id: string) {
+		let qDiscipline = disciplines.find((d) => d.id === id);
+
+		if (!qDiscipline) return null;
+		return `${qDiscipline.name} (x${qDiscipline.factor})`;
+	}
 </script>
 
-<Dialog.Root>
+<Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}
 		><PlusCircle /> Neuer Eintrag</Dialog.Trigger
 	>
@@ -114,13 +130,14 @@
 							<Form.Label>Disziplin</Form.Label>
 							<Select.Root type="single" bind:value={$form.disciplineId} name={props.name}>
 								<Select.Trigger {...props}>
-									{$form.disciplineId
-										? disciplines.find((d) => d.id === $form.disciplineId)?.name
-										: 'Disziplin Wählen'}
+									{$form.disciplineId ? getDiscipline($form.disciplineId) : 'Disziplin Wählen'}
 								</Select.Trigger>
 								<Select.Content>
 									{#each disciplines as discipline}
-										<Select.Item value={discipline.id} label={discipline.name} />
+										<Select.Item
+											value={discipline.id}
+											label={`${discipline.name} (x${discipline.factor})`}
+										/>
 									{/each}
 								</Select.Content>
 							</Select.Root>

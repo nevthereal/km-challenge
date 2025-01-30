@@ -9,14 +9,19 @@
 
 	let { formData }: { formData: SuperValidated<Infer<typeof addDisciplines>> } = $props();
 
+	let sheetOpen = $state(false);
+
 	const disciplineForm = superForm(formData, {
-		dataType: 'json'
+		dataType: 'json',
+		onSubmit: () => {
+			sheetOpen = !sheetOpen;
+		}
 	});
 
 	const { enhance, form, constraints } = disciplineForm;
 </script>
 
-<Sheet.Root>
+<Sheet.Root bind:open={sheetOpen}>
 	<Sheet.Trigger class="mt-2">
 		<Button variant="outline">Diszipline hinzufügen</Button>
 	</Sheet.Trigger>

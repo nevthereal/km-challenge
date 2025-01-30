@@ -127,6 +127,20 @@
       "when": 1738165099487,
       "tag": "0017_yellow_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1738267471456,
+      "tag": "0018_absent_skaar",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1738267503020,
+      "tag": "0019_premium_tomas",
+      "breakpoints": true
     }
   ]
 }

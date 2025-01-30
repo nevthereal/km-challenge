@@ -89,6 +89,9 @@
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Einladungslink generieren</Dialog.Title>
+				<Dialog.Description
+					>Diese Aktion macht alle alten Einladungscodes ungültig</Dialog.Description
+				>
 			</Dialog.Header>
 			{#if !inviteCode}
 				<Button type="submit" form="generateForm" variant="outline"><Link /> Generieren</Button>
@@ -99,7 +102,6 @@
 						onclick={async () => {
 							await navigator.clipboard.writeText(inviteText);
 							toast.success('Link in die Zwischenablage kopiert');
-							Dialog.Close;
 						}}
 						variant="outline">Kopieren</Button
 					>

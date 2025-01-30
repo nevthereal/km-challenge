@@ -61,6 +61,8 @@ export const actions: Actions = {
 		const user = getUser(locals, url.pathname);
 		if (!user.superUser) return error(401, 'Nicht erlaubt.');
 
+		await db.delete(inviteCode).where(eq(inviteCode.clubId, params.clubId));
+
 		const [{ code }] = await db
 			.insert(inviteCode)
 			.values({

@@ -11,7 +11,7 @@
 <h1 class="h1">Deine Clubs</h1>
 
 {#if data.superUser}
-	<Button size="lg" href="/clubs/create" class="mb-2">Club erstellen</Button>
+	<Button size="lg" href="/clubs/create" class="my-4">Club erstellen</Button>
 {/if}
 
 <div class="mb-6 grid gap-6 md:grid-cols-4">

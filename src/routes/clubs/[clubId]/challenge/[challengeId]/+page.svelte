@@ -1,12 +1,16 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table/index';
+	import * as Table from '$lib/components/ui/table';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { prettyDate } from '$lib/utils';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { superForm } from 'sveltekit-superforms';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import { Trash2 } from 'lucide-svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
+
+	let dialogOpen = $state(false);
 
 	const { challenge } = $derived(data);
 	const { currentUserChallenge } = data;
@@ -51,8 +55,35 @@
 			<h2 class="h2">Diszipline:</h2>
 			<ul>
 				{#each challenge.disciplines as d}
-					<li>
-						{d.name}: {d.factor}
+					<li class="mb-2 flex justify-between gap-2">
+						<span>
+							{d.name} (x{d.factor})
+						</span>
+						<AlertDialog.Root bind:open={dialogOpen}>
+							<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
+							<AlertDialog.Content>
+								<AlertDialog.Header>
+									<AlertDialog.Title>Disziplin "{d.name}" löschen?</AlertDialog.Title>
+									<AlertDialog.Description>
+										Diese Aktion wird jeden Eintrag mit der gelöschten Disziplin auch löschen. Diese
+										Aktion kann nicht rückgängig gemacht werden.
+									</AlertDialog.Description>
+								</AlertDialog.Header>
+								<AlertDialog.Footer>
+									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+									<AlertDialog.Action
+										onclick={async () => {
+											await fetch(`/api/delete-discipline?id=${d.id}`, {
+												method: 'post'
+											});
+											dialogOpen = !dialogOpen;
+											invalidateAll();
+										}}
+										class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+									>
+								</AlertDialog.Footer>
+							</AlertDialog.Content>
+						</AlertDialog.Root>
 					</li>
 				{:else}
 					<p class="text-destructive font-medium">Keine diszipline</p>

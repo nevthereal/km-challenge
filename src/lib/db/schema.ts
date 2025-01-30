@@ -101,7 +101,7 @@ export const verification = pgTable('verification', {
 	updatedAt: timestamp()
 });
 
-export const inviteCode = pgTable('code', {
+export const inviteCode = pgTable('invite_code', {
 	code: text()
 		.primaryKey()
 		.$defaultFn(() => generateNumber(6)),

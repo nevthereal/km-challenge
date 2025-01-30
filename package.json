@@ -26,7 +26,7 @@
 		"@sveltejs/kit": "^2.15.2",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.78",
+		"bits-ui": "1.0.0-next.80",
 		"clsx": "^2.1.1",
 		"daisyui": "^4.12.23",
 		"drizzle-kit": "^0.30.1",

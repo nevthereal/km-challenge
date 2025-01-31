@@ -4,31 +4,36 @@
 	import { LogIn } from 'lucide-svelte';
 	import * as Table from '$lib/components/ui/table';
 	import { prettyDate } from '$lib/utils';
+	import StartPage from '$lib/components/StartPage.svelte';
 
 	let { data } = $props();
 
 	let { challengesWithLeaderboards: challenges } = data;
 </script>
 
-{#each challenges as challenge}
-	{#await challenge then challenge}
-		<div>
-			<h2 class="h2">{challenge.name}</h2>
-			{#each challenge.leaderboard as competitor, idx}
-				<Table.Row>
-					<Table.Cell class="font-medium">{idx + 1}</Table.Cell>
-					<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
-					<Table.Cell>{competitor.score}</Table.Cell>
-					<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
-					<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
-				</Table.Row>
-			{:else}
-				<Table.Row>
-					<Table.Cell colspan={5} class="text-center">
-						<p class="text-lg font-bold text-destructive">No entries yet</p>
-					</Table.Cell>
-				</Table.Row>
-			{/each}
-		</div>
-	{/await}
-{/each}
+{#if challenges}
+	{#each challenges as challenge}
+		{#await challenge then challenge}
+			<div>
+				<h2 class="h2">{challenge.name}</h2>
+				{#each challenge.leaderboard as competitor, idx}
+					<Table.Row>
+						<Table.Cell class="font-medium">{idx + 1}</Table.Cell>
+						<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
+						<Table.Cell>{competitor.score}</Table.Cell>
+						<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
+						<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
+					</Table.Row>
+				{:else}
+					<Table.Row>
+						<Table.Cell colspan={5} class="text-center">
+							<p class="text-lg font-bold text-destructive">No entries yet</p>
+						</Table.Cell>
+					</Table.Row>
+				{/each}
+			</div>
+		{/await}
+	{/each}
+{:else}
+	<StartPage />
+{/if}

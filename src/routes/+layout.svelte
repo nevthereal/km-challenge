@@ -16,7 +16,7 @@
 <ModeWatcher defaultMode="system" />
 <nav class="flex items-center justify-between p-6">
 	<div class="flex items-center gap-4">
-		<a href="/" class="text-4xl font-bold">Home</a>
+		<a href="/" class="text-4xl font-bold">Startseite</a>
 		<div class="contents">
 			<a href="/clubs" class="text-lg font-semibold">Clubs</a>
 		</div>

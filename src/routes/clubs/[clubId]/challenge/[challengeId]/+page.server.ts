@@ -1,7 +1,7 @@
-import { db } from '$lib/db';
-import { and, eq, sql, desc } from 'drizzle-orm';
+import { db, getLeaderBoard } from '$lib/db';
+import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { challenge, challengeMember, discipline, entry, user } from '$lib/db/schema';
+import { challenge, challengeMember, discipline, entry } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -50,21 +50,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	const newEntryForm = await superValidate(zod(newEntry));
 
-	const leaderboard = await db
-		.select({
-			username: user.name,
-			score: sql<number>`round(sum(${entry.amount} * ${discipline.factor}), 2)`.as('score'),
-			totalEntries: sql<number>`count(${entry.id})`.as('total_entries'),
-			lastActivity: sql<Date>`max(${entry.date})`.as('last_activity'),
-			role: user.role,
-			gender: user.gender
-		})
-		.from(entry)
-		.innerJoin(discipline, eq(entry.disciplineId, discipline.id))
-		.innerJoin(user, eq(entry.userId, user.id))
-		.where(eq(entry.challengeId, challengeId))
-		.groupBy(user.id)
-		.orderBy(desc(sql`score`));
+	const leaderboard = getLeaderBoard(challengeId);
 
 	return {
 		challenge: qchallenge,

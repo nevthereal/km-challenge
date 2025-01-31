@@ -1,4 +1,4 @@
-import { db } from '$lib/db';
+import { db, getLeaderBoard } from '$lib/db';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -12,7 +12,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 			)
 	});
 
-	console.log(activeChallenges);
+	const challengesWithLeaderboards = activeChallenges.map(async (c) => {
+		const leaderboard = await getLeaderBoard(c.id);
+		return { ...c, leaderboard };
+	});
 
-	return { user, activeChallenges };
+	return { user, challengesWithLeaderboards };
 };

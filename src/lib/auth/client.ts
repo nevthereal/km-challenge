@@ -1,6 +1,6 @@
-import { dev } from '$app/environment';
+import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 import { createAuthClient } from 'better-auth/svelte';
 
 export const authClient = createAuthClient({
-	baseURL: dev ? 'http://localhost:5173' : 'https://km.nevillebrem.com'
+	baseURL: PUBLIC_BETTER_AUTH_URL
 });

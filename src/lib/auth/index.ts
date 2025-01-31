@@ -2,8 +2,10 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../db';
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
+import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 
 export const auth = betterAuth({
+	baseURL: PUBLIC_BETTER_AUTH_URL,
 	database: drizzleAdapter(db, {
 		provider: 'pg'
 	}),

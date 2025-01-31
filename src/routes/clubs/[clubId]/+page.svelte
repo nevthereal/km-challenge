@@ -10,7 +10,7 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Link } from 'lucide-svelte';
+	import { ArrowLeft, Link } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 
@@ -39,6 +39,12 @@
 		`Trete dem Club ${qClub.name} bei mit dem Code ${inviteCode} oder über diesen Link: ${inviteUrl}`
 	);
 </script>
+
+<nav class="mb-4">
+	<a href="/clubs" class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+		><ArrowLeft strokeWidth={3} /> Alle Clubs</a
+	>
+</nav>
 
 <h1 class="h1">{qClub.name}</h1>
 <NiceList className="mb-4" {listItems} />

@@ -5,7 +5,7 @@
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
@@ -15,6 +15,14 @@
 	const { challenge } = $derived(data);
 	const { currentUserChallenge } = data;
 </script>
+
+<nav class="mb-4">
+	<a
+		href={`/clubs/${challenge.clubId}`}
+		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+		><ArrowLeft strokeWidth={3} /> Zum Club</a
+	>
+</nav>
 
 <h1 class="h1">Challenge: {challenge.name}</h1>
 {#if currentUserChallenge}

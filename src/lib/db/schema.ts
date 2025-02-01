@@ -1,65 +1,99 @@
 import { generateCode, generateNumber } from '@nevthereal/random-utils';
-import { pgTable, text, timestamp, boolean, pgEnum, numeric, date } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	text,
+	timestamp,
+	boolean,
+	pgEnum,
+	numeric,
+	date,
+	index
+} from 'drizzle-orm/pg-core';
 
-export const challenge = pgTable('challenge', {
-	id: text()
-		.primaryKey()
-		.$defaultFn(() => generateCode(6)),
-	name: text().notNull(),
-	startsAt: timestamp().notNull(),
-	endsAt: timestamp().notNull(),
-	creatorId: text()
-		.references(() => user.id, { onDelete: 'cascade' })
-		.notNull(),
-	clubId: text()
-		.references(() => club.id, { onDelete: 'cascade' })
-		.notNull()
-});
+export const challenge = pgTable(
+	'challenge',
+	{
+		id: text()
+			.primaryKey()
+			.$defaultFn(() => generateCode(6)),
+		name: text().notNull(),
+		startsAt: timestamp().notNull(),
+		endsAt: timestamp().notNull(),
+		creatorId: text()
+			.references(() => user.id, { onDelete: 'cascade' })
+			.notNull(),
+		clubId: text()
+			.references(() => club.id, { onDelete: 'cascade' })
+			.notNull()
+	},
+	(table) => [
+		index('creator_id_idx').on(table.creatorId),
+		index('club_id_idx').on(table.clubId),
+		index('date_range_idx').on(table.startsAt, table.endsAt)
+	]
+);
 
-export const discipline = pgTable('discipline', {
-	id: text()
-		.primaryKey()
-		.$defaultFn(() => generateCode(10)),
-	name: text().notNull(),
-	factor: numeric({ scale: 1 }).notNull(),
-	challengeId: text().references(() => challenge.id, { onDelete: 'cascade' })
-});
+export const discipline = pgTable(
+	'discipline',
+	{
+		id: text()
+			.primaryKey()
+			.$defaultFn(() => generateCode(10)),
+		name: text().notNull(),
+		factor: numeric({ scale: 1 }).notNull(),
+		challengeId: text().references(() => challenge.id, { onDelete: 'cascade' })
+	},
+	(table) => [index('discipline_challenge_id_idx').on(table.challengeId)]
+);
 
 export const roles = pgEnum('role', ['Coach', 'U15', 'U17', 'U19']);
 export const gender = pgEnum('gender', ['M', 'F']);
 
-export const entry = pgTable('entry', {
-	id: text()
-		.primaryKey()
-		.$defaultFn(() => generateCode(16)),
-	disciplineId: text()
-		.references(() => discipline.id, { onDelete: 'cascade' })
-		.notNull(),
-	challengeId: text()
-		.references(() => challenge.id, { onDelete: 'cascade' })
-		.notNull(),
-	userId: text()
-		.references(() => user.id, { onDelete: 'cascade' })
-		.notNull(),
-	date: date({ mode: 'date' }).notNull(),
-	amount: numeric({ scale: 2 }).notNull(),
-	createdAt: timestamp()
-		.notNull()
-		.$defaultFn(() => new Date())
-});
+export const entry = pgTable(
+	'entry',
+	{
+		id: text()
+			.primaryKey()
+			.$defaultFn(() => generateCode(16)),
+		disciplineId: text()
+			.references(() => discipline.id, { onDelete: 'cascade' })
+			.notNull(),
+		challengeId: text()
+			.references(() => challenge.id, { onDelete: 'cascade' })
+			.notNull(),
+		userId: text()
+			.references(() => user.id, { onDelete: 'cascade' })
+			.notNull(),
+		date: date({ mode: 'date' }).notNull(),
+		amount: numeric({ scale: 2 }).notNull(),
+		createdAt: timestamp()
+			.notNull()
+			.$defaultFn(() => new Date())
+	},
+	(table) => [
+		index('entry_discipline_id_idx').on(table.disciplineId),
+		index('entry_challenge_id_idx').on(table.challengeId),
+		index('entry_user_id_idx').on(table.userId),
+		index('entry_date_idx').on(table.date)
+	]
+);
 
-export const user = pgTable('user', {
-	id: text().primaryKey(),
-	name: text().notNull(),
-	email: text().notNull().unique(),
-	emailVerified: boolean().notNull(),
-	image: text(),
-	createdAt: timestamp().notNull(),
-	updatedAt: timestamp().notNull(),
-	role: roles(),
-	gender: gender(),
-	admin: boolean().default(false)
-});
+export const user = pgTable(
+	'user',
+	{
+		id: text().primaryKey(),
+		name: text().notNull(),
+		email: text().notNull().unique(),
+		emailVerified: boolean().notNull(),
+		image: text(),
+		createdAt: timestamp().notNull(),
+		updatedAt: timestamp().notNull(),
+		role: roles(),
+		gender: gender(),
+		admin: boolean().default(false)
+	},
+	(table) => [index('user_email_idx').on(table.email)]
+);
 
 export const session = pgTable('session', {
 	id: text().primaryKey(),
@@ -117,41 +151,62 @@ export const club = pgTable('club', {
 	name: text().notNull()
 });
 
-export const clubAdmin = pgTable('club_admin', {
-	id: text()
-		.notNull()
-		.primaryKey()
-		.$defaultFn(() => generateCode(20)),
-	userId: text()
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	clubId: text()
-		.notNull()
-		.references(() => club.id, { onDelete: 'cascade' })
-});
+export const clubAdmin = pgTable(
+	'club_admin',
+	{
+		id: text()
+			.notNull()
+			.primaryKey()
+			.$defaultFn(() => generateCode(20)),
+		userId: text()
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		clubId: text()
+			.notNull()
+			.references(() => club.id, { onDelete: 'cascade' })
+	},
+	(table) => [
+		index('club_admin_user_id_idx').on(table.userId),
+		index('club_admin_club_id_idx').on(table.clubId)
+	]
+);
 
-export const clubMember = pgTable('club_member', {
-	id: text()
-		.notNull()
-		.primaryKey()
-		.$defaultFn(() => generateCode(20)),
-	userId: text()
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	clubId: text()
-		.notNull()
-		.references(() => club.id, { onDelete: 'cascade' })
-});
+export const clubMember = pgTable(
+	'club_member',
+	{
+		id: text()
+			.notNull()
+			.primaryKey()
+			.$defaultFn(() => generateCode(20)),
+		userId: text()
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		clubId: text()
+			.notNull()
+			.references(() => club.id, { onDelete: 'cascade' })
+	},
+	(table) => [
+		index('club_member_user_id_idx').on(table.userId),
+		index('club_member_club_id_idx').on(table.clubId)
+	]
+);
 
-export const challengeMember = pgTable('challenge_member', {
-	id: text()
-		.notNull()
-		.primaryKey()
-		.$defaultFn(() => generateCode(20)),
-	userId: text()
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	challengeId: text()
-		.notNull()
-		.references(() => challenge.id, { onDelete: 'cascade' })
-});
+export const challengeMember = pgTable(
+	'challenge_member',
+	{
+		id: text()
+			.notNull()
+			.primaryKey()
+			.$defaultFn(() => generateCode(20)),
+		userId: text()
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		challengeId: text()
+			.notNull()
+			.references(() => challenge.id, { onDelete: 'cascade' })
+	},
+	(table) => [
+		index('challenge_member_user_id_idx').on(table.userId),
+		index('challenge_member_challenge_id_idx').on(table.challengeId)
+	]
+);

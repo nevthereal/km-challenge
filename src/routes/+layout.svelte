@@ -6,6 +6,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { page } from '$app/state';
 
 	let { children, data } = $props();
 
@@ -41,7 +42,7 @@
 							class="m-2"
 							variant="destructive"
 							onclick={async () => {
-								await authClient.signOut();
+								await authClient(page.url.origin).signOut();
 								location.reload();
 							}}
 							><LogOut /><span> Ausloggen </span>

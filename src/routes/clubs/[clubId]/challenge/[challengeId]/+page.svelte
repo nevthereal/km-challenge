@@ -28,7 +28,7 @@
 	<div class="mt-6 flex gap-8 p-6 max-md:flex-col-reverse">
 		<div class="flex-grow">
 			<h2 class="h2">Rangliste:</h2>
-			<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
+			<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 			<Leaderboard {leaderboard} />
 		</div>
 		<div>

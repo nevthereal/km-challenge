@@ -7,7 +7,7 @@
 	import { Input } from './ui/input';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { newEntry } from '$lib/zod';
-	import type { discipline } from '$lib/db/schema';
+	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
 	import { cn } from '$lib/utils';
 	import {
@@ -20,13 +20,13 @@
 	import { Calendar } from './ui/calendar';
 	import { toast } from 'svelte-sonner';
 
-	let {
-		formData,
-		disciplines
-	}: {
+	interface Props {
 		formData: SuperValidated<Infer<typeof newEntry>>;
-		disciplines: (typeof discipline.$inferSelect)[];
-	} = $props();
+		disciplines: (typeof disciplineTable.$inferSelect)[];
+		challenge: typeof challengeTable.$inferSelect;
+	}
+
+	let { formData, disciplines, challenge }: Props = $props();
 
 	let dialogOpen = $state(false);
 
@@ -36,7 +36,8 @@
 		},
 		onUpdated: () => {
 			toast.success('Eintrag hinzugefügt');
-		}
+		},
+		id: `entry-${challenge.id}`
 	});
 
 	const { enhance, form, constraints } = entryForm;
@@ -48,10 +49,10 @@
 	let value = $state<DateValue | undefined>();
 
 	$effect(() => {
-		value = $form.date ? parseDate($form.date.toString()) : undefined;
+		value = $form.date ? parseDate($form.date.toString()) : today(getLocalTimeZone());
 	});
 
-	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
+	let placeholder = $state<DateValue>();
 
 	function getDiscipline(id: string) {
 		let qDiscipline = disciplines.find((d) => d.id === id);
@@ -68,7 +69,11 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
-			<form use:enhance action="?/newEntry" method="post">
+			<form
+				use:enhance
+				action={`/clubs/${challenge.clubId}/challenge/${challenge.id}?/newEntry`}
+				method="post"
+			>
 				<div class="flex gap-4">
 					<Form.Field form={entryForm} name="amount">
 						<Form.Control>

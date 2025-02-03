@@ -1,13 +1,10 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { prettyDate } from '$lib/utils';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 
 	let { data } = $props();

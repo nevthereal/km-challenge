@@ -28,7 +28,7 @@
 		{:else}
 			<Table.Row>
 				<Table.Cell colspan={5} class="text-center">
-					<p class="text-lg font-bold text-destructive">No entries yet</p>
+					<p class="text-lg font-bold text-destructive">Keine Einträge</p>
 				</Table.Cell>
 			</Table.Row>
 		{/each}

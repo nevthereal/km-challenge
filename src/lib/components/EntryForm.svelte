@@ -49,10 +49,10 @@
 	let value = $state<DateValue | undefined>();
 
 	$effect(() => {
-		value = $form.date ? parseDate($form.date.toString()) : today(getLocalTimeZone());
+		value = $form.date ? parseDate($form.date.toString()) : undefined;
 	});
 
-	let placeholder = $state<DateValue>();
+	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
 
 	function getDiscipline(id: string) {
 		let qDiscipline = disciplines.find((d) => d.id === id);
@@ -104,7 +104,7 @@
 											!value && 'text-muted-foreground'
 										)}
 									>
-										{value ? df.format(value.toDate(getLocalTimeZone())) : 'Pick a date'}
+										{value ? df.format(value.toDate(getLocalTimeZone())) : 'Datum wählen'}
 										<CalendarIcon class="ml-auto size-4 opacity-50" />
 									</Popover.Trigger>
 									<Popover.Content class="w-auto p-0" side="top">
@@ -112,7 +112,8 @@
 											type="single"
 											value={value as DateValue}
 											bind:placeholder
-											calendarLabel="Date of birth"
+											maxValue={today(getLocalTimeZone())}
+											calendarLabel="Tag des Eintrags"
 											onValueChange={(v) => {
 												if (v) {
 													$form.date = v.toString();

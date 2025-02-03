@@ -10,7 +10,7 @@ const schema = z.object({
 });
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	const form = await superValidate(zod(schema));
 

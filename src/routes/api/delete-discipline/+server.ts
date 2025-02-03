@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	if (!user.superUser) return error(401, 'Not an Admin');
 

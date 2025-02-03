@@ -10,7 +10,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 	const qClub = await db.query.club.findFirst({
 		where: eq(club.id, params.clubId),
 		with: {
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 export const actions: Actions = {
 	createChallenge: async ({ locals, request, url, params }) => {
-		const user = getUser(locals, url.pathname);
+		const user = getUser({ locals, redirectUrl: url.pathname });
 
 		const form = await superValidate(request, zod(createProjectSchema));
 
@@ -58,7 +58,7 @@ export const actions: Actions = {
 		redirect(302, `/clubs/${params.clubId}/challenge/${challengeId}`);
 	},
 	getCode: async ({ locals, params, url }) => {
-		const user = getUser(locals, url.pathname);
+		const user = getUser({ locals, redirectUrl: url.pathname });
 		if (!user.superUser) return error(401, 'Nicht erlaubt.');
 
 		await db.delete(inviteCode).where(eq(inviteCode.clubId, params.clubId));

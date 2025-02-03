@@ -9,7 +9,7 @@ import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const currentUser = getUser(locals, url.pathname);
+	const currentUser = getUser({ locals, redirectUrl: url.pathname });
 	const { challengeId } = params;
 
 	if (!currentUser.completedProfile) return redirect(302, '/profile/edit');
@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 export const actions: Actions = {
 	addDiscipline: async ({ request, params, locals, url }) => {
-		const user = getUser(locals, url.pathname);
+		const user = getUser({ locals, redirectUrl: url.pathname });
 
 		if (!user.superUser) return error(401);
 
@@ -81,7 +81,7 @@ export const actions: Actions = {
 		}
 	},
 	newEntry: async ({ request, params, locals, url }) => {
-		const user = getUser(locals, url.pathname);
+		const user = getUser({ locals, redirectUrl: url.pathname });
 		const form = await superValidate(request, zod(newEntry));
 
 		if (!form.valid) return fail(400, { form });

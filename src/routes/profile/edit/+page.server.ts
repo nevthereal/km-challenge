@@ -10,7 +10,7 @@ import { user } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	const form = await superValidate(zod(userSetup), {
 		defaults: {
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
-		const currentUser = getUser(locals, url.pathname);
+		const currentUser = getUser({ locals, redirectUrl: url.pathname });
 
 		const form = await superValidate(request, zod(userSetup));
 

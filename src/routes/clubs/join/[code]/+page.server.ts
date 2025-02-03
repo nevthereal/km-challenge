@@ -6,7 +6,7 @@ import { clubMember, inviteCode } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	const qClub = await db.query.inviteCode.findFirst({
 		where: eq(inviteCode.code, params.code)

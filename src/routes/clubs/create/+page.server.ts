@@ -12,7 +12,7 @@ const clubSchema = z.object({
 });
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	const { superUser } = user;
 
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
-		const user = getUser(locals, url.pathname);
+		const user = getUser({ locals, redirectUrl: url.pathname });
 
 		const { superUser } = user;
 

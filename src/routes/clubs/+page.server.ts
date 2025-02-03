@@ -5,7 +5,7 @@ import { clubMember } from '$lib/db/schema';
 import { getUser } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const user = getUser(locals, url.pathname);
+	const user = getUser({ locals, redirectUrl: url.pathname });
 
 	const { superUser } = user;
 

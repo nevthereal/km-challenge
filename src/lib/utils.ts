@@ -10,7 +10,7 @@ export function prettyDate(date: Date) {
 	return Intl.DateTimeFormat('de', { dateStyle: 'long' }).format(date);
 }
 
-export function getUser(locals: App.Locals, redirectUrl: string) {
+export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectUrl: string }) {
 	const { user } = locals;
 
 	if (!user) return redirect(302, `/signin?redirect=${redirectUrl}`);

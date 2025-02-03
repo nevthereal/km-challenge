@@ -8,12 +8,13 @@
 	import { ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import Leaderboard from '$lib/components/Leaderboard.svelte';
 
 	let { data } = $props();
 
 	let dialogOpen = $state(false);
 
-	const { challenge } = $derived(data);
+	const { challenge, leaderboard } = $derived(data);
 	const { currentUserChallenge } = data;
 </script>
 
@@ -31,44 +32,7 @@
 		<div class="flex-grow">
 			<h2 class="h2">Rangliste:</h2>
 			<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
-			<Table.Root class="mt-8">
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>Rang</Table.Head>
-						<Table.Head>Name</Table.Head>
-						<Table.Head>Punktzahl</Table.Head>
-						<Table.Head>Geschlecht / Kategorie</Table.Head>
-						<Table.Head>Zuletzt aktiv</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#await data.leaderboard}
-						{#each { length: 4 }}
-							<Table.Row>
-								{#each { length: 5 }}
-									<Table.Cell class="text-center"><Skeleton class="h-4 w-full" /></Table.Cell>
-								{/each}
-							</Table.Row>
-						{/each}
-					{:then leaderboard}
-						{#each leaderboard as competitor, idx}
-							<Table.Row>
-								<Table.Cell class="font-medium">{idx + 1}</Table.Cell>
-								<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
-								<Table.Cell>{competitor.score}</Table.Cell>
-								<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
-								<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
-							</Table.Row>
-						{:else}
-							<Table.Row>
-								<Table.Cell colspan={5} class="text-center">
-									<p class="text-lg font-bold text-destructive">No entries yet</p>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					{/await}
-				</Table.Body>
-			</Table.Root>
+			<Leaderboard {leaderboard} />
 		</div>
 		<div>
 			<h2 class="h2">Diszipline:</h2>

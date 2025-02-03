@@ -27,3 +27,5 @@ export async function getLeaderBoard(challengeId: string) {
 		.groupBy(schema.user.id)
 		.orderBy(desc(sql`score`));
 }
+
+export type Leaderboard = Awaited<ReturnType<typeof getLeaderBoard>>;

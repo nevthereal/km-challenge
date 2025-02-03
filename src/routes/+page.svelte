@@ -1,15 +1,23 @@
 <script>
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
+	import { SquareArrowOutUpRight } from 'lucide-svelte';
 
 	let { data } = $props();
 </script>
 
 {#if data.user}
 	<div class="flex flex-col gap-8">
+		<h1 class="h1">Aktive Challenges:</h1>
 		{#each data.challengesWithLeaderboards as challenge}
 			<div class="rounded-md border border-border p-6">
-				<h2 class="h2">{challenge.name}</h2>
+				<a
+					href={`/clubs/${challenge.clubId}/challenge/${challenge.id}`}
+					class="h2 flex items-center gap-2 hover:text-primary"
+				>
+					{challenge.name}
+					<SquareArrowOutUpRight />
+				</a>
 				<EntryForm disciplines={challenge.disciplines} formData={data.newEntryForm} />
 				<!-- TODO: Add challenge ID to form -->
 				<Leaderboard leaderboard={challenge.leaderboard} />

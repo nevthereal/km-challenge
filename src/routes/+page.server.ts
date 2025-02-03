@@ -1,6 +1,6 @@
 import { db, getLeaderBoard } from '$lib/db';
-import { challenge, challengeMember } from '$lib/db/schema';
-import { lte, gte, and, eq } from 'drizzle-orm';
+import { challenge } from '$lib/db/schema';
+import { lte, gte, and } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -20,10 +20,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 		const newEntryForm = await superValidate(zod(newEntry));
 
-		const challengesWithLeaderboards = activeChallenges.map(async (c) => {
-			const leaderboard = await getLeaderBoard(c.id);
+		const challengesWithLeaderboards = activeChallenges.map((c) => {
+			const leaderboard = getLeaderBoard(c.id);
 			return { ...c, leaderboard };
 		});
+
 		return { challengesWithLeaderboards, user, newEntryForm };
 	}
 };

@@ -28,4 +28,4 @@ export async function getLeaderBoard(challengeId: string) {
 		.orderBy(desc(sql`score`));
 }
 
-export type Leaderboard = Awaited<ReturnType<typeof getLeaderBoard>>;
+export type Leaderboard = ReturnType<typeof getLeaderBoard>;

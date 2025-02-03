@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	const newEntryForm = await superValidate(zod(newEntry));
 
-	const leaderboard = await getLeaderBoard(challengeId);
+	const leaderboard = getLeaderBoard(challengeId);
 
 	return {
 		challenge: qchallenge,

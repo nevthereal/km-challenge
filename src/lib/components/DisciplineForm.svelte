@@ -13,8 +13,8 @@
 
 	const disciplineForm = superForm(formData, {
 		dataType: 'json',
-		onSubmit: () => {
-			sheetOpen = !sheetOpen;
+		onResult: ({ result }) => {
+			if (result.type === 'success') sheetOpen = !sheetOpen;
 		}
 	});
 

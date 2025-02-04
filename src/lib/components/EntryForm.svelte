@@ -63,7 +63,7 @@
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>
-	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}
+	<Dialog.Trigger class={cn(buttonVariants({ variant: 'default' }), 'mb-8')}
 		><PlusCircle /> Neuer Eintrag</Dialog.Trigger
 	>
 	<Dialog.Content>

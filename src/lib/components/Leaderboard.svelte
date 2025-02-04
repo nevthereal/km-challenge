@@ -7,7 +7,7 @@
 	let { leaderboard }: { leaderboard: Leaderboard } = $props();
 </script>
 
-<Table.Root class="mt-8">
+<Table.Root>
 	<Table.Header>
 		<Table.Row>
 			<Table.Head>Rang</Table.Head>

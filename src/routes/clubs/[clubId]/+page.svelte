@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SuperUser from '$lib/components/SuperUser.svelte';
 	import { toast } from 'svelte-sonner';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { superForm } from 'sveltekit-superforms';
@@ -49,7 +50,7 @@
 <h1 class="h1">{qClub.name}</h1>
 <NiceList className="mb-4" {listItems} />
 
-{#if data.user.superUser}
+<SuperUser user={data.user}>
 	<Sheet.Root>
 		<Sheet.Trigger class={buttonVariants()}>Challenge erstellen</Sheet.Trigger>
 		<Sheet.Content>
@@ -115,7 +116,7 @@
 			{/if}
 		</Dialog.Content>
 	</Dialog.Root>
-{/if}
+</SuperUser>
 
 <div class="mt-6 grid gap-4 md:grid-cols-3">
 	{#each qClub.challenges as challenge}

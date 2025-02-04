@@ -7,6 +7,7 @@
 	import { ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
+	import SuperUser from '$lib/components/SuperUser.svelte';
 
 	let { data } = $props();
 
@@ -43,7 +44,7 @@
 							<span>
 								{d.name} (x{d.factor})
 							</span>
-							{#if data.user.superUser}
+							<SuperUser user={data.user}>
 								<AlertDialog.Root bind:open={dialogOpen}>
 									<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
 									<AlertDialog.Content>
@@ -70,16 +71,16 @@
 										</AlertDialog.Footer>
 									</AlertDialog.Content>
 								</AlertDialog.Root>
-							{/if}
+							</SuperUser>
 						</li>
 					{:else}
 						<p class="text-destructive font-medium">Keine diszipline</p>
 					{/each}
 				</ul>
 
-				{#if data.user.superUser}
+				<SuperUser user={data.user}>
 					<DisciplineForm formData={data.addDisciplineForm} />
-				{/if}
+				</SuperUser>
 			</div>
 		</div>
 	{:else}

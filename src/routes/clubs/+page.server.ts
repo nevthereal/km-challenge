@@ -7,8 +7,6 @@ import { getUser } from '$lib/utils';
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = getUser({ locals, redirectUrl: url.pathname });
 
-	const { superUser } = user;
-
 	const usersClubs = await db.query.clubMember.findMany({
 		where: eq(clubMember.userId, user.id),
 		with: {
@@ -21,5 +19,5 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 	});
 
-	return { usersClubs, superUser };
+	return { usersClubs, user };
 };

@@ -5,7 +5,7 @@
 	import * as Form from './ui/form';
 	import * as Select from './ui/select';
 	import { Input } from './ui/input';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { newEntry } from '$lib/zod';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
@@ -31,11 +31,11 @@
 	let dialogOpen = $state(false);
 
 	const entryForm = superForm(formData, {
-		onSubmit: () => {
-			dialogOpen = !dialogOpen;
+		onResult: ({ result }) => {
+			if (result.type === 'success') dialogOpen = !dialogOpen;
 		},
-		onUpdated: () => {
-			toast.success('Eintrag hinzugefügt');
+		onUpdated: ({ form }) => {
+			if (form.valid) toast.success('Eintrag hinzugefügt');
 		},
 		id: `entry-${challenge.id}`
 	});
@@ -49,10 +49,14 @@
 	let value = $state<DateValue | undefined>();
 
 	$effect(() => {
+		value = today(getLocalTimeZone());
+	});
+
+	$effect(() => {
 		value = $form.date ? parseDate($form.date.toString()) : undefined;
 	});
 
-	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
+	let placeholder = $state<DateValue>();
 
 	function getDiscipline(id: string) {
 		let qDiscipline = disciplines.find((d) => d.id === id);
@@ -69,6 +73,7 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
+			<!-- <SuperDebug data={$form} /> -->
 			<form
 				use:enhance
 				action={`/clubs/${challenge.clubId}/challenge/${challenge.id}?/newEntry`}

@@ -20,7 +20,7 @@ export const challenge = pgTable(
 		startsAt: timestamp().notNull(),
 		endsAt: timestamp().notNull(),
 		creatorId: text()
-			.references(() => user.id, { onDelete: 'cascade' })
+			.references(() => user.id, { onDelete: 'restrict' })
 			.notNull(),
 		clubId: text()
 			.references(() => club.id, { onDelete: 'cascade' })
@@ -57,9 +57,7 @@ export const entry = pgTable(
 		id: text()
 			.primaryKey()
 			.$defaultFn(() => generateCode(16)),
-		disciplineId: text()
-			.references(() => discipline.id, { onDelete: 'cascade' })
-			.notNull(),
+		disciplineId: text().references(() => discipline.id, { onDelete: 'set null' }),
 		challengeId: text()
 			.references(() => challenge.id, { onDelete: 'cascade' })
 			.notNull(),

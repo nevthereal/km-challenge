@@ -12,16 +12,17 @@ export async function getLeaderBoard(challengeId: string) {
 	return await db
 		.select({
 			username: schema.user.name,
-			score: sql<number>`round(sum(${schema.entry.amount} * ${schema.discipline.factor}), 2)`.as(
-				'score'
-			),
+			score:
+				sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
+					'score'
+				),
 			totalEntries: sql<number>`count(${schema.entry.id})`.as('total_entries'),
 			lastActivity: sql<Date>`max(${schema.entry.date})`.as('last_activity'),
 			role: schema.user.role,
 			gender: schema.user.gender
 		})
 		.from(schema.entry)
-		.innerJoin(schema.discipline, eq(schema.entry.disciplineId, schema.discipline.id))
+		.leftJoin(schema.discipline, eq(schema.entry.disciplineId, schema.discipline.id))
 		.innerJoin(schema.user, eq(schema.entry.userId, schema.user.id))
 		.where(eq(schema.entry.challengeId, challengeId))
 		.groupBy(schema.user.id)

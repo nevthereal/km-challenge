@@ -11,12 +11,14 @@
 		<h1 class="h1">Aktive Challenges:</h1>
 		{#each data.challengesWithLeaderboards as challenge}
 			<div class="rounded-md border border-border p-6">
-				<div class="flex justify-between">
+				<div class="flex justify-between gap-4">
 					<a
 						href={`/clubs/${challenge.clubId}/challenge/${challenge.id}`}
-						class="h2 flex items-center gap-2 hover:text-primary"
+						class="flex items-center gap-2 hover:text-primary"
 					>
-						{challenge.name}
+						<span class="w-fit text-2xl font-extrabold">
+							{challenge.name}
+						</span>
 						<SquareArrowOutUpRight />
 					</a>
 					<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />

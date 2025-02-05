@@ -67,8 +67,8 @@
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>
-	<Dialog.Trigger class={cn(buttonVariants({ variant: 'default' }), 'mb-8')}
-		><PlusCircle /> Neuer Eintrag</Dialog.Trigger
+	<Dialog.Trigger class={cn(buttonVariants({ variant: 'default' }), 'max-md:my-auto md:mb-8')}
+		><PlusCircle /> <span class="max-md:hidden">Neuer Eintrag</span></Dialog.Trigger
 	>
 	<Dialog.Content>
 		<Dialog.Header>

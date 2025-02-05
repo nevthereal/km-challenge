@@ -6,12 +6,12 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
-	import { prettyDate } from '$lib/utils';
+	import { cn, prettyDate } from '$lib/utils';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { ArrowLeft, Link } from 'lucide-svelte';
+	import { ArrowLeft, Link, PlusCircle } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 
@@ -52,7 +52,9 @@
 
 <SuperUser user={data.user}>
 	<Sheet.Root>
-		<Sheet.Trigger class={buttonVariants()}>Challenge erstellen</Sheet.Trigger>
+		<Sheet.Trigger class={cn(buttonVariants(), 'max-md:mb-2')}
+			><PlusCircle /> Challenge erstellen</Sheet.Trigger
+		>
 		<Sheet.Content>
 			<Sheet.Header>
 				<form
@@ -91,7 +93,7 @@
 	</Sheet.Root>
 	<Dialog.Root>
 		<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
-			>Einladungslink generieren</Dialog.Trigger
+			><Link /> Einladungslink generieren</Dialog.Trigger
 		>
 		<Dialog.Content>
 			<Dialog.Header>

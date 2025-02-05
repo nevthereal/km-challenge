@@ -16,10 +16,10 @@
 <Toaster />
 <ModeWatcher defaultMode="system" />
 <nav class="flex items-center justify-between p-6">
-	<div class="flex items-baseline gap-4">
+	<div class="flex gap-4">
 		<a href="/" class="text-4xl font-bold">Start</a>
-		<div class="contents">
-			<a href="/clubs" class="text-lg font-semibold">Clubs</a>
+		<div class="flex">
+			<a href="/clubs" class="my-auto text-lg font-semibold">Clubs</a>
 		</div>
 	</div>
 	{#if !session}

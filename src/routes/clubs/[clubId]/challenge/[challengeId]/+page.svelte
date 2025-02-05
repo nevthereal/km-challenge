@@ -29,54 +29,61 @@
 	<h1 class="h1">{challenge.name}</h1>
 	<Separator class="mb-4" />
 	{#if currentUserChallenge}
-		<div class="flex gap-8 max-md:flex-col-reverse">
+		<div class="flex gap-4 max-md:flex-col md:gap-8">
 			<div class="flex-grow">
 				<h2 class="h2 mb-2">Rangliste:</h2>
-				<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
+				<EntryForm
+					hideOnMobile={false}
+					{challenge}
+					disciplines={challenge.disciplines}
+					formData={data.newEntryForm}
+				/>
 				<Leaderboard {leaderboard} />
 			</div>
 			<Separator class="mb-4" orientation="vertical" />
 			<div>
-				<h2 class="h2">Diszipline:</h2>
-				<ul>
-					{#each challenge.disciplines as d}
-						<li class="mb-2 flex justify-between gap-2">
-							<span>
-								{d.name} (x{d.factor})
-							</span>
-							<SuperUser user={data.user}>
-								<AlertDialog.Root bind:open={dialogOpen}>
-									<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
-									<AlertDialog.Content>
-										<AlertDialog.Header>
-											<AlertDialog.Title>Disziplin "{d.name}" löschen?</AlertDialog.Title>
-											<AlertDialog.Description>
-												Diese Aktion wird jeden Eintrag mit der gelöschten Disziplin auch löschen.
-												Diese Aktion kann nicht rückgängig gemacht werden.
-											</AlertDialog.Description>
-										</AlertDialog.Header>
-										<AlertDialog.Footer>
-											<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-											<AlertDialog.Action
-												onclick={async () => {
-													await fetch(`/api/delete-discipline?id=${d.id}`, {
-														method: 'post'
-													});
-													dialogOpen = !dialogOpen;
-													invalidateAll();
-												}}
-												class={buttonVariants({ variant: 'destructive' })}
-												>Continue</AlertDialog.Action
-											>
-										</AlertDialog.Footer>
-									</AlertDialog.Content>
-								</AlertDialog.Root>
-							</SuperUser>
-						</li>
-					{:else}
-						<p class="text-destructive font-medium">Keine diszipline</p>
-					{/each}
-				</ul>
+				<div>
+					<h2 class="h2">Diszipline:</h2>
+					<ul>
+						{#each challenge.disciplines as d}
+							<li class="mb-2 flex justify-between gap-2">
+								<span>
+									{d.name} (x{d.factor})
+								</span>
+								<SuperUser user={data.user}>
+									<AlertDialog.Root bind:open={dialogOpen}>
+										<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
+										<AlertDialog.Content>
+											<AlertDialog.Header>
+												<AlertDialog.Title>Disziplin "{d.name}" löschen?</AlertDialog.Title>
+												<AlertDialog.Description>
+													Diese Aktion wird jeden Eintrag mit der gelöschten Disziplin auch löschen.
+													Diese Aktion kann nicht rückgängig gemacht werden.
+												</AlertDialog.Description>
+											</AlertDialog.Header>
+											<AlertDialog.Footer>
+												<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+												<AlertDialog.Action
+													onclick={async () => {
+														await fetch(`/api/delete-discipline?id=${d.id}`, {
+															method: 'post'
+														});
+														dialogOpen = !dialogOpen;
+														invalidateAll();
+													}}
+													class={buttonVariants({ variant: 'destructive' })}
+													>Continue</AlertDialog.Action
+												>
+											</AlertDialog.Footer>
+										</AlertDialog.Content>
+									</AlertDialog.Root>
+								</SuperUser>
+							</li>
+						{:else}
+							<p class="text-destructive font-medium">Keine diszipline</p>
+						{/each}
+					</ul>
+				</div>
 
 				<SuperUser user={data.user}>
 					<DisciplineForm formData={data.addDisciplineForm} />

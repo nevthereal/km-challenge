@@ -7,7 +7,7 @@
 	let { leaderboard }: { leaderboard: Leaderboard } = $props();
 </script>
 
-<Table.Root>
+<Table.Root class="max-md:portrait:hidden">
 	<Table.Header>
 		<Table.Row>
 			<Table.Head>Rang</Table.Head>
@@ -45,3 +45,6 @@
 		{/await}
 	</Table.Body>
 </Table.Root>
+<p class="my-4 hidden text-center font-mono italic text-destructive max-md:portrait:block">
+	Bildschirm drehen um Tabelle anzuzeigen
+</p>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SuperUser from '$lib/components/SuperUser.svelte';
+	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { toast } from 'svelte-sonner';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { superForm } from 'sveltekit-superforms';
@@ -39,6 +39,8 @@
 	const inviteText = $derived(
 		`Trete dem Club ${qClub.name} bei mit dem Code ${inviteCode} oder über diesen Link: ${inviteUrl}`
 	);
+
+	const isAdmin = data.clubAdmin;
 </script>
 
 <nav class="mb-4 flex">
@@ -50,7 +52,7 @@
 <h1 class="h1">{qClub.name}</h1>
 <NiceList className="mb-4" {listItems} />
 
-<SuperUser user={data.user}>
+<ClubAdmin {isAdmin}>
 	<Sheet.Root>
 		<Sheet.Trigger class={cn(buttonVariants(), 'max-md:mb-2')}
 			><PlusCircle /> Challenge erstellen</Sheet.Trigger
@@ -118,7 +120,7 @@
 			{/if}
 		</Dialog.Content>
 	</Dialog.Root>
-</SuperUser>
+</ClubAdmin>
 
 <div class="mt-6 grid gap-4 md:grid-cols-3">
 	{#each qClub.challenges as challenge}

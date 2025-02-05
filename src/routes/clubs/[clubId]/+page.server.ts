@@ -1,7 +1,7 @@
-import { db } from '$lib/db';
-import { eq } from 'drizzle-orm';
+import { db, checkAdmin } from '$lib/db';
+import { and, eq } from 'drizzle-orm';
 import type { PageServerLoad, Actions } from './$types';
-import { club, challenge, inviteCode } from '$lib/db/schema';
+import { club, challenge, inviteCode, clubMember } from '$lib/db/schema';
 import { error } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { createProjectSchema } from '$lib/zod';
@@ -25,9 +25,18 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	if (!qClub) return error(404, 'Dieser Club existiert nicht');
 
+	if (
+		!(await db.query.clubMember.findFirst({
+			where: and(eq(clubMember.clubId, qClub.id), eq(clubMember.userId, user.id))
+		}))
+	)
+		return redirect(302, '/clubs');
+
 	const createForm = await superValidate(zod(createProjectSchema));
 
-	return { qClub, createForm, user };
+	const clubAdmin = await checkAdmin(params.clubId, user.id);
+
+	return { qClub, createForm, user, clubAdmin };
 };
 
 export const actions: Actions = {

@@ -1,7 +1,7 @@
-import { db, getLeaderBoard } from '$lib/db';
+import { checkAdmin, db, getLeaderBoard } from '$lib/db';
 import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { challenge, challengeMember, discipline, entry } from '$lib/db/schema';
+import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -9,12 +9,12 @@ import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const currentUser = getUser({ locals, redirectUrl: url.pathname });
+	const user = getUser({ locals, redirectUrl: url.pathname });
 	const { challengeId } = params;
 
-	if (!currentUser.completedProfile) return redirect(302, '/profile/edit');
+	if (!user.completedProfile) return redirect(302, '/profile/edit');
 
-	const qchallenge = await db.query.challenge.findFirst({
+	const qChallenge = await db.query.challenge.findFirst({
 		where: eq(challenge.id, challengeId),
 		with: {
 			members: true,
@@ -28,14 +28,17 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 		}
 	});
 
+	if (!qChallenge) return error(404, 'Challenge nicht gefunden');
+
 	const currentUserChallenge = await db.query.challengeMember.findFirst({
-		where: and(
-			eq(challengeMember.challengeId, challengeId),
-			eq(challengeMember.userId, currentUser.id)
-		)
+		where: and(eq(challengeMember.challengeId, challengeId), eq(challengeMember.userId, user.id))
 	});
 
-	if (!qchallenge) return redirect(302, '/challenges');
+	const currentUserClub = await db.query.clubMember.findFirst({
+		where: and(eq(clubMember.clubId, qChallenge.clubId), eq(clubMember.userId, user.id))
+	});
+
+	if (!currentUserClub) return redirect(302, '/clubs');
 
 	const addDisciplineForm = await superValidate(zod(addDisciplines), {
 		defaults: {
@@ -52,13 +55,16 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	const leaderboard = getLeaderBoard(challengeId);
 
+	const clubAdmin = await checkAdmin(params.clubId, user.id);
+
 	return {
-		challenge: qchallenge,
-		user: currentUser,
+		challenge: qChallenge,
+		user: user,
 		addDisciplineForm,
 		newEntryForm,
 		currentUserChallenge,
-		leaderboard
+		leaderboard,
+		clubAdmin
 	};
 };
 

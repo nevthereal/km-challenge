@@ -1,5 +1,4 @@
 <script lang="ts">
-	import SuperUser from '$lib/components/SuperUser.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { PlusCircle } from 'lucide-svelte';
@@ -11,9 +10,9 @@
 
 <h1 class="h1">Deine Clubs</h1>
 
-<SuperUser user={data.user}>
+{#if data.user.superUser}
 	<Button size="lg" href="/clubs/create" class="my-4">Club erstellen</Button>
-</SuperUser>
+{/if}
 
 <div class="mb-6 grid gap-6 md:grid-cols-4">
 	<Card.Root>

@@ -7,7 +7,7 @@
 	import { ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
-	import SuperUser from '$lib/components/SuperUser.svelte';
+	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 
 	let { data } = $props();
 
@@ -15,6 +15,8 @@
 
 	const { challenge, leaderboard } = $derived(data);
 	const { currentUserChallenge } = data;
+
+	const isAdmin = data.clubAdmin;
 </script>
 
 <nav class="mb-4 flex">
@@ -50,7 +52,7 @@
 								<span>
 									{d.name} (x{d.factor})
 								</span>
-								<SuperUser user={data.user}>
+								<ClubAdmin {isAdmin}>
 									<AlertDialog.Root bind:open={dialogOpen}>
 										<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
 										<AlertDialog.Content>
@@ -77,7 +79,7 @@
 											</AlertDialog.Footer>
 										</AlertDialog.Content>
 									</AlertDialog.Root>
-								</SuperUser>
+								</ClubAdmin>
 							</li>
 						{:else}
 							<p class="text-destructive font-medium">Keine diszipline</p>
@@ -85,9 +87,9 @@
 					</ul>
 				</div>
 
-				<SuperUser user={data.user}>
+				<ClubAdmin {isAdmin}>
 					<DisciplineForm formData={data.addDisciplineForm} />
-				</SuperUser>
+				</ClubAdmin>
 			</div>
 		</div>
 	{:else}

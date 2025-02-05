@@ -41,7 +41,9 @@ export const discipline = pgTable(
 			.$defaultFn(() => generateCode(10)),
 		name: text().notNull(),
 		factor: numeric({ scale: 1 }).notNull(),
-		challengeId: text().references(() => challenge.id, { onDelete: 'cascade' })
+		challengeId: text()
+			.references(() => challenge.id, { onDelete: 'cascade' })
+			.notNull()
 	},
 	(table) => [index('discipline_challenge_id_idx').on(table.challengeId)]
 );

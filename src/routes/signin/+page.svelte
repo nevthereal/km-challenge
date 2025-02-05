@@ -8,7 +8,7 @@
 	const redirectUrl = page.url.searchParams.get('redirect');
 </script>
 
-<main class="flex h-[80vh] w-screen items-center justify-center">
+<main class="flex h-[80vh] items-center justify-center">
 	<Button
 		size="lg"
 		onclick={async () => {

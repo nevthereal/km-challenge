@@ -20,5 +20,3 @@ export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectU
 
 	return { ...user, superUser, completedProfile };
 }
-
-export type FullUser = ReturnType<typeof getUser>;

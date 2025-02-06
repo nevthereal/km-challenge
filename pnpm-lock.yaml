@@ -30,8 +30,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       better-auth:
-        specifier: ^1.1.13
-        version: 1.1.13
+        specifier: ^1.1.16
+        version: 1.1.16
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -857,8 +857,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@levischuck/tiny-cbor@0.2.2':
-    resolution: {integrity: sha512-f5CnPw997Y2GQ8FAvtuVVC19FX8mwNNC+1XJcIi16n/LTJifKO6QBgGLgN3YEmqtGMk17SKSuoWES3imJVxAVw==}
+  '@levischuck/tiny-cbor@0.2.8':
+    resolution: {integrity: sha512-Es+ajyTgqHREY9Fch5xPnZIDiTqgZc3dH3XU1/YWn8UsaOD8G8zhyhDib/UYgx31manKa7ZszKaLtcHKcGNchA==}
 
   '@mapbox/node-pre-gyp@2.0.0-rc.0':
     resolution: {integrity: sha512-nhSMNprz3WmeRvd8iUs5JqkKr0Ncx46JtPxM3AhXes84XpSJfmIwKeWXRpsr53S7kqPkQfPhzrMFUxSNb23qSA==}
@@ -874,8 +874,8 @@ packages:
   '@noble/ciphers@0.6.0':
     resolution: {integrity: sha512-mIbq/R9QXk5/cTfESb1OKtyFnk7oc1Om/8onA1158K9/OZUQFDEVy55jVTato+xmp3XX6F6Qh0zz0Nc1AxAlRQ==}
 
-  '@noble/hashes@1.7.0':
-    resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
+  '@noble/hashes@1.7.1':
+    resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
     engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -1055,8 +1055,8 @@ packages:
   '@simplewebauthn/browser@13.1.0':
     resolution: {integrity: sha512-WuHZ/PYvyPJ9nxSzgHtOEjogBhwJfC8xzYkPC+rR/+8chl/ft4ngjiK8kSU5HtRJfczupyOh33b25TjYbvwAcg==}
 
-  '@simplewebauthn/server@13.1.0':
-    resolution: {integrity: sha512-vGz9sgzoN0c0IySnpdG0TG0B71GM75basrlTpXHDAw8tQ/JUH5O73x6s3UXzDWHlv7d2E4Hy4aX5ugoHkW4udg==}
+  '@simplewebauthn/server@13.1.1':
+    resolution: {integrity: sha512-1hsLpRHfSuMB9ee2aAdh0Htza/X3f4djhYISrggqGe3xopNjOcePiSDkDDoPzDYaaMCrbqGP1H2TYU7bgL9PmA==}
     engines: {node: '>=20.0.0'}
 
   '@sinclair/typebox@0.34.13':
@@ -1284,8 +1284,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  better-auth@1.1.13:
-    resolution: {integrity: sha512-Tt4QYGFKuAFTjJx6RyXzC50KNyh96/QeVT2QxJRnXiEmp6wGEGmua9iRb5XL3bSnBu8oepAE7xlLF/AvfkEZig==}
+  better-auth@1.1.16:
+    resolution: {integrity: sha512-Xc5pxafKZw4QVU8WYfkV2z4Hd8KCXXbphrgOpe2gA/EfanysLBhE1G/F7cEi5e0bW2pGR+vw6gf0ARHA7VFihg==}
 
   better-call@0.3.3:
     resolution: {integrity: sha512-N4lDVm0NGmFfDJ0XMQ4O83Zm/3dPlvIQdxvwvgSLSkjFX5PM4GUYSVAuxNzXN27QZMHDkrJTWUqxBrm4tPC3eA==}
@@ -3176,7 +3176,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@levischuck/tiny-cbor@0.2.2': {}
+  '@levischuck/tiny-cbor@0.2.8': {}
 
   '@mapbox/node-pre-gyp@2.0.0-rc.0':
     dependencies:
@@ -3201,7 +3201,7 @@ snapshots:
 
   '@noble/ciphers@0.6.0': {}
 
-  '@noble/hashes@1.7.0': {}
+  '@noble/hashes@1.7.1': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -3357,10 +3357,10 @@ snapshots:
 
   '@simplewebauthn/browser@13.1.0': {}
 
-  '@simplewebauthn/server@13.1.0':
+  '@simplewebauthn/server@13.1.1':
     dependencies:
       '@hexagon/base64': 1.1.28
-      '@levischuck/tiny-cbor': 0.2.2
+      '@levischuck/tiny-cbor': 0.2.8
       '@peculiar/asn1-android': 2.3.15
       '@peculiar/asn1-ecc': 2.3.15
       '@peculiar/asn1-rsa': 2.3.15
@@ -3658,20 +3658,19 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  better-auth@1.1.13:
+  better-auth@1.1.16:
     dependencies:
       '@better-auth/utils': 0.2.3
       '@better-fetch/fetch': 1.1.12
       '@noble/ciphers': 0.6.0
-      '@noble/hashes': 1.7.0
+      '@noble/hashes': 1.7.1
       '@simplewebauthn/browser': 13.1.0
-      '@simplewebauthn/server': 13.1.0
+      '@simplewebauthn/server': 13.1.1
       better-call: 0.3.3
       defu: 6.1.4
       jose: 5.9.6
       kysely: 0.27.5
       nanostores: 0.11.3
-      uncrypto: 0.1.3
       zod: 3.24.1
 
   better-call@0.3.3:

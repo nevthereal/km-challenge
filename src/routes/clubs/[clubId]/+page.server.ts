@@ -59,7 +59,6 @@ export const actions: Actions = {
 				name,
 				startsAt: new Date(startsAt),
 				endsAt: new Date(endsAt),
-				creatorId: user.id,
 				clubId: params.clubId
 			})
 			.returning({ id: challenge.id });

@@ -30,10 +30,6 @@ export const challengeRelation = relations(challenge, ({ many, one }) => ({
 	entries: many(entry),
 	disciplines: many(discipline),
 	members: many(challengeMember),
-	creator: one(user, {
-		fields: [challenge.creatorId],
-		references: [user.id]
-	}),
 	club: one(club, {
 		fields: [challenge.clubId],
 		references: [club.id]

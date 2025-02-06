@@ -19,15 +19,11 @@ export const challenge = pgTable(
 		name: text().notNull(),
 		startsAt: timestamp().notNull(),
 		endsAt: timestamp().notNull(),
-		creatorId: text()
-			.references(() => user.id, { onDelete: 'restrict' })
-			.notNull(),
 		clubId: text()
 			.references(() => club.id, { onDelete: 'cascade' })
 			.notNull()
 	},
 	(table) => [
-		index('creator_id_idx').on(table.creatorId),
 		index('club_id_idx').on(table.clubId),
 		index('date_range_idx').on(table.startsAt, table.endsAt)
 	]

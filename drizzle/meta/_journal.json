@@ -162,6 +162,13 @@
       "when": 1738788339129,
       "tag": "0022_fixed_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1738823615490,
+      "tag": "0023_faulty_the_hood",
+      "breakpoints": true
     }
   ]
 }

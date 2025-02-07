@@ -30,6 +30,16 @@
 				</div>
 				<Leaderboard leaderboard={challenge.leaderboard} />
 			</div>
+		{:else}
+			<div class="text-center mt-4">
+				<h2 class="h2 mb-2">Keine Challenges</h2>
+				<p>
+					Du bist momentan in keinen Aktiven Challenges. Trete <a
+						class="underline font-medium"
+						href="/clubs">einem Club bei</a
+					>, um eine Challenge zu aktivieren.
+				</p>
+			</div>
 		{/each}
 	</div>
 {:else}

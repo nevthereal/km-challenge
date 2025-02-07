@@ -40,10 +40,11 @@
 			</a>
 		</Card.Root>
 	{:else}
-		<p>
-			Du bist momentan in keinem Club. Du kannst aber einem <a class="a" href="/clubs/join"
-				>beitreten.</a
-			>
+		<p class="text-center my-auto">
+			Du bist momentan in keinem Club. Du kannst aber einem <a
+				class="underline font-medium"
+				href="/clubs/join">beitreten</a
+			>.
 		</p>
 	{/each}
 </div>

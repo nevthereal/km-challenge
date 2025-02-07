@@ -1,5 +1,5 @@
 import { checkAdmin, db } from '$lib/db';
-import { challenge } from '$lib/db/schema';
+import { club } from '$lib/db/schema';
 import { getUser } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ locals, url }) => {
 	if (!isAdmin) return error(401, 'Nicht erlaubt');
 
 	// actually delete
-	await db.delete(challenge).where(eq(challenge.id, qClub.id));
+	await db.delete(club).where(eq(club.id, qClub.id));
 
 	throw redirect(303, '/clubs');
 };

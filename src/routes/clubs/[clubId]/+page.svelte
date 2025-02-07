@@ -40,7 +40,7 @@
 	let inviteCode = $derived(formData?.code);
 	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
 	const inviteText = $derived(
-		`Trete dem Club ${club.name} bei mit dem Code ${inviteCode} oder über diesen Link: ${inviteUrl}`
+		`Trete dem Club ${club.name} bei mit dem Code ${inviteCode} oder über diesen Link: \n${inviteUrl}`
 	);
 
 	const isAdmin = data.clubAdmin;
@@ -61,9 +61,9 @@
 	</div>
 	<ClubAdmin {isAdmin}>
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
-				><Ellipsis /></DropdownMenu.Trigger
-			>
+			<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
+				><Ellipsis /><span class="max-md:hidden">Optionen</span>
+			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				<DropdownMenu.Group>
 					<DropdownMenu.GroupHeading>Mehr Optionen</DropdownMenu.GroupHeading>
@@ -117,7 +117,7 @@
 								<Dialog.Header>
 									<Dialog.Title>Einladungslink generieren</Dialog.Title>
 									<Dialog.Description
-										>Diese Aktion macht alle alten Einladungscodes ungültig</Dialog.Description
+										>Diese Aktion generiert einen Einladungslink und einen Code.</Dialog.Description
 									>
 								</Dialog.Header>
 								{#if !inviteCode}

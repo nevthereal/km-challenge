@@ -30,7 +30,7 @@
 </nav>
 
 <main class="p-4">
-	<div class="flex justify-between">
+	<div class="flex justify-between pb-4 max-md:flex-col max-md:gap-4">
 		<h1 class="h1">{challenge.name}</h1>
 		<ClubAdmin {isAdmin}>
 			<AlertDialog.Root bind:open={challengeDialogOpen}>

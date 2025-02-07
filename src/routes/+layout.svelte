@@ -28,7 +28,9 @@
 		<div class="flex gap-2">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'default' })}>
-					<User />{session.user.name}
+					<User /><span class="max-md:hidden">
+						{session.user.name}
+					</span>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Group>

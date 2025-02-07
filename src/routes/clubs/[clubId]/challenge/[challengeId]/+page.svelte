@@ -9,6 +9,7 @@
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn } from '$lib/utils';
+	import { enhance } from '$app/forms';
 
 	let { data } = $props();
 
@@ -101,13 +102,7 @@
 											<AlertDialog.Footer>
 												<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 												<AlertDialog.Action
-													onclick={async () => {
-														await fetch(`/api/delete/discipline?id=${d.id}`, {
-															method: 'POST'
-														});
-														disciplineDialogOpen = !disciplineDialogOpen;
-														invalidateAll();
-													}}
+													form="deleteForm"
 													class={buttonVariants({ variant: 'destructive' })}
 													>Continue</AlertDialog.Action
 												>
@@ -140,3 +135,4 @@
 		</div>
 	{/if}
 </main>
+<form action="?/deleteChallenge" use:enhance method="post"></form>

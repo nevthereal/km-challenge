@@ -55,8 +55,8 @@
 </nav>
 
 <div class="flex items-center justify-between">
-	<div>
-		<h1 class="h1">{club.name}</h1>
+	<div class="mb-4">
+		<h1 class="h1 mb-2">{club.name}</h1>
 		<NiceList className="mb-4" {listItems} />
 	</div>
 	<ClubAdmin {isAdmin}>
@@ -193,6 +193,8 @@
 				</Card.Footer>
 			</Card.Root>
 		</a>
+	{:else}
+		<p class="text-center my-auto">Keine Challenge existiert</p>
 	{/each}
 </div>
 

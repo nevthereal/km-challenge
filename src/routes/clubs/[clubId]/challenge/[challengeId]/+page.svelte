@@ -48,17 +48,8 @@
 					</AlertDialog.Header>
 					<AlertDialog.Footer>
 						<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-						<AlertDialog.Action
-							onclick={async () => {
-								const req = await fetch(`/api/delete/challenge?id=${challenge.id}`, {
-									method: 'POST'
-								});
-
-								if (req.ok) {
-									await goto(req.url);
-								}
-							}}
-							class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+						<AlertDialog.Action form="deleteForm" class={buttonVariants({ variant: 'destructive' })}
+							>Continue</AlertDialog.Action
 						>
 					</AlertDialog.Footer>
 				</AlertDialog.Content>
@@ -135,4 +126,4 @@
 		</div>
 	{/if}
 </main>
-<form action="?/deleteChallenge" use:enhance method="post"></form>
+<form id="deleteForm" hidden action="?/deleteChallenge" use:enhance method="post"></form>

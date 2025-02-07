@@ -106,18 +106,12 @@ export const actions: Actions = {
 			userId: user.id
 		});
 	},
-	deleteChallenge: async ({ locals, url }) => {
+	deleteChallenge: async ({ locals, url, params }) => {
 		const user = getUser({ locals, redirectUrl: url.pathname });
-
-		// get challenge ID
-		const idFromParams = url.searchParams.get('id');
-
-		// error if no param
-		if (!idFromParams) return error(400, 'No ID provided');
 
 		// query challenge from db
 		const qChallenge = await db.query.challenge.findFirst({
-			where: ({ id }, { eq }) => eq(id, idFromParams)
+			where: ({ id }, { eq }) => eq(id, params.challengeId)
 		});
 
 		// error if no challenge

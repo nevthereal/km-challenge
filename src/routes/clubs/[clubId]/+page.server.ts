@@ -77,5 +77,28 @@ export const actions: Actions = {
 			.returning();
 
 		return { code };
+	},
+	deleteClub: async ({ locals, url, params }) => {
+		console.log('hit');
+		const user = getUser({ locals, redirectUrl: url.pathname });
+
+		// query challenge from db
+		const qClub = await db.query.club.findFirst({
+			where: ({ id }, { eq }) => eq(id, params.clubId)
+		});
+
+		// error if no club
+		if (!qClub) return error(404, 'Challenge existiert nicht');
+
+		// check if user is admin of club
+		const isAdmin = checkAdmin(qClub.id, user.id);
+
+		// error if not admin
+		if (!isAdmin) return error(401, 'Nicht erlaubt');
+
+		// actually delete
+		await db.delete(club).where(eq(club.id, qClub.id));
+
+		return redirect(302, '/clubs');
 	}
 };

@@ -159,7 +159,8 @@ export const clubAdmin = pgTable(
 			.references(() => user.id, { onDelete: 'cascade' }),
 		clubId: text()
 			.notNull()
-			.references(() => club.id, { onDelete: 'cascade' })
+			.references(() => club.id, { onDelete: 'cascade' }),
+		grantedAt: timestamp().defaultNow()
 	},
 	(table) => [
 		index('club_admin_user_id_idx').on(table.userId),
@@ -179,7 +180,8 @@ export const clubMember = pgTable(
 			.references(() => user.id, { onDelete: 'cascade' }),
 		clubId: text()
 			.notNull()
-			.references(() => club.id, { onDelete: 'cascade' })
+			.references(() => club.id, { onDelete: 'cascade' }),
+		joinedAt: timestamp().defaultNow()
 	},
 	(table) => [
 		index('club_member_user_id_idx').on(table.userId),
@@ -199,7 +201,8 @@ export const challengeMember = pgTable(
 			.references(() => user.id, { onDelete: 'cascade' }),
 		challengeId: text()
 			.notNull()
-			.references(() => challenge.id, { onDelete: 'cascade' })
+			.references(() => challenge.id, { onDelete: 'cascade' }),
+		joinedAt: timestamp().defaultNow()
 	},
 	(table) => [
 		index('challenge_member_user_id_idx').on(table.userId),

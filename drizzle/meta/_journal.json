@@ -169,6 +169,13 @@
       "when": 1738823615490,
       "tag": "0023_faulty_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1738939869801,
+      "tag": "0024_exotic_madame_hydra",
+      "breakpoints": true
     }
   ]
 }

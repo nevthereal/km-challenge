@@ -5,13 +5,16 @@
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, Trash2 } from 'lucide-svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
+	import { cn } from '$lib/utils.js';
+	import { redirect } from '@sveltejs/kit';
 
 	let { data } = $props();
 
-	let dialogOpen = $state(false);
+	let disciplineDialogOpen = $state(false);
+	let challengeDialogOpen = $state(false);
 
 	const { challenge, leaderboard } = $derived(data);
 	const { currentUserChallenge } = data;
@@ -28,7 +31,40 @@
 </nav>
 
 <main class="p-4">
-	<h1 class="h1">{challenge.name}</h1>
+	<div class="flex justify-between">
+		<h1 class="h1">{challenge.name}</h1>
+		<ClubAdmin {isAdmin}>
+			<AlertDialog.Root bind:open={challengeDialogOpen}>
+				<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
+					<Trash2 />Challenge löschen
+				</AlertDialog.Trigger>
+				<AlertDialog.Content>
+					<AlertDialog.Header>
+						<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
+						<AlertDialog.Description>
+							Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese
+							Aktion kann nicht rückgängig gemacht werden.
+						</AlertDialog.Description>
+					</AlertDialog.Header>
+					<AlertDialog.Footer>
+						<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+						<AlertDialog.Action
+							onclick={async () => {
+								const req = await fetch(`/api/delete/challenge?id=${challenge.id}`, {
+									method: 'POST'
+								});
+
+								if (req.ok) {
+									await goto(req.url);
+								}
+							}}
+							class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+						>
+					</AlertDialog.Footer>
+				</AlertDialog.Content>
+			</AlertDialog.Root>
+		</ClubAdmin>
+	</div>
 	<Separator class="mb-4" />
 	{#if currentUserChallenge}
 		<div class="flex gap-4 max-md:flex-col md:gap-8">
@@ -53,13 +89,13 @@
 									{d.name} (x{d.factor})
 								</span>
 								<ClubAdmin {isAdmin}>
-									<AlertDialog.Root bind:open={dialogOpen}>
+									<AlertDialog.Root bind:open={disciplineDialogOpen}>
 										<AlertDialog.Trigger class="text-destructive"><Trash2 /></AlertDialog.Trigger>
 										<AlertDialog.Content>
 											<AlertDialog.Header>
 												<AlertDialog.Title>Disziplin "{d.name}" löschen?</AlertDialog.Title>
 												<AlertDialog.Description>
-													Diese Aktion wird jeden Eintrag mit der gelöschten Disziplin auch löschen.
+													Diese Aktion wird jeden Eintrag mit der gelöschten Disziplin auf 1 setzen.
 													Diese Aktion kann nicht rückgängig gemacht werden.
 												</AlertDialog.Description>
 											</AlertDialog.Header>
@@ -67,10 +103,10 @@
 												<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 												<AlertDialog.Action
 													onclick={async () => {
-														await fetch(`/api/delete-discipline?id=${d.id}`, {
-															method: 'post'
+														await fetch(`/api/delete/discipline?id=${d.id}`, {
+															method: 'POST'
 														});
-														dialogOpen = !dialogOpen;
+														disciplineDialogOpen = !disciplineDialogOpen;
 														invalidateAll();
 													}}
 													class={buttonVariants({ variant: 'destructive' })}

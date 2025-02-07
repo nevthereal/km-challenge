@@ -69,3 +69,7 @@
 .h4 {
 	@apply scroll-m-20 text-xl font-semibold tracking-tight;
 }
+
+.link {
+	@apply font-medium underline hover:text-primary;
+}

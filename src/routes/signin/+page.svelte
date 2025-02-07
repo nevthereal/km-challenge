@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth/client';
+	import GoogleLogo from '$lib/components/GoogleLogo.svelte';
 
 	import { Button } from '$lib/components/ui/button';
-	import { LogIn } from 'lucide-svelte';
 
 	const redirectUrl = page.url.searchParams.get('redirect');
 </script>
 
 <main class="flex h-[80vh] items-center justify-center">
 	<Button
+		variant="outline"
 		size="lg"
 		onclick={async () => {
 			await authClient(page.url.origin).signIn.social({
@@ -17,6 +18,6 @@
 				callbackURL: redirectUrl || '/',
 				newUserCallbackURL: `/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
 			});
-		}}><LogIn />Mit Google anmelden</Button
+		}}><GoogleLogo />Mit Google anmelden</Button
 	>
 </main>

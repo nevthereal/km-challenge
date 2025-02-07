@@ -34,9 +34,8 @@
 			<div class="text-center mt-4">
 				<h2 class="h2 mb-2">Keine Challenges</h2>
 				<p>
-					Du bist momentan in keinen Aktiven Challenges. Trete <a
-						class="underline font-medium"
-						href="/clubs">einem Club bei</a
+					Du bist momentan in keinen Aktiven Challenges. <a class="link" href="/clubs"
+						>Trete einem Club bei</a
 					>, um eine Challenge zu aktivieren.
 				</p>
 			</div>
@@ -48,8 +47,8 @@
 		<p>Auf der Kilometer-Challenge Website</p>
 		<h2 class="mt-4 font-medium">Wichtige Links:</h2>
 		<ul class="mt-2 list-inside list-disc">
-			<li><a class="font-medium underline" href="/signin">Einloggen</a></li>
-			<li><a class="font-medium underline" href="/clubs">Clubs</a></li>
+			<li><a class="link" href="/signin">Einloggen</a></li>
+			<li><a class="link" href="/clubs">Clubs</a></li>
 		</ul>
 	</section>
 {/if}

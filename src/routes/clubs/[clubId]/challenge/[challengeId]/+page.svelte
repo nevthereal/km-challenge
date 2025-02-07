@@ -8,8 +8,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { cn } from '$lib/utils.js';
-	import { redirect } from '@sveltejs/kit';
+	import { cn } from '$lib/utils';
 
 	let { data } = $props();
 

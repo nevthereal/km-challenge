@@ -53,7 +53,7 @@
 				{:else if startValue}
 					{df.format(startValue.toDate(getLocalTimeZone()))}
 				{:else}
-					Start und Enddatum auswählen
+					Start- und Enddatum
 				{/if}
 				<input hidden value={startValue} name={startName} />
 				<input hidden value={endValue} name={endName} />

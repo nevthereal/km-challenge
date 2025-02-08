@@ -4,7 +4,7 @@
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { ArrowLeft, LogOut, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, LogIn, LogOut, Trash2 } from 'lucide-svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn } from '$lib/utils';
@@ -33,7 +33,7 @@
 <main class="p-4">
 	<div class="flex justify-between pb-4 max-md:flex-col max-md:gap-4">
 		<h1 class="h1">{challenge.name}</h1>
-		<div>
+		<div class="flex items-center gap-2">
 			<ClubAdmin {isAdmin}>
 				<AlertDialog.Root bind:open={challengeDialogOpen}>
 					<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
@@ -57,22 +57,34 @@
 					</AlertDialog.Content>
 				</AlertDialog.Root>
 			</ClubAdmin>
-			<AlertDialog.Root bind:open={leaveDialogOpen}>
-				<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
-					<LogOut />Verlassen
-				</AlertDialog.Trigger>
-				<AlertDialog.Content>
-					<AlertDialog.Header>
-						<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
-					</AlertDialog.Header>
-					<AlertDialog.Footer>
-						<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-						<AlertDialog.Action form="leaveForm" class={buttonVariants({ variant: 'destructive' })}
-							>Verlassen</AlertDialog.Action
-						>
-					</AlertDialog.Footer>
-				</AlertDialog.Content>
-			</AlertDialog.Root>
+			{#if currentUserChallenge}
+				<AlertDialog.Root bind:open={leaveDialogOpen}>
+					<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+						<LogOut />Verlassen
+					</AlertDialog.Trigger>
+					<AlertDialog.Content>
+						<AlertDialog.Header>
+							<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
+						</AlertDialog.Header>
+						<AlertDialog.Footer>
+							<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+							<AlertDialog.Action
+								form="leaveForm"
+								class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
+							>
+						</AlertDialog.Footer>
+					</AlertDialog.Content>
+				</AlertDialog.Root>
+			{:else}
+				<Button
+					onclick={async () => {
+						await fetch(`/api/join-challenge?id=${challenge.id}`, {
+							method: 'post'
+						});
+						location.reload();
+					}}><LogIn />Beitreten</Button
+				>
+			{/if}
 		</div>
 	</div>
 	<Separator class="mb-4" />
@@ -126,17 +138,6 @@
 					<DisciplineForm formData={data.addDisciplineForm} />
 				</ClubAdmin>
 			</div>
-		</div>
-	{:else}
-		<div>
-			<Button
-				onclick={async () => {
-					await fetch(`/api/join-challenge?id=${challenge.id}`, {
-						method: 'post'
-					});
-					location.reload();
-				}}>Challenge beitreten</Button
-			>
 		</div>
 	{/if}
 </main>

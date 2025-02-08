@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
-import { getUser } from '$lib/utils';
+import { getUser, isActive } from '$lib/utils';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { addDisciplines, newEntry } from '$lib/zod';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -95,6 +95,17 @@ export const actions: Actions = {
 		const qDiscipline = await db.query.discipline.findFirst({
 			where: eq(discipline.id, form.data.disciplineId)
 		});
+
+		if (!qDiscipline) return error(404, 'Disziplin nicht gefunden');
+
+		const qChallenge = await db.query.challenge.findFirst({
+			where: eq(challenge.id, qDiscipline?.challengeId)
+		});
+
+		if (!qChallenge) return error(404, 'Challenge nicht gefunden');
+
+		if (!isActive({ start: qChallenge.startsAt, finish: qChallenge.endsAt }))
+			return error(403, 'Challenge ist nicht aktiv');
 
 		if (!qDiscipline) return setError(form, 'disciplineId', 'Disziplin wählen');
 

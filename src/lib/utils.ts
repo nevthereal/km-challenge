@@ -20,3 +20,8 @@ export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectU
 
 	return { ...user, superUser, completedProfile };
 }
+
+export function isActive({ start, finish }: { start: Date; finish: Date }) {
+	const now = new Date();
+	return start <= now && finish >= now;
+}

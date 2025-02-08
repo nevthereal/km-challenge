@@ -9,7 +9,7 @@
 	import { newEntry } from '$lib/zod';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
-	import { cn } from '$lib/utils';
+	import { cn, isActive } from '$lib/utils';
 	import {
 		DateFormatter,
 		getLocalTimeZone,
@@ -67,7 +67,12 @@
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>
-	<Dialog.Trigger class={cn(buttonVariants({ variant: 'default' }), 'max-md:my-auto md:mb-8')}
+	<Dialog.Trigger
+		disabled={!isActive({ finish: challenge.endsAt, start: challenge.startsAt })}
+		class={cn(
+			buttonVariants({ variant: 'default' }),
+			'disabled:cursor-not-allowed max-md:my-auto md:mb-8'
+		)}
 		><PlusCircle />
 		<span class="max-md:hidden">Neuer Eintrag</span></Dialog.Trigger
 	>

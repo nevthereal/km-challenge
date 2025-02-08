@@ -6,7 +6,7 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
-	import { prettyDate } from '$lib/utils';
+	import { cn, isActive, prettyDate } from '$lib/utils';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
@@ -202,6 +202,9 @@
 				<Card.Header>
 					<Card.Title>{challenge.name}</Card.Title>
 					<Card.Description
+						class={cn(
+							isActive({ finish: challenge.endsAt, start: challenge.startsAt }) && 'text-green-500'
+						)}
 						>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
 							new Date(challenge.endsAt)
 						)}</Card.Description

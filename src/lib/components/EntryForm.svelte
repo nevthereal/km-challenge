@@ -24,10 +24,9 @@
 		formData: SuperValidated<Infer<typeof newEntry>>;
 		disciplines: (typeof disciplineTable.$inferSelect)[];
 		challenge: typeof challengeTable.$inferSelect;
-		hideOnMobile: boolean;
 	}
 
-	let { formData, disciplines, challenge, hideOnMobile }: Props = $props();
+	let { formData, disciplines, challenge }: Props = $props();
 
 	let dialogOpen = $state(false);
 
@@ -70,7 +69,7 @@
 <Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Trigger class={cn(buttonVariants({ variant: 'default' }), 'max-md:my-auto md:mb-8')}
 		><PlusCircle />
-		<span class={cn(hideOnMobile && 'max-md:hidden')}>Neuer Eintrag</span></Dialog.Trigger
+		<span class="max-md:hidden">Neuer Eintrag</span></Dialog.Trigger
 	>
 	<Dialog.Content>
 		<Dialog.Header>

@@ -100,5 +100,18 @@ export const actions: Actions = {
 		await db.delete(club).where(eq(club.id, qClub.id));
 
 		return redirect(302, '/clubs');
+	},
+	leave: async ({ locals, url, params }) => {
+		const user = getUser({ locals, redirectUrl: url.pathname });
+
+		const qClubMember = await db.query.clubMember.findFirst({
+			where: and(eq(clubMember.clubId, params.clubId), eq(clubMember.userId, user.id))
+		});
+
+		if (!qClubMember) return error(404, 'Du bist kein Mitglied dieses Clubs');
+
+		await db.delete(clubMember).where(eq(clubMember.id, qClubMember.id));
+
+		return redirect(302, '/clubs');
 	}
 };

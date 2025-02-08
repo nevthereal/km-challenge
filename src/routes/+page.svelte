@@ -21,12 +21,7 @@
 						</span>
 						<SquareArrowOutUpRight />
 					</a>
-					<EntryForm
-						hideOnMobile={true}
-						{challenge}
-						disciplines={challenge.disciplines}
-						formData={data.newEntryForm}
-					/>
+					<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 				</div>
 				<Leaderboard leaderboard={challenge.leaderboard} />
 			</div>

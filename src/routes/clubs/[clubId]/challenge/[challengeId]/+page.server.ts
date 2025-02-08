@@ -127,5 +127,21 @@ export const actions: Actions = {
 		await db.delete(challenge).where(eq(challenge.id, qChallenge.id));
 
 		return redirect(302, `/clubs/${qChallenge.clubId}`);
+	},
+	leave: async ({ locals, url, params }) => {
+		const user = getUser({ locals, redirectUrl: url.pathname });
+
+		const qChallengeMember = await db.query.challengeMember.findFirst({
+			where: and(
+				eq(challengeMember.challengeId, params.challengeId),
+				eq(challengeMember.userId, user.id)
+			)
+		});
+
+		if (!qChallengeMember) return error(404, 'Du bist kein Mitglied dieser Challenge');
+
+		await db.delete(challengeMember).where(eq(challengeMember.id, qChallengeMember.id));
+
+		return redirect(302, `/clubs/${params.clubId}`);
 	}
 };

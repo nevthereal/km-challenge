@@ -13,7 +13,7 @@
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { ArrowLeft, Ellipsis, Link, PlusCircle, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, Ellipsis, Link, LogOut, PlusCircle, Trash2 } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 
@@ -45,6 +45,7 @@
 	const isAdmin = data.clubAdmin;
 
 	let deleteDialogOpen = $state(false);
+	let leaveDialogOpen = $state(false);
 </script>
 
 <nav class="mb-4 flex">
@@ -58,71 +59,91 @@
 		<h1 class="h1 mb-2">{club.name}</h1>
 		<NiceList className="mb-4" {listItems} />
 	</div>
-	<ClubAdmin {isAdmin}>
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
-				><Ellipsis /><span class="max-md:hidden">Optionen</span>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-				<DropdownMenu.Group>
-					<DropdownMenu.GroupHeading>Mehr Optionen</DropdownMenu.GroupHeading>
-					<DropdownMenu.Separator />
-					<DropdownMenu.Group class="flex flex-col gap-2 p-2">
-						<Dialog.Root>
-							<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
-								><Link /> Einladungslink generieren</Dialog.Trigger
-							>
-							<Dialog.Content>
-								<Dialog.Header>
-									<Dialog.Title>Einladungslink generieren</Dialog.Title>
-									<Dialog.Description
-										>Diese Aktion generiert einen Einladungslink und einen Code.</Dialog.Description
-									>
-								</Dialog.Header>
-								{#if !inviteCode}
-									<Button type="submit" form="generateForm" variant="outline"
-										><Link /> Generieren</Button
-									>
-								{:else}
-									<div class="flex gap-4">
-										<Input value={inviteUrl} readonly />
-										<Button
-											onclick={async () => {
-												await navigator.clipboard.writeText(inviteText);
-												toast.success('Link in die Zwischenablage kopiert');
-											}}
-											variant="outline">Kopieren</Button
+	<div>
+		{#if !isAdmin}
+			<AlertDialog.Root bind:open={leaveDialogOpen}>
+				<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+					<LogOut />Club verlassen
+				</AlertDialog.Trigger>
+				<AlertDialog.Content>
+					<AlertDialog.Header>
+						<AlertDialog.Title>Club "{club.name}" verlassen?</AlertDialog.Title>
+					</AlertDialog.Header>
+					<AlertDialog.Footer>
+						<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+						<AlertDialog.Action form="leaveForm" class={buttonVariants({ variant: 'destructive' })}
+							>Verlassen</AlertDialog.Action
+						>
+					</AlertDialog.Footer>
+				</AlertDialog.Content>
+			</AlertDialog.Root>
+		{/if}
+		<ClubAdmin {isAdmin}>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
+					><Ellipsis /><span class="max-md:hidden">Optionen</span>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.GroupHeading>Mehr Optionen</DropdownMenu.GroupHeading>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Group class="flex flex-col gap-2 p-2">
+							<Dialog.Root>
+								<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
+									><Link /> Einladungslink generieren</Dialog.Trigger
+								>
+								<Dialog.Content>
+									<Dialog.Header>
+										<Dialog.Title>Einladungslink generieren</Dialog.Title>
+										<Dialog.Description
+											>Diese Aktion generiert einen Einladungslink und einen Code.</Dialog.Description
 										>
-									</div>
-								{/if}
-							</Dialog.Content>
-						</Dialog.Root>
-						<AlertDialog.Root bind:open={deleteDialogOpen}>
-							<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
-								<Trash2 />Club löschen
-							</AlertDialog.Trigger>
-							<AlertDialog.Content>
-								<AlertDialog.Header>
-									<AlertDialog.Title>Club "{club.name}" löschen?</AlertDialog.Title>
-									<AlertDialog.Description>
-										Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion kann
-										nicht rückgängig gemacht werden.
-									</AlertDialog.Description>
-								</AlertDialog.Header>
-								<AlertDialog.Footer>
-									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-									<AlertDialog.Action
-										form="deleteForm"
-										class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
-									>
-								</AlertDialog.Footer>
-							</AlertDialog.Content>
-						</AlertDialog.Root>
+									</Dialog.Header>
+									{#if !inviteCode}
+										<Button type="submit" form="generateForm" variant="outline"
+											><Link /> Generieren</Button
+										>
+									{:else}
+										<div class="flex gap-4">
+											<Input value={inviteUrl} readonly />
+											<Button
+												onclick={async () => {
+													await navigator.clipboard.writeText(inviteText);
+													toast.success('Link in die Zwischenablage kopiert');
+												}}
+												variant="outline">Kopieren</Button
+											>
+										</div>
+									{/if}
+								</Dialog.Content>
+							</Dialog.Root>
+							<AlertDialog.Root bind:open={deleteDialogOpen}>
+								<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
+									<Trash2 />Club löschen
+								</AlertDialog.Trigger>
+								<AlertDialog.Content>
+									<AlertDialog.Header>
+										<AlertDialog.Title>Club "{club.name}" löschen?</AlertDialog.Title>
+										<AlertDialog.Description>
+											Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion kann
+											nicht rückgängig gemacht werden.
+										</AlertDialog.Description>
+									</AlertDialog.Header>
+									<AlertDialog.Footer>
+										<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+										<AlertDialog.Action
+											form="deleteForm"
+											class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
+										>
+									</AlertDialog.Footer>
+								</AlertDialog.Content>
+							</AlertDialog.Root>
+						</DropdownMenu.Group>
 					</DropdownMenu.Group>
-				</DropdownMenu.Group>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
-	</ClubAdmin>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</ClubAdmin>
+	</div>
 </div>
 
 <div class="mt-6 grid gap-4 md:grid-cols-3">
@@ -194,9 +215,10 @@
 			</Card.Root>
 		</a>
 	{:else}
-		<p class="text-center my-auto">Keine Challenge existiert</p>
+		<p class="text-center">Dieser Club hat noch keine Challenges.</p>
 	{/each}
 </div>
 
 <form id="generateForm" action="?/getCode" method="post" use:enhance hidden></form>
 <form id="deleteForm" action="?/deleteClub" method="post" use:enhance hidden></form>
+<form id="leaveForm" action="?/leave" method="post" use:enhance hidden></form>

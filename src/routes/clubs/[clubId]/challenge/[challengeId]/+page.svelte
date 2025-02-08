@@ -4,8 +4,7 @@
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { ArrowLeft, Trash2 } from 'lucide-svelte';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { ArrowLeft, LogOut, Trash2 } from 'lucide-svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn } from '$lib/utils';
@@ -15,6 +14,7 @@
 
 	let disciplineDialogOpen = $state(false);
 	let challengeDialogOpen = $state(false);
+	let leaveDialogOpen = $state(false);
 
 	const { challenge, leaderboard } = $derived(data);
 	const { currentUserChallenge } = data;
@@ -33,46 +33,62 @@
 <main class="p-4">
 	<div class="flex justify-between pb-4 max-md:flex-col max-md:gap-4">
 		<h1 class="h1">{challenge.name}</h1>
-		<ClubAdmin {isAdmin}>
-			<AlertDialog.Root bind:open={challengeDialogOpen}>
-				<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
-					<Trash2 />Challenge löschen
+		<div>
+			<ClubAdmin {isAdmin}>
+				<AlertDialog.Root bind:open={challengeDialogOpen}>
+					<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
+						<Trash2 /><span class="max-md:hidden">Challenge löschen</span>
+					</AlertDialog.Trigger>
+					<AlertDialog.Content>
+						<AlertDialog.Header>
+							<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
+							<AlertDialog.Description>
+								Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese
+								Aktion kann nicht rückgängig gemacht werden.
+							</AlertDialog.Description>
+						</AlertDialog.Header>
+						<AlertDialog.Footer>
+							<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+							<AlertDialog.Action
+								form="deleteForm"
+								class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+							>
+						</AlertDialog.Footer>
+					</AlertDialog.Content>
+				</AlertDialog.Root>
+			</ClubAdmin>
+			<AlertDialog.Root bind:open={leaveDialogOpen}>
+				<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+					<LogOut />Verlassen
 				</AlertDialog.Trigger>
 				<AlertDialog.Content>
 					<AlertDialog.Header>
-						<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
-						<AlertDialog.Description>
-							Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese
-							Aktion kann nicht rückgängig gemacht werden.
-						</AlertDialog.Description>
+						<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
 					</AlertDialog.Header>
 					<AlertDialog.Footer>
-						<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-						<AlertDialog.Action form="deleteForm" class={buttonVariants({ variant: 'destructive' })}
-							>Continue</AlertDialog.Action
+						<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+						<AlertDialog.Action form="leaveForm" class={buttonVariants({ variant: 'destructive' })}
+							>Verlassen</AlertDialog.Action
 						>
 					</AlertDialog.Footer>
 				</AlertDialog.Content>
 			</AlertDialog.Root>
-		</ClubAdmin>
+		</div>
 	</div>
 	<Separator class="mb-4" />
 	{#if currentUserChallenge}
 		<div class="flex gap-4 max-md:flex-col md:gap-8">
 			<div class="flex-grow">
-				<h2 class="h2 mb-2">Rangliste:</h2>
-				<EntryForm
-					hideOnMobile={false}
-					{challenge}
-					disciplines={challenge.disciplines}
-					formData={data.newEntryForm}
-				/>
+				<div class="flex items-center justify-between">
+					<h2 class="h2 mb-2">Rangliste</h2>
+					<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
+				</div>
 				<Leaderboard {leaderboard} />
 			</div>
 			<Separator class="mb-4" orientation="vertical" />
 			<div>
 				<div>
-					<h2 class="h2">Diszipline:</h2>
+					<h2 class="h2">Diszipline</h2>
 					<ul>
 						{#each challenge.disciplines as d}
 							<li class="mb-2 flex justify-between gap-2">
@@ -102,8 +118,6 @@
 									</AlertDialog.Root>
 								</ClubAdmin>
 							</li>
-						{:else}
-							<p class="text-destructive font-medium">Keine diszipline</p>
 						{/each}
 					</ul>
 				</div>
@@ -126,4 +140,6 @@
 		</div>
 	{/if}
 </main>
+
 <form id="deleteForm" hidden action="?/deleteChallenge" use:enhance method="post"></form>
+<form id="leaveForm" action="?/leave" method="post" use:enhance hidden></form>

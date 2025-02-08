@@ -27,11 +27,11 @@
 			</div>
 		{:else}
 			<div class="text-center mt-4">
-				<h2 class="h2 mb-2">Keine Challenges</h2>
+				<h2 class="h2 mb-2">Keine aktiven Challenges</h2>
 				<p>
-					Du bist momentan in keinen Aktiven Challenges. <a class="link" href="/clubs"
-						>Trete einem Club bei</a
-					>, um eine Challenge zu aktivieren.
+					Du bist momentan in keinen aktiven Challenges. Zeige alle <a href="/clubs" class="link"
+						>Clubs und Challenges</a
+					> hier an.
 				</p>
 			</div>
 		{/each}

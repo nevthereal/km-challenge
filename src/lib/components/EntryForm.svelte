@@ -5,11 +5,13 @@
 	import * as Form from './ui/form';
 	import * as Select from './ui/select';
 	import { Input } from './ui/input';
-	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { newEntry } from '$lib/zod';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
 	import { cn, isActive } from '$lib/utils';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+
 	import {
 		DateFormatter,
 		getLocalTimeZone,
@@ -64,17 +66,19 @@
 		if (!qDiscipline) return null;
 		return `${qDiscipline.name} (x${qDiscipline.factor})`;
 	}
+	const active = isActive({ finish: challenge.endsAt, start: challenge.startsAt });
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Trigger
-		disabled={!isActive({ finish: challenge.endsAt, start: challenge.startsAt })}
+		disabled={!active}
 		class={cn(
-			buttonVariants({ variant: 'default' }),
+			buttonVariants({ variant: active ? 'default' : 'secondary' }),
 			'disabled:cursor-not-allowed max-md:my-auto md:mb-8'
 		)}
 		><PlusCircle />
-		<span class="max-md:hidden">Neuer Eintrag</span></Dialog.Trigger
+		<span class="max-md:hidden">{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}</span
+		></Dialog.Trigger
 	>
 	<Dialog.Content>
 		<Dialog.Header>

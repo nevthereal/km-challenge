@@ -98,9 +98,10 @@
 				<Leaderboard {leaderboard} />
 			</div>
 			<Separator class="mb-4" orientation="vertical" />
+			<Separator class="md:hidden" orientation="horizontal" />
 			<div>
 				<div>
-					<h2 class="h2">Diszipline</h2>
+					<h2 class="h2 mb-2">Diszipline</h2>
 					<ul>
 						{#each challenge.disciplines as d}
 							<li class="mb-2 flex justify-between gap-2">

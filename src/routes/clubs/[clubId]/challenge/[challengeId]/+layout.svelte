@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Separator } from '$lib/components/ui/separator';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, LogIn, LogOut, Trash2 } from 'lucide-svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
@@ -22,15 +21,15 @@
 		},
 		{
 			name: 'Diszipline',
-			href: 'disciplines'
+			href: '/disciplines'
 		},
 		{
 			name: 'Mitglieder',
-			href: 'members'
+			href: '/members'
 		},
 		{
 			name: 'Deine Aktivität',
-			href: 'activity'
+			href: '/activity'
 		}
 	];
 
@@ -108,15 +107,19 @@
 	</div>
 </div>
 
-<Separator class="my-4" />
-
 {#if !currentUserChallenge}
 	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 {:else}
-	<nav class="overflow-x-scroll">
-		<ul class="mb-4 flex gap-2 whitespace-nowrap">
+	<nav class="my-2 overflow-x-scroll border-y-2 py-4">
+		<ul class="flex gap-1 whitespace-nowrap">
 			{#each paths as path}
-				<a class="font-bold text-primary" href={`${challengePath}/${path.href}`}>{path.name}</a>
+				<a
+					class={cn(
+						'p-2 font-bold',
+						page.url.pathname === `${challengePath}${path.href}` && 'rounded-md bg-muted'
+					)}
+					href={`${challengePath}${path.href}`}>{path.name}</a
+				>
 			{/each}
 		</ul>
 	</nav>

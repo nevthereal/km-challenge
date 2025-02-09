@@ -11,7 +11,12 @@
 	<ul class="list-inside list-disc">
 		{#each members as member}
 			{@const { user } = member}
-			<li>{user.name}, {prettyDate(member.joinedAt!)}</li>
+			<li>
+				{user.name},
+				<span class="text-muted-foreground">
+					{prettyDate(member.joinedAt!)}
+				</span>
+			</li>
 		{/each}
 	</ul>
 </main>

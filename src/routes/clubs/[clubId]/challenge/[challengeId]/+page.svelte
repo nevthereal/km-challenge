@@ -8,7 +8,7 @@
 </script>
 
 <main class="flex-grow">
-	<div class="mb-4 flex items-center justify-between">
+	<div class="mb-4 flex items-center justify-between gap-2 max-md:portrait:flex-col">
 		<h1 class="h1">Rangliste</h1>
 		<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 	</div>

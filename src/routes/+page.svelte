@@ -11,7 +11,7 @@
 		<h1 class="h1">Aktive Challenges:</h1>
 		{#each data.challengesWithLeaderboards as challenge}
 			<div class="rounded-md border border-border p-6">
-				<div class="flex justify-between gap-4">
+				<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
 					<a
 						href={`/clubs/${challenge.clubId}/challenge/${challenge.id}`}
 						class="flex items-center gap-2 hover:text-primary"

@@ -80,9 +80,8 @@
 			classNames
 		)}
 		><PlusCircle />
-		<span class="max-md:hidden">{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}</span
-		></Dialog.Trigger
-	>
+		{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}
+	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>

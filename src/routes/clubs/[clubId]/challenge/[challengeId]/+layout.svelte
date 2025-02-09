@@ -29,7 +29,7 @@
 			href: 'members'
 		},
 		{
-			name: 'Aktivität',
+			name: 'Deine Aktivität',
 			href: 'activity'
 		}
 	];
@@ -42,9 +42,9 @@
 		><ArrowLeft strokeWidth={3} /> Zum Club</a
 	>
 </nav>
-<div class="flex items-center justify-between">
+<div class="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start">
 	<h1 class="h1">{challenge.name}</h1>
-	<div class="flex justify-between pb-4 max-md:flex-col max-md:gap-4">
+	<div class="flex justify-between max-md:flex-col max-md:gap-4">
 		<div class="flex items-center gap-2">
 			<ClubAdmin {isAdmin}>
 				<AlertDialog.Root bind:open={deleteDialogOpen}>
@@ -103,15 +103,16 @@
 
 <Separator class="my-4" />
 
-<ul class="mb-4 flex gap-2">
-	{#each paths as path}
-		<a class="font-bold text-primary" href={`${challengePath}/${path.href}`}>{path.name}</a>
-	{/each}
-</ul>
-
 {#if !currentUserChallenge}
 	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 {:else}
+	<nav class="overflow-x-scroll">
+		<ul class="mb-4 flex gap-2 whitespace-nowrap">
+			{#each paths as path}
+				<a class="font-bold text-primary" href={`${challengePath}/${path.href}`}>{path.name}</a>
+			{/each}
+		</ul>
+	</nav>
 	{@render children()}
 {/if}
 

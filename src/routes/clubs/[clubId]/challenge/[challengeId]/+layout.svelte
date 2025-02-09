@@ -4,7 +4,7 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, LogIn, LogOut, Trash2 } from 'lucide-svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { cn } from '$lib/utils';
+	import { cn, isActive, prettyDate } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 
@@ -33,6 +33,8 @@
 			href: 'activity'
 		}
 	];
+
+	const active = $derived(isActive({ start: challenge.startsAt, finish: challenge.endsAt }));
 </script>
 
 <nav class="mb-4 flex gap-4">
@@ -43,7 +45,12 @@
 	>
 </nav>
 <div class="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start">
-	<h1 class="h1">{challenge.name}</h1>
+	<div>
+		<h1 class="h1 mb-2">{challenge.name}</h1>
+		<p class={cn(active && 'text-green-500')}>
+			{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}
+		</p>
+	</div>
 	<div class="flex justify-between max-md:flex-col max-md:gap-4">
 		<div class="flex items-center gap-2">
 			<ClubAdmin {isAdmin}>

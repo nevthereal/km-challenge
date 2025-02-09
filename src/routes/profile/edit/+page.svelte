@@ -50,7 +50,7 @@
 	<Form.Field {form} name="gender">
 		<Form.Control>
 			{#snippet children({ props })}
-				<Form.Label>Kategorie</Form.Label>
+				<Form.Label>Geschlecht</Form.Label>
 				<Select.Root type="single" bind:value={$formFields.gender} name={props.name}>
 					<Select.Trigger {...props}>
 						{$formFields.gender ? $formFields.gender : 'Auswählen'}

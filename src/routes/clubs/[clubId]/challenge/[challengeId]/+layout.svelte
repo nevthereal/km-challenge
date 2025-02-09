@@ -6,6 +6,7 @@
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn } from '$lib/utils';
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 
 	let { data, children } = $props();
 
@@ -13,6 +14,25 @@
 	let leaveDialogOpen = $state(false);
 
 	const { challenge, currentUserChallenge, clubAdmin: isAdmin, challengePath } = $derived(data);
+
+	const paths = [
+		{
+			name: 'Übersicht',
+			href: ''
+		},
+		{
+			name: 'Diszipline',
+			href: 'disciplines'
+		},
+		{
+			name: 'Mitglieder',
+			href: 'members'
+		},
+		{
+			name: 'Aktivität',
+			href: 'activity'
+		}
+	];
 </script>
 
 <nav class="mb-4 flex gap-4">
@@ -83,11 +103,10 @@
 
 <Separator class="my-4" />
 
-<ul>
-	<a href={`${challengePath}/`}>Übersicht</a>
-	<a href={`${challengePath}/disciplines`}>Diszipline</a>
-	<a href={`${challengePath}/members`}>Mitglieder</a>
-	<a href={`${challengePath}/activities`}>Aktivitäten</a>
+<ul class="mb-4 flex gap-2">
+	{#each paths as path}
+		<a class="font-bold text-primary" href={`${challengePath}/${path.href}`}>{path.name}</a>
+	{/each}
 </ul>
 
 {#if !currentUserChallenge}
@@ -95,6 +114,7 @@
 {:else}
 	{@render children()}
 {/if}
+
 <form
 	id="deleteForm"
 	hidden

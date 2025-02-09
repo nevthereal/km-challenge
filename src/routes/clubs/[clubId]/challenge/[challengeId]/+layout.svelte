@@ -1,0 +1,105 @@
+<script lang="ts">
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Separator } from '$lib/components/ui/separator';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import { ArrowLeft, LogIn, LogOut, Trash2 } from 'lucide-svelte';
+	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
+	import { cn } from '$lib/utils';
+	import { enhance } from '$app/forms';
+
+	let { data, children } = $props();
+
+	let deleteDialogOpen = $state(false);
+	let leaveDialogOpen = $state(false);
+
+	const { challenge, currentUserChallenge, clubAdmin: isAdmin, challengePath } = $derived(data);
+</script>
+
+<nav class="mb-4 flex gap-4">
+	<a
+		href={`/clubs/${challenge.clubId}`}
+		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+		><ArrowLeft strokeWidth={3} /> Zum Club</a
+	>
+</nav>
+<div class="flex items-center justify-between">
+	<h1 class="h1">{challenge.name}</h1>
+	<div class="flex justify-between pb-4 max-md:flex-col max-md:gap-4">
+		<div class="flex items-center gap-2">
+			<ClubAdmin {isAdmin}>
+				<AlertDialog.Root bind:open={deleteDialogOpen}>
+					<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
+						<Trash2 /><span class="max-md:hidden">Challenge löschen</span>
+					</AlertDialog.Trigger>
+					<AlertDialog.Content>
+						<AlertDialog.Header>
+							<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
+							<AlertDialog.Description>
+								Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese
+								Aktion kann nicht rückgängig gemacht werden.
+							</AlertDialog.Description>
+						</AlertDialog.Header>
+						<AlertDialog.Footer>
+							<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+							<AlertDialog.Action
+								form="deleteForm"
+								class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+							>
+						</AlertDialog.Footer>
+					</AlertDialog.Content>
+				</AlertDialog.Root>
+			</ClubAdmin>
+			{#if currentUserChallenge}
+				<AlertDialog.Root bind:open={leaveDialogOpen}>
+					<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+						<LogOut />Verlassen
+					</AlertDialog.Trigger>
+					<AlertDialog.Content>
+						<AlertDialog.Header>
+							<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
+						</AlertDialog.Header>
+						<AlertDialog.Footer>
+							<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+							<AlertDialog.Action
+								form="leaveForm"
+								class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
+							>
+						</AlertDialog.Footer>
+					</AlertDialog.Content>
+				</AlertDialog.Root>
+			{:else}
+				<Button
+					onclick={async () => {
+						await fetch(`/api/join-challenge?id=${challenge.id}`, {
+							method: 'post'
+						});
+						location.reload();
+					}}><LogIn />Beitreten</Button
+				>
+			{/if}
+		</div>
+	</div>
+</div>
+
+<Separator class="my-4" />
+
+<ul>
+	<a href={`${challengePath}/`}>Übersicht</a>
+	<a href={`${challengePath}/disciplines`}>Diszipline</a>
+	<a href={`${challengePath}/members`}>Mitglieder</a>
+	<a href={`${challengePath}/activities`}>Aktivitäten</a>
+</ul>
+
+{#if !currentUserChallenge}
+	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
+{:else}
+	{@render children()}
+{/if}
+<form
+	id="deleteForm"
+	hidden
+	action={`${challengePath}/?/deleteChallenge`}
+	use:enhance
+	method="post"
+></form>
+<form id="leaveForm" action={`${challengePath}/?/leave`} method="post" use:enhance hidden></form>

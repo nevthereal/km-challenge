@@ -17,7 +17,8 @@
 		getLocalTimeZone,
 		parseDate,
 		today,
-		type DateValue
+		type DateValue,
+		parseDateTime
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
 	import { toast } from 'svelte-sonner';
@@ -26,9 +27,10 @@
 		formData: SuperValidated<Infer<typeof newEntry>>;
 		disciplines: (typeof disciplineTable.$inferSelect)[];
 		challenge: typeof challengeTable.$inferSelect;
+		classNames?: string;
 	}
 
-	let { formData, disciplines, challenge }: Props = $props();
+	let { formData, disciplines, challenge, classNames }: Props = $props();
 
 	let dialogOpen = $state(false);
 
@@ -74,7 +76,8 @@
 		disabled={!active}
 		class={cn(
 			buttonVariants({ variant: active ? 'default' : 'secondary' }),
-			'disabled:cursor-not-allowed max-md:my-auto md:mb-8'
+			'disabled:cursor-not-allowed max-md:my-auto',
+			classNames
 		)}
 		><PlusCircle />
 		<span class="max-md:hidden">{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}</span
@@ -127,6 +130,7 @@
 											type="single"
 											value={value as DateValue}
 											bind:placeholder
+											minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
 											maxValue={today(getLocalTimeZone())}
 											calendarLabel="Tag des Eintrags"
 											onValueChange={(v) => {

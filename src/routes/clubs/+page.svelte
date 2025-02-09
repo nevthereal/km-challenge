@@ -8,7 +8,7 @@
 	const { usersClubs } = data;
 </script>
 
-<h1 class="h1">Deine Clubs</h1>
+<h1 class="h1 mb-8">Deine Clubs</h1>
 
 {#if data.user.superUser}
 	<Button size="lg" href="/clubs/create" class="my-4">Club erstellen</Button>

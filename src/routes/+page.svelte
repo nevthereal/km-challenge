@@ -8,7 +8,10 @@
 
 {#if data.user}
 	<div class="flex flex-col gap-8">
-		<h1 class="h1">Aktive Challenges:</h1>
+		<div>
+			<p class="text-lg">Willkommen, {data.user.name}</p>
+			<h1 class="h1">Aktive Challenges:</h1>
+		</div>
 		{#each data.challengesWithLeaderboards as challenge}
 			<div class="rounded-md border border-border p-6">
 				<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
@@ -21,7 +24,6 @@
 						</span>
 						<SquareArrowOutUpRight />
 					</a>
-					<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 				</div>
 				<Leaderboard leaderboard={challenge.leaderboard} />
 			</div>

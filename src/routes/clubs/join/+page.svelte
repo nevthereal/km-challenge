@@ -18,7 +18,7 @@
 </script>
 
 <main class="flex flex-col items-center">
-	<h1 class="h1">Club beitreten</h1>
+	<h1 class="h1 mb-4">Club beitreten</h1>
 	<form method="POST" class="flex flex-col items-center space-y-6" use:enhance>
 		<Form.Field {form} name="code">
 			<Form.Control>

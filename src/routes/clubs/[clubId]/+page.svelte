@@ -25,17 +25,6 @@
 
 	let { qClub: club } = data;
 
-	const listItems: ListItems = [
-		{
-			name: 'Mitglieder',
-			content: club.members.length.toString()
-		},
-		{
-			name: 'Anzahl Challenges',
-			content: club.challenges.length.toString()
-		}
-	];
-
 	let inviteCode = $derived(formData?.code);
 	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
 	const inviteText = $derived(
@@ -54,10 +43,9 @@
 	>
 </nav>
 
-<div class="flex items-center justify-between">
-	<div class="mb-4">
-		<h1 class="h1 mb-2">{club.name}</h1>
-		<NiceList className="mb-4" {listItems} />
+<div class="flex items-center justify-between max-md:flex-col max-md:items-start">
+	<div class="mb-2 md:mb-4">
+		<h1 class="h1">{club.name}</h1>
 	</div>
 	<div>
 		{#if !isAdmin}

@@ -96,7 +96,7 @@
 					Bitte Kilometer roh eintragen, die Punkte werden später verrechnet
 				</p>
 
-				<div class="mb-4 flex gap-4">
+				<div class="mb-2 flex gap-4">
 					<Form.Field form={entryForm} name="amount" class="w-24 md:w-32">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -174,7 +174,7 @@
 						{/snippet}
 					</Form.Control>
 				</Form.Field>
-				<Button type="submit" class="mt-auto">Hinzufügen</Button>
+				<Button type="submit" class="mt-2">Hinzufügen</Button>
 			</form>
 		</Dialog.Header>
 	</Dialog.Content>

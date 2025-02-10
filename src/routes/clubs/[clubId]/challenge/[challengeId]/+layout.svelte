@@ -16,7 +16,7 @@
 
 	const paths = [
 		{
-			name: 'Übersicht',
+			name: 'Rangliste',
 			href: ''
 		},
 		{
@@ -77,7 +77,7 @@
 			</ClubAdmin>
 			{#if currentUserChallenge}
 				<AlertDialog.Root bind:open={leaveDialogOpen}>
-					<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+					<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary', size: 'sm' })}>
 						<LogOut />Verlassen
 					</AlertDialog.Trigger>
 					<AlertDialog.Content>
@@ -110,20 +110,22 @@
 {#if !currentUserChallenge}
 	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 {:else}
-	<nav class="my-2 overflow-x-scroll border-y-2 py-4">
+	<nav class="my-2 overflow-x-scroll border-t-2">
 		<ul class="flex gap-1 whitespace-nowrap">
 			{#each paths as path}
 				<a
 					class={cn(
 						'p-2 font-bold',
-						page.url.pathname === `${challengePath}${path.href}` && 'rounded-md bg-muted'
+						page.url.pathname === `${challengePath}${path.href}` && 'rounded-b-md bg-muted'
 					)}
 					href={`${challengePath}${path.href}`}>{path.name}</a
 				>
 			{/each}
 		</ul>
 	</nav>
-	{@render children()}
+	<div class="mt-2 pt-2">
+		{@render children()}
+	</div>
 {/if}
 
 <form

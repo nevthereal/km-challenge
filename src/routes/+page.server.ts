@@ -25,13 +25,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 			)
 			.groupBy(challenge.id);
 
-		// activeChallenges = activeChallenges.filter((c) => c.members.some((m) => m.userId === user.id));
-
 		const newEntryForm = await superValidate(zod(newEntry));
 
-		const challengesWithLeaderboards = activeChallenges.map((c) => {
+		const challengesWithLeaderboards = activeChallenges.map(async (c) => {
+			const disciplines = await db.query.discipline.findMany({
+				where: ({ challengeId }, { eq }) => eq(challengeId, c.id)
+			});
 			const leaderboard = getLeaderBoard(c.id);
-			return { ...c, leaderboard };
+			return { ...c, leaderboard, disciplines };
 		});
 
 		return { challengesWithLeaderboards, user, newEntryForm };

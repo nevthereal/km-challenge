@@ -82,7 +82,7 @@
 		><PlusCircle />
 		{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}
 	</Dialog.Trigger>
-	<Dialog.Content>
+	<Dialog.Content class="">
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
 			<!-- <SuperDebug data={$form} /> -->
@@ -92,50 +92,12 @@
 				method="post"
 				class="text-left"
 			>
-				<p class="mb-4 text-balance text-center text-sm text-muted-foreground">
+				<p class="mb-4 text-balance text-sm text-muted-foreground max-md:text-center">
 					Bitte Kilometer roh eintragen, die Punkte werden später verrechnet
 				</p>
-				<div class="flex gap-4">
-					<Form.Field form={entryForm} name="date" class="flex flex-col gap-2">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Datum</Form.Label>
-								<Popover.Root>
-									<Popover.Trigger
-										{...props}
-										class={cn(
-											buttonVariants({ variant: 'outline' }),
-											'justify-start text-left font-normal',
-											!value && 'text-muted-foreground'
-										)}
-									>
-										{value ? df.format(value.toDate(getLocalTimeZone())) : 'Datum wählen'}
-										<CalendarIcon class="ml-auto size-4 opacity-50" />
-									</Popover.Trigger>
-									<Popover.Content class="w-auto p-0" side="top">
-										<Calendar
-											type="single"
-											value={value as DateValue}
-											bind:placeholder
-											minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
-											maxValue={today(getLocalTimeZone())}
-											calendarLabel="Tag des Eintrags"
-											onValueChange={(v) => {
-												if (v) {
-													$form.date = v.toString();
-												} else {
-													$form.date = '';
-												}
-											}}
-										/>
-									</Popover.Content>
-								</Popover.Root>
-								<Form.FieldErrors />
-								<input hidden value={$form.date} name={props.name} />
-							{/snippet}
-						</Form.Control>
-					</Form.Field>
-					<Form.Field form={entryForm} name="amount">
+
+				<div class="mb-4 flex gap-4">
+					<Form.Field form={entryForm} name="amount" class="w-24 md:w-32">
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Kilometer</Form.Label>
@@ -150,27 +112,67 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
+					<Form.Field form={entryForm} name="disciplineId" class="flex-grow">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Disziplin</Form.Label>
+								<Select.Root type="single" bind:value={$form.disciplineId} name={props.name}>
+									<Select.Trigger {...props}>
+										{$form.disciplineId ? getDiscipline($form.disciplineId) : 'Disziplin Wählen'}
+									</Select.Trigger>
+									<Select.Content>
+										{#each disciplines as discipline}
+											<Select.Item
+												value={discipline.id}
+												label={`${discipline.name} (x${discipline.factor})`}
+											/>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
 				</div>
-				<Form.Field form={entryForm} name="disciplineId">
+
+				<Form.Field form={entryForm} name="date" class="flex flex-col">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label>Disziplin</Form.Label>
-							<Select.Root type="single" bind:value={$form.disciplineId} name={props.name}>
-								<Select.Trigger {...props}>
-									{$form.disciplineId ? getDiscipline($form.disciplineId) : 'Disziplin Wählen'}
-								</Select.Trigger>
-								<Select.Content>
-									{#each disciplines as discipline}
-										<Select.Item
-											value={discipline.id}
-											label={`${discipline.name} (x${discipline.factor})`}
-										/>
-									{/each}
-								</Select.Content>
-							</Select.Root>
+							<Form.Label>Datum</Form.Label>
+							<Popover.Root>
+								<Popover.Trigger
+									{...props}
+									class={cn(
+										buttonVariants({ variant: 'outline' }),
+										'justify-start text-left font-normal md:flex-grow',
+										!value && 'text-muted-foreground'
+									)}
+								>
+									{value ? df.format(value.toDate(getLocalTimeZone())) : 'Datum wählen'}
+									<CalendarIcon class="ml-auto size-4 opacity-50" />
+								</Popover.Trigger>
+								<Popover.Content side="top">
+									<Calendar
+										type="single"
+										value={value as DateValue}
+										bind:placeholder
+										minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
+										maxValue={today(getLocalTimeZone())}
+										calendarLabel="Tag des Eintrags"
+										onValueChange={(v) => {
+											if (v) {
+												$form.date = v.toString();
+											} else {
+												$form.date = '';
+											}
+										}}
+									/>
+								</Popover.Content>
+							</Popover.Root>
+							<Form.FieldErrors />
+							<input hidden value={$form.date} name={props.name} />
 						{/snippet}
 					</Form.Control>
-					<Form.FieldErrors />
 				</Form.Field>
 				<Button type="submit" class="mt-auto">Hinzufügen</Button>
 			</form>

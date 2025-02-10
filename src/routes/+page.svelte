@@ -13,20 +13,29 @@
 			<h1 class="h1">Aktive Challenges:</h1>
 		</div>
 		{#each data.challengesWithLeaderboards as challenge}
-			<div class="rounded-md border border-border p-6">
-				<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
-					<a
-						href={`/clubs/${challenge.clubId}/challenge/${challenge.id}`}
-						class="flex items-center gap-2 hover:text-primary"
-					>
-						<span class="w-fit text-2xl font-extrabold">
-							{challenge.name}
-						</span>
-						<SquareArrowOutUpRight />
-					</a>
+			{#await challenge}
+				<p class="text-center font-mono text-lg font-bold italic">Challenge wird geladen...</p>
+			{:then resolvedChallenge}
+				<div class="rounded-md border border-border p-6">
+					<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
+						<a
+							href={`/clubs/${resolvedChallenge.clubId}/challenge/${resolvedChallenge.id}`}
+							class="flex items-center gap-2 hover:text-primary"
+						>
+							<span class="w-fit text-2xl font-extrabold">
+								{resolvedChallenge.name}
+							</span>
+							<SquareArrowOutUpRight />
+						</a>
+						<EntryForm
+							challenge={resolvedChallenge}
+							disciplines={resolvedChallenge.disciplines}
+							formData={data.newEntryForm}
+						/>
+					</div>
+					<Leaderboard leaderboard={resolvedChallenge.leaderboard} />
 				</div>
-				<Leaderboard leaderboard={challenge.leaderboard} />
-			</div>
+			{/await}
 		{:else}
 			<div class="text-center mt-4">
 				<h2 class="h2 mb-2">Keine aktiven Challenges</h2>

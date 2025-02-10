@@ -32,7 +32,7 @@
 
 	let { formData, disciplines, challenge, classNames }: Props = $props();
 
-	let dialogOpen = $state(true);
+	let dialogOpen = $state(false);
 
 	const entryForm = superForm(formData, {
 		onResult: ({ result }) => {

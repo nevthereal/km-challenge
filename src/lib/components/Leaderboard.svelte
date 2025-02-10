@@ -13,7 +13,8 @@
 			<Table.Head>Rang</Table.Head>
 			<Table.Head>Name</Table.Head>
 			<Table.Head>Punktzahl</Table.Head>
-			<Table.Head>Geschlecht / Kategorie</Table.Head>
+			<Table.Head>Ges.</Table.Head>
+			<Table.Head>Kat.</Table.Head>
 			<Table.Head>Zuletzt aktiv</Table.Head>
 		</Table.Row>
 	</Table.Header>
@@ -29,11 +30,16 @@
 		{:then leaderboard}
 			{#each leaderboard as competitor, idx}
 				<Table.Row>
-					<Table.Cell class="font-medium">{idx + 1}</Table.Cell>
+					<Table.Cell>{idx + 1}</Table.Cell>
 					<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
 					<Table.Cell>{competitor.score}</Table.Cell>
-					<Table.Cell>{competitor.gender} / {competitor.role}</Table.Cell>
-					<Table.Cell>{prettyDate(new Date(competitor.lastActivity))}</Table.Cell>
+					<Table.Cell>{competitor.gender}</Table.Cell>
+					<Table.Cell>{competitor.role}</Table.Cell>
+					<Table.Cell
+						>{Intl.DateTimeFormat('de', { dateStyle: 'medium' }).format(
+							new Date(competitor.lastActivity)
+						)}</Table.Cell
+					>
 				</Table.Row>
 			{:else}
 				<Table.Row>

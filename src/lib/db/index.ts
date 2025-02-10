@@ -17,7 +17,7 @@ export async function getLeaderBoard(challengeId: string) {
 					'score'
 				),
 			totalEntries: sql<number>`count(${schema.entry.id})`.as('total_entries'),
-			lastActivity: sql<Date>`max(${schema.entry.date})`.as('last_activity'),
+			lastActivity: sql<string>`max(${schema.entry.date})`.as('last_activity'),
 			role: schema.user.role,
 			gender: schema.user.gender
 		})

@@ -32,7 +32,7 @@
 
 	let { formData, disciplines, challenge, classNames }: Props = $props();
 
-	let dialogOpen = $state(false);
+	let dialogOpen = $state(true);
 
 	const entryForm = superForm(formData, {
 		onResult: ({ result }) => {
@@ -90,25 +90,13 @@
 				use:enhance
 				action={`/clubs/${challenge.clubId}/challenge/${challenge.id}?/newEntry`}
 				method="post"
+				class="text-left"
 			>
+				<p class="mb-4 text-balance text-center text-sm text-muted-foreground">
+					Bitte Kilometer roh eintragen, die Punkte werden später verrechnet
+				</p>
 				<div class="flex gap-4">
-					<Form.Field form={entryForm} name="amount">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Kilometer</Form.Label>
-								<Input
-									{...props}
-									{...$constraints.amount}
-									step="0.01"
-									type="number"
-									bind:value={$form.amount}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-
-					<Form.Field form={entryForm} name="date">
+					<Form.Field form={entryForm} name="date" class="flex flex-col gap-2">
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Datum</Form.Label>
@@ -117,7 +105,7 @@
 										{...props}
 										class={cn(
 											buttonVariants({ variant: 'outline' }),
-											'w-[280px] justify-start pl-4 text-left font-normal',
+											'justify-start text-left font-normal',
 											!value && 'text-muted-foreground'
 										)}
 									>
@@ -146,6 +134,21 @@
 								<input hidden value={$form.date} name={props.name} />
 							{/snippet}
 						</Form.Control>
+					</Form.Field>
+					<Form.Field form={entryForm} name="amount">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Kilometer</Form.Label>
+								<Input
+									{...props}
+									{...$constraints.amount}
+									step="0.01"
+									type="number"
+									bind:value={$form.amount}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
 					</Form.Field>
 				</div>
 				<Form.Field form={entryForm} name="disciplineId">

@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { challengeMember } from '$lib/db/schema';
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent, params }) => {
 	const { challenge } = await parent();
 	const members = await db.query.challengeMember.findMany({
 		where: eq(challengeMember.challengeId, challenge.id),
@@ -12,11 +12,17 @@ export const load: PageServerLoad = async ({ parent }) => {
 				columns: {
 					name: true,
 					gender: true,
-					role: true
+					role: true,
+					id: true,
+					admin: true
 				}
 			}
 		}
 	});
 
-	return { members };
+	const admins = await db.query.clubAdmin.findMany({
+		where: ({ clubId }, { eq }) => eq(clubId, params.clubId)
+	});
+
+	return { members, admins };
 };

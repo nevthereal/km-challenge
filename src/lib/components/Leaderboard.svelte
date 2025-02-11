@@ -1,10 +1,13 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import type { Leaderboard } from '$lib/db';
-	import { prettyDate } from '$lib/utils';
+	import type { challenge } from '$lib/db/schema';
 	import { Skeleton } from './ui/skeleton';
 
-	let { leaderboard }: { leaderboard: Leaderboard } = $props();
+	let {
+		leaderboard,
+		currentChallenge
+	}: { leaderboard: Leaderboard; currentChallenge: typeof challenge.$inferSelect } = $props();
 </script>
 
 <Table.Root class="max-md:portrait:hidden">
@@ -31,7 +34,12 @@
 			{#each leaderboard as competitor, idx}
 				<Table.Row>
 					<Table.Cell>{idx + 1}</Table.Cell>
-					<Table.Cell class="font-medium">{competitor.username}</Table.Cell>
+					<Table.Cell class="font-medium"
+						><a
+							href={`/clubs/${currentChallenge.clubId}/challenge/${currentChallenge.id}/members/${competitor.id}`}
+							>{competitor.name}</a
+						></Table.Cell
+					>
 					<Table.Cell>{competitor.score}</Table.Cell>
 					<Table.Cell>{competitor.gender}</Table.Cell>
 					<Table.Cell>{competitor.role}</Table.Cell>

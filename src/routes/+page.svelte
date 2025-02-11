@@ -33,7 +33,10 @@
 							formData={data.newEntryForm}
 						/>
 					</div>
-					<Leaderboard leaderboard={resolvedChallenge.leaderboard} />
+					<Leaderboard
+						currentChallenge={resolvedChallenge}
+						leaderboard={resolvedChallenge.leaderboard}
+					/>
 				</div>
 			{/await}
 		{:else}

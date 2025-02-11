@@ -14,5 +14,5 @@
 		<h1 class="h1">Rangliste</h1>
 		<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 	</div>
-	<Leaderboard {leaderboard} />
+	<Leaderboard currentChallenge={challenge} {leaderboard} />
 </main>

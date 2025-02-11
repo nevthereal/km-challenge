@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import type { LayoutServerLoad } from './$types';
 import { challenge, challengeMember, clubMember } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
-import { getUser, isActive } from '$lib/utils';
+import { getUser } from '$lib/utils';
 
 export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 	const user = getUser({ locals, redirectUrl: url.pathname });

@@ -16,7 +16,7 @@
 
 	const paths = [
 		{
-			name: 'Rangliste',
+			name: 'Übersicht',
 			href: ''
 		},
 		{
@@ -111,7 +111,7 @@
 	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 {:else}
 	<nav class="my-2 overflow-x-scroll border-t-2">
-		<ul class="flex gap-1 whitespace-nowrap">
+		<ul class="flex whitespace-nowrap">
 			{#each paths as path}
 				<a
 					class={cn(

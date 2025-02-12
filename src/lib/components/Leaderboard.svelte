@@ -2,6 +2,8 @@
 	import * as Table from '$lib/components/ui/table';
 	import type { Leaderboard } from '$lib/db';
 	import type { challenge } from '$lib/db/schema';
+	import { cn } from '$lib/utils';
+	import { SquareArrowOutUpRight } from 'lucide-svelte';
 	import { Skeleton } from './ui/skeleton';
 
 	let {
@@ -32,12 +34,23 @@
 			{/each}
 		{:then leaderboard}
 			{#each leaderboard as competitor, idx}
-				<Table.Row>
+				<Table.Row
+					class={cn(
+						idx === 0
+							? 'text-amber-400'
+							: idx === 1
+								? 'text-gray-400'
+								: idx === 2
+									? 'text-orange-800'
+									: ''
+					)}
+				>
 					<Table.Cell>{idx + 1}</Table.Cell>
 					<Table.Cell class="font-medium"
 						><a
+							class="flex items-center gap-1 font-bold"
 							href={`/clubs/${currentChallenge.clubId}/challenge/${currentChallenge.id}/members/${competitor.id}`}
-							>{competitor.name}</a
+							>{competitor.name} <SquareArrowOutUpRight size={16} strokeWidth={3} /></a
 						></Table.Cell
 					>
 					<Table.Cell>{competitor.score}</Table.Cell>

@@ -1,10 +1,31 @@
 <script lang="ts">
 	import { ArrowLeft } from 'lucide-svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
+	import { prettyDate } from '$lib/utils';
 
 	let { data } = $props();
 
 	let { member } = $derived(data);
+
+	const listItems: ListItems = $derived([
+		{
+			name: 'Beigetreten am',
+			content: prettyDate(member.joinedAt!)
+		},
+		{
+			name: 'Kategorie',
+			content: member.user.role ?? 'Nicht angegeben'
+		},
+		{
+			name: 'Geschlecht',
+			content: member.user.gender ?? 'Nicht angegeben'
+		},
+		{
+			name: 'Einträge',
+			content: String(member.user.entries.length)
+		}
+	]);
 </script>
 
 <div class="mb-4 flex">
@@ -14,15 +35,16 @@
 		><ArrowLeft strokeWidth={3} /> Alle Mitglieder</a
 	>
 </div>
-<h1 class="h1">
-	<span class="text-primary">
-		{member.name}
-	</span>
+<h1 class="h1 mb-4">
+	{member.user.name}
 </h1>
+<div class="mt-2">
+	<NiceList {listItems} />
+</div>
 
 <h2 class="h2 my-4">Einträge:</h2>
-<div class="flex flex-col gap-4 p-2">
-	{#each member.entries as entry}
+<div class="mt-4 flex flex-col gap-4">
+	{#each member.user.entries as entry}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title

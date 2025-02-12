@@ -45,8 +45,8 @@
 </nav>
 <div class="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start">
 	<div>
-		<h1 class="h1 mb-2">{challenge.name}</h1>
-		<p class={cn(active && 'text-green-500')}>
+		<h1 class="h1 mb-4">{challenge.name}</h1>
+		<p class={cn(active && 'my-2 text-green-500')}>
 			{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}
 		</p>
 	</div>

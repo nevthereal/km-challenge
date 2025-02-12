@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { prettyDate } from '$lib/utils';
-
 	let { data } = $props();
 
 	let { members, challengePath, admins } = $derived(data);

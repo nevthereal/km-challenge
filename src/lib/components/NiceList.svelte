@@ -17,8 +17,8 @@
 <ul class={className}>
 	{#each listItems as item}
 		<li>
-			<span class="font-medium">{item.name}:</span>
-			<span class="text-muted-foreground">{item.content}</span>
+			<span class="font-medium text-muted-foreground">{item.name}:</span>
+			<span class="font-medium">{item.content}</span>
 		</li>
 	{/each}
 </ul>

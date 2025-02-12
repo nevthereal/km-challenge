@@ -27,5 +27,5 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 
 	if (!qMember) return error(404, 'Dieses Mitglied existiert nicht');
 
-	return { member: qMember.user };
+	return { member: qMember };
 };

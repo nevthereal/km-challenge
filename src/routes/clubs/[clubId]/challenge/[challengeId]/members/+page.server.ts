@@ -17,6 +17,9 @@ export const load: PageServerLoad = async ({ parent, params }) => {
 					admin: true
 				}
 			}
+		},
+		orderBy(fields, operators) {
+			return operators.asc(fields.joinedAt);
 		}
 	});
 

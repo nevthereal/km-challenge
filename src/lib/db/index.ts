@@ -8,8 +8,8 @@ import { sql, eq, desc, and, getTableColumns } from 'drizzle-orm';
 const client = neon(DATABASE_URL);
 export const db = drizzle(client, { casing: 'snake_case', schema: { ...schema, ...relations } });
 
-export async function getLeaderBoard(challengeId: string) {
-	return await db
+export async function getLeaderBoard(challengeId: string, limit?: number) {
+	const lb = db
 		.select({
 			...getTableColumns(schema.user),
 			score:
@@ -25,6 +25,10 @@ export async function getLeaderBoard(challengeId: string) {
 		.where(eq(schema.entry.challengeId, challengeId))
 		.groupBy(schema.user.id)
 		.orderBy(desc(sql`score`));
+
+	if (limit) return await lb.limit(limit);
+
+	return await lb;
 }
 
 export type Leaderboard = ReturnType<typeof getLeaderBoard>;

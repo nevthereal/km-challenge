@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			const disciplines = await db.query.discipline.findMany({
 				where: ({ challengeId }, { eq }) => eq(challengeId, c.id)
 			});
-			const leaderboard = getLeaderBoard(c.id);
+			const leaderboard = getLeaderBoard(c.id, 5);
 			return { ...c, leaderboard, disciplines };
 		});
 

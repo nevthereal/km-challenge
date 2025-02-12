@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 						where: ({ challengeId }, { eq }) => eq(challengeId, currentChallengeId),
 						with: {
 							discipline: true
-						}
+						},
+						orderBy: (fields, operators) => operators.desc(fields.createdAt)
 					}
 				}
 			}

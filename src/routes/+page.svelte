@@ -1,6 +1,9 @@
 <script>
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
+
+	import Button from '$lib/components/ui/button/button.svelte';
+
 	import { SquareArrowOutUpRight } from 'lucide-svelte';
 
 	let { data } = $props();
@@ -37,6 +40,11 @@
 						currentChallenge={resolvedChallenge}
 						leaderboard={resolvedChallenge.leaderboard}
 					/>
+					<Button
+						variant="link"
+						href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
+						>Komplette Rangliste</Button
+					>
 				</div>
 			{/await}
 		{:else}

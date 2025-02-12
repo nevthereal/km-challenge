@@ -77,7 +77,7 @@
 			</ClubAdmin>
 			{#if currentUserChallenge}
 				<AlertDialog.Root bind:open={leaveDialogOpen}>
-					<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary', size: 'sm' })}>
+					<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
 						<LogOut />Verlassen
 					</AlertDialog.Trigger>
 					<AlertDialog.Content>

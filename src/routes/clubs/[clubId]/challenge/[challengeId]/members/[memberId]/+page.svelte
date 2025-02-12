@@ -4,7 +4,7 @@
 
 	let { data } = $props();
 
-	let { member, challenge } = $derived(data);
+	let { member } = $derived(data);
 </script>
 
 <div class="mb-4 flex">
@@ -38,5 +38,7 @@
 				</p>
 			</Card.Content>
 		</Card.Root>
+	{:else}
+		<p class="italic font-mono font-bold">Noch keine Aktivität</p>
 	{/each}
 </div>

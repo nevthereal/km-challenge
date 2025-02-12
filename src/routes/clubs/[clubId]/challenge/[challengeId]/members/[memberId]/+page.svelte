@@ -20,10 +20,6 @@
 		{
 			name: 'Geschlecht',
 			content: member.user.gender ?? 'Nicht angegeben'
-		},
-		{
-			name: 'Einträge',
-			content: String(member.user.entries.length)
 		}
 	]);
 </script>
@@ -42,7 +38,9 @@
 	<NiceList {listItems} />
 </div>
 
-<h2 class="h2 my-4">Einträge:</h2>
+<h2 class="h2 my-4">
+	Einträge ({member.user.entries.length != 0 ? member.user.entries.length.toString() : 'keine'}):
+</h2>
 <div class="mt-4 flex flex-col gap-4">
 	{#each member.user.entries as entry}
 		<Card.Root>

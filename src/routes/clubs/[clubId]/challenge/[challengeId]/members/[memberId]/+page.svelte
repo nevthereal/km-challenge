@@ -9,7 +9,7 @@
 
 <div class="mb-4 flex">
 	<a
-		href={`${data.challengePath}/members`}
+		href="{data.challengePath}/members"
 		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
 		><ArrowLeft strokeWidth={3} /> Alle Mitglieder</a
 	>

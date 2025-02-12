@@ -27,7 +27,7 @@
 	</Card.Root>
 	{#each usersClubs as { club }}
 		<Card.Root>
-			<a href={`/clubs/${club.id}`}>
+			<a href="/clubs/{club.id}">
 				<Card.Header>
 					<Card.Title>
 						{club.name}

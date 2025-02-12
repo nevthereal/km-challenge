@@ -38,7 +38,7 @@
 
 <nav class="mb-4 flex gap-4">
 	<a
-		href={`/clubs/${challenge.clubId}`}
+		href="/clubs/{challenge.clubId}"
 		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
 		><ArrowLeft strokeWidth={3} /> Zum Club</a
 	>
@@ -118,7 +118,7 @@
 						'p-2 font-bold',
 						page.url.pathname === `${challengePath}${path.href}` && 'rounded-b-md bg-muted'
 					)}
-					href={`${challengePath}${path.href}`}>{path.name}</a
+					href="{challengePath}{path.href}">{path.name}</a
 				>
 			{/each}
 		</ul>

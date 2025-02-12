@@ -185,7 +185,7 @@
 		</Sheet.Root>
 	</ClubAdmin>
 	{#each club.challenges as challenge}
-		<a href={`/clubs/${club.id}/challenge/${challenge.id}`}>
+		<a href="/clubs/{club.id}/challenge/{challenge.id}">
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>{challenge.name}</Card.Title>

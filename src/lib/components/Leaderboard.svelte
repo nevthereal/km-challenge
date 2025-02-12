@@ -49,8 +49,8 @@
 					<Table.Cell class="font-medium"
 						><a
 							class="flex items-center gap-1 font-bold"
-							href={`/clubs/${currentChallenge.clubId}/challenge/${currentChallenge.id}/members/${competitor.id}`}
-							>{competitor.name} <SquareArrowOutUpRight size={16} strokeWidth={3} /></a
+							href="/clubs/{currentChallenge.clubId}/challenge/{currentChallenge.id}/members/{competitor.id}"
+							>{competitor.name}</a
 						></Table.Cell
 					>
 					<Table.Cell>{competitor.score}</Table.Cell>

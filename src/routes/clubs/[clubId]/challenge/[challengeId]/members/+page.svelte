@@ -12,7 +12,7 @@
 		{#each members as member}
 			{@const { user } = member}
 			<li>
-				<a class="link" href={`${challengePath}/members/${user.id}`}>
+				<a class="link" href="{challengePath}/members/{user.id}">
 					{user.name}
 					{#if admins.some((a) => a.userId === user.id)}
 						<span>(Admin)</span>

@@ -22,7 +22,7 @@
 				<div class="rounded-md border border-border p-6">
 					<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
 						<a
-							href={`/clubs/${resolvedChallenge.clubId}/challenge/${resolvedChallenge.id}`}
+							href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
 							class="flex items-center gap-2 hover:text-primary"
 						>
 							<span class="w-fit text-2xl font-extrabold">
@@ -42,6 +42,7 @@
 					/>
 					<Button
 						variant="link"
+						class="mt-2"
 						href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
 						>Komplette Rangliste</Button
 					>

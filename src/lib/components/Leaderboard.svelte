@@ -37,15 +37,17 @@
 				<Table.Row
 					class={cn(
 						idx === 0
-							? 'text-amber-400'
+							? 'text-amber-200'
 							: idx === 1
-								? 'text-gray-400'
+								? 'text-gray-200'
 								: idx === 2
-									? 'text-orange-800'
+									? 'text-orange-600'
 									: ''
 					)}
 				>
-					<Table.Cell>{idx + 1}</Table.Cell>
+					<Table.Cell>
+						{idx + 1}
+					</Table.Cell>
 					<Table.Cell class="font-medium"
 						><a
 							class="flex items-center gap-1 font-bold"

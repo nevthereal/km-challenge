@@ -14,7 +14,21 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const leaderboard = getLeaderBoard(challenge.id);
 	const newEntryForm = await superValidate(zod(newEntry));
 
-	return { leaderboard, newEntryForm };
+	const lastActivities = await db.query.entry.findMany({
+		where(fields, operators) {
+			return operators.eq(fields.challengeId, challenge.id);
+		},
+		limit: 10,
+		orderBy(fields, operators) {
+			return operators.desc(fields.createdAt);
+		},
+		with: {
+			user: true,
+			discipline: true
+		}
+	});
+
+	return { leaderboard, newEntryForm, lastActivities };
 };
 
 export const actions: Actions = {

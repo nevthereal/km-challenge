@@ -50,7 +50,7 @@
 	<div>
 		{#if !isAdmin}
 			<AlertDialog.Root bind:open={leaveDialogOpen}>
-				<AlertDialog.Trigger class={buttonVariants({ variant: 'secondary' })}>
+				<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
 					<LogOut />Club verlassen
 				</AlertDialog.Trigger>
 				<AlertDialog.Content>

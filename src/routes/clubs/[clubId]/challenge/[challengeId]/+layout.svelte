@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { ArrowLeft, LogIn, LogOut, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, DoorOpen, LogOut, Trash2 } from 'lucide-svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn, isActive, prettyDate } from '$lib/utils';
 	import { enhance } from '$app/forms';
@@ -66,10 +66,10 @@
 							</AlertDialog.Description>
 						</AlertDialog.Header>
 						<AlertDialog.Footer>
-							<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+							<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 							<AlertDialog.Action
 								form="deleteForm"
-								class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
+								class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
 							>
 						</AlertDialog.Footer>
 					</AlertDialog.Content>
@@ -77,7 +77,7 @@
 			</ClubAdmin>
 			{#if currentUserChallenge}
 				<AlertDialog.Root bind:open={leaveDialogOpen}>
-					<AlertDialog.Trigger class={buttonVariants({ variant: 'outline', size: 'sm' })}>
+					<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
 						<LogOut />Verlassen
 					</AlertDialog.Trigger>
 					<AlertDialog.Content>
@@ -94,14 +94,7 @@
 					</AlertDialog.Content>
 				</AlertDialog.Root>
 			{:else}
-				<Button
-					onclick={async () => {
-						await fetch(`/api/join-challenge?id=${challenge.id}`, {
-							method: 'post'
-						});
-						location.reload();
-					}}><LogIn />Beitreten</Button
-				>
+				<Button type="submit" form="joinForm"><DoorOpen />Beitreten</Button>
 			{/if}
 		</div>
 	</div>
@@ -136,3 +129,4 @@
 	method="post"
 ></form>
 <form id="leaveForm" action="{challengePath}/?/leave" method="post" use:enhance hidden></form>
+<form id="joinForm" action="{challengePath}/?/join" method="post" use:enhance hidden></form>

@@ -5,7 +5,7 @@ import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { newEntry } from '$lib/zod';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
-import { challenge, challengeMember, discipline, entry } from '$lib/db/schema';
+import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
 import { and, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ parent }) => {
@@ -98,7 +98,19 @@ export const actions: Actions = {
 		if (!qChallengeMember) return error(404, 'Du bist kein Mitglied dieser Challenge');
 
 		await db.delete(challengeMember).where(eq(challengeMember.id, qChallengeMember.id));
+	},
+	join: async ({ params, locals, url }) => {
+		const user = getUser({ locals, redirectUrl: url.pathname });
 
-		return redirect(302, `/clubs/${params.clubId}`);
+		const clubRel = await db.query.clubMember.findFirst({
+			where: and(eq(clubMember.userId, user.id), eq(clubMember.clubId, params.clubId))
+		});
+
+		if (!clubRel) return error(401, 'Du bist kein Mitglied des Clubs');
+
+		await db.insert(challengeMember).values({
+			challengeId: params.challengeId,
+			userId: user.id
+		});
 	}
 };

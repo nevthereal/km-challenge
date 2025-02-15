@@ -123,7 +123,7 @@
 										{#each disciplines as discipline}
 											<Select.Item
 												value={discipline.id}
-												label={`${discipline.name} (x${discipline.factor})`}
+												label="{discipline.name} (x{discipline.factor})"
 											/>
 										{/each}
 									</Select.Content>

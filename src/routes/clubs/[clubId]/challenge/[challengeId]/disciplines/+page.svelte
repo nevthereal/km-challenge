@@ -1,4 +1,5 @@
 <script>
+	import { enhance } from '$app/forms';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
@@ -34,6 +35,8 @@
 									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 									<AlertDialog.Action
 										form="deleteForm"
+										value={d.id}
+										name="id"
 										class={buttonVariants({ variant: 'destructive' })}>Continue</AlertDialog.Action
 									>
 								</AlertDialog.Footer>
@@ -54,3 +57,5 @@
 		</div>
 	{/if}
 </main>
+
+<form id="deleteForm" action="?/delete" method="post" use:enhance hidden></form>

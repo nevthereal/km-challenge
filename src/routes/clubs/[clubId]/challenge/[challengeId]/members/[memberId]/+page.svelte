@@ -43,7 +43,7 @@
 </h2>
 <div class="mt-4 flex flex-col gap-4">
 	{#each member.user.entries as entry}
-		<EntryCard {entry} discipline={entry.discipline} edit={false} />
+		<EntryCard {entry} discipline={entry.discipline} editForm={false} />
 	{:else}
 		<p class="italic font-mono font-bold">Noch keine Aktivität</p>
 	{/each}

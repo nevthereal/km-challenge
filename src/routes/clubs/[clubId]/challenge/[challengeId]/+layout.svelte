@@ -131,8 +131,8 @@
 <form
 	id="deleteForm"
 	hidden
-	action={`${challengePath}/?/deleteChallenge`}
+	action="{challengePath}/?/deleteChallenge"
 	use:enhance
 	method="post"
 ></form>
-<form id="leaveForm" action={`${challengePath}/?/leave`} method="post" use:enhance hidden></form>
+<form id="leaveForm" action="{challengePath}/?/leave" method="post" use:enhance hidden></form>

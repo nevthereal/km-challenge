@@ -87,7 +87,7 @@
 			<!-- <SuperDebug data={$form} /> -->
 			<form
 				use:enhance
-				action={`/clubs/${challenge.clubId}/challenge/${challenge.id}?/newEntry`}
+				action="/clubs/{challenge.clubId}/challenge/{challenge.id}?/newEntry"
 				method="post"
 				class="text-left"
 			>

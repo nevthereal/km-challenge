@@ -1,6 +1,9 @@
 import { db } from '$lib/db';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { editEntry } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const { challenge, user } = await parent();
@@ -29,7 +32,9 @@ export const load: PageServerLoad = async ({ parent }) => {
 		}
 	});
 
+	const editForm = await superValidate(zod(editEntry));
+
 	if (!membership) return error(400);
 
-	return { entries, membership };
+	return { entries, membership, editForm };
 };

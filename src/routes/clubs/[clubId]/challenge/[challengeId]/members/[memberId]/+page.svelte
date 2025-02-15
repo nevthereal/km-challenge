@@ -6,7 +6,7 @@
 
 	let { data } = $props();
 
-	let { member } = $derived(data);
+	let { member, challengePath } = $derived(data);
 
 	const listItems: ListItems = $derived([
 		{
@@ -43,7 +43,7 @@
 </h2>
 <div class="mt-4 flex flex-col gap-4">
 	{#each member.user.entries as entry}
-		<EntryCard {entry} discipline={entry.discipline} editForm={false} />
+		<EntryCard {entry} discipline={entry.discipline} edit={false} {challengePath} />
 	{:else}
 		<p class="italic font-mono font-bold">Noch keine Aktivität</p>
 	{/each}

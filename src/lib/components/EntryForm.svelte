@@ -20,7 +20,6 @@
 		parseDateTime
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
-	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		formData: SuperValidated<Infer<typeof newEntry>>;
@@ -36,9 +35,6 @@
 	const entryForm = superForm(formData, {
 		onResult: ({ result }) => {
 			if (result.type === 'success') dialogOpen = !dialogOpen;
-		},
-		onUpdated: ({ form }) => {
-			if (form.valid) toast.success('Eintrag hinzugefügt');
 		},
 		id: `entry-${challenge.id}`
 	});

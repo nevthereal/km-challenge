@@ -67,7 +67,7 @@ export const actions: Actions = {
 	},
 	getCode: async ({ locals, params, url }) => {
 		const user = getUser({ locals, redirectUrl: url.pathname });
-		if (!user.superUser) return error(401, 'Nicht erlaubt.');
+		if (!checkAdmin(params.clubId, user.id)) return error(401, 'Nicht erlaubt.');
 
 		const [{ code }] = await db
 			.insert(inviteCode)

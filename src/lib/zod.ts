@@ -37,3 +37,10 @@ export const newEntry = z.object({
 	amount: z.number().step(0.01).min(0.01),
 	date: z.string().date()
 });
+
+export const editEntry = z.object({
+	disciplineId: z.string(),
+	amount: z.number().step(0.01).min(0.01),
+	date: z.string().date(),
+	entryId: z.string()
+});

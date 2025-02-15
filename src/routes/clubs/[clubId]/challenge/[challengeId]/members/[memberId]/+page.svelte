@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { ArrowLeft } from 'lucide-svelte';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import { prettyDate } from '$lib/utils';
+	import EntryCard from '$lib/components/EntryCard.svelte';
 
 	let { data } = $props();
 
@@ -43,21 +43,7 @@
 </h2>
 <div class="mt-4 flex flex-col gap-4">
 	{#each member.user.entries as entry}
-		<Card.Root>
-			<Card.Header>
-				<Card.Title
-					>{entry.discipline?.name ?? 'Aktivität'} am {Intl.DateTimeFormat('de', {
-						dateStyle: 'medium'
-					}).format(entry.createdAt)}</Card.Title
-				>
-			</Card.Header>
-			<Card.Content>
-				<p>
-					{Number(entry.amount) * Number(entry.discipline?.factor ?? 1)} Punkte
-					<span class="font-mono text-muted-foreground">({entry.amount}km)</span>
-				</p>
-			</Card.Content>
-		</Card.Root>
+		<EntryCard {entry} discipline={entry.discipline} edit={false} />
 	{:else}
 		<p class="italic font-mono font-bold">Noch keine Aktivität</p>
 	{/each}

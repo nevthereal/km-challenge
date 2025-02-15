@@ -10,7 +10,6 @@
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
 	import { cn, isActive } from '$lib/utils';
-	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	import {
 		DateFormatter,

@@ -1,10 +1,8 @@
 <script lang="ts">
+	import EntryCard from '$lib/components/EntryCard.svelte';
 	import type { ListItems } from '$lib/components/NiceList.svelte';
 	import NiceList from '$lib/components/NiceList.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import { prettyDate } from '$lib/utils';
-	import { Pencil, Trash2 } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -33,25 +31,7 @@
 </h2>
 <div class="mt-4 flex flex-col gap-4">
 	{#each entries as entry}
-		<Card.Root>
-			<Card.Header>
-				<Card.Title
-					>{entry.discipline?.name ?? 'Aktivität'} am {Intl.DateTimeFormat('de', {
-						dateStyle: 'medium'
-					}).format(entry.createdAt)}</Card.Title
-				>
-			</Card.Header>
-			<Card.Content class="flex items-center justify-between">
-				<p>
-					{Number(entry.amount) * Number(entry.discipline?.factor ?? 1)} Punkte
-					<span class="font-mono text-muted-foreground">({entry.amount}km)</span>
-				</p>
-				<!-- <div class="flex gap-2">
-					<Button variant="ghost" size="icon" class="text-primary"><Pencil /></Button>
-					<Button variant="ghost" size="icon" class="text-destructive"><Trash2 /></Button>
-				</div> -->
-			</Card.Content>
-		</Card.Root>
+		<EntryCard {entry} discipline={entry.discipline} edit={true} />
 	{:else}
 		<p class="italic font-mono font-bold">Noch keine Aktivität</p>
 	{/each}

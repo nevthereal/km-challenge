@@ -6,7 +6,7 @@
 
 	let { data } = $props();
 
-	let { challenge, leaderboard, lastActivities } = $derived(data);
+	let { challenge, leaderboard, lastActivities, challengePath } = $derived(data);
 </script>
 
 <main class="flex-grow">
@@ -29,7 +29,11 @@
 							activity.createdAt
 						)}</Badge
 					>
-					<span class="font-medium">{activity.user.name}</span>
+					<span class="font-medium"
+						><a class="underline" href="{challengePath}/members/{activity.userId}"
+							>{activity.user.name}</a
+						></span
+					>
 					<span class="text-muted-foreground">hat</span>
 					<span class="font-medium">{activity.amount}km</span>
 					<span class="text-muted-foreground">in</span>

@@ -10,20 +10,29 @@
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { ArrowLeft, Ellipsis, Link, LogOut, PlusCircle, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 
 	let { data, form: formData } = $props();
 
-	const form = superForm(data.createForm);
+	const createForm = superForm(data.createForm);
+	const editClubForm = superForm(data.editClubForm, {
+		onResult: ({ result }) => {
+			if ((result.type = 'success')) editDialogOpen = !editDialogOpen;
+		}
+	});
 
-	const { form: formFields, enhance: sfEnhance } = form;
+	const { form: createFormFields, enhance: createEnhance } = createForm;
+	const {
+		form: editFormFields,
+		enhance: editFormEnhance,
+		constraints: editFormContraints
+	} = editClubForm;
 
-	let { qClub: club } = data;
+	let { qClub: club } = $derived(data);
 
 	let inviteCode = $derived(formData?.code);
 	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
@@ -35,6 +44,7 @@
 
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
+	let editDialogOpen = $state(false);
 </script>
 
 <nav class="mb-4 flex">
@@ -69,13 +79,14 @@
 		<ClubAdmin {isAdmin}>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
-					><Ellipsis /><span class="max-md:hidden">Optionen</span>
+					><Ellipsis />Optionen
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Group>
 						<DropdownMenu.GroupHeading>Mehr Optionen</DropdownMenu.GroupHeading>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Group class="flex flex-col gap-2 p-2">
+							<!-- Link generation -->
 							<Dialog.Root>
 								<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
 									><Link /> Einladungslink generieren</Dialog.Trigger
@@ -105,6 +116,36 @@
 									{/if}
 								</Dialog.Content>
 							</Dialog.Root>
+
+							<!-- Club edit -->
+							<Dialog.Root bind:open={editDialogOpen}>
+								<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
+									><Pencil /> Club bearbeiten</Dialog.Trigger
+								>
+								<Dialog.Content>
+									<Dialog.Header>
+										<Dialog.Title>Club bearbeiten</Dialog.Title>
+									</Dialog.Header>
+									<form use:editFormEnhance action="?/edit" method="post">
+										<Form.Field form={editClubForm} name="name">
+											<Form.Control>
+												{#snippet children({ props })}
+													<Form.Label>Name</Form.Label>
+													<Input
+														{...props}
+														{...$editFormContraints.name}
+														bind:value={$editFormFields.name}
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+										<Button type="submit">Bearbeiten</Button>
+									</form>
+								</Dialog.Content>
+							</Dialog.Root>
+
+							<!-- Club deletion -->
 							<AlertDialog.Root bind:open={deleteDialogOpen}>
 								<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
 									<Trash2 />Club löschen
@@ -152,27 +193,27 @@
 					<form
 						method="post"
 						action="?/createChallenge"
-						use:sfEnhance
+						use:createEnhance
 						class="flex max-w-xl flex-col gap-2"
 					>
-						<Form.Field {form} name="name">
+						<Form.Field form={createForm} name="name">
 							<Form.Control>
 								{#snippet children({ props })}
 									<Form.Label>Name</Form.Label>
-									<Input {...props} bind:value={$formFields.name} />
+									<Input {...props} bind:value={$createFormFields.name} />
 								{/snippet}
 							</Form.Control>
 							<Form.FieldErrors />
 						</Form.Field>
-						<Form.Field {form} name="startsAt" class="flex flex-col">
+						<Form.Field form={createForm} name="startsAt" class="flex flex-col">
 							<Form.Control>
 								{#snippet children()}
 									<Form.Label>Start der Challenge</Form.Label>
 									<DatePicker
 										startName="startsAt"
 										endName="endsAt"
-										bind:startValue={$formFields.startsAt}
-										bind:endValue={$formFields.endsAt}
+										bind:startValue={$createFormFields.startsAt}
+										bind:endValue={$createFormFields.endsAt}
 									/>
 								{/snippet}
 							</Form.Control>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { gender, roles } from './db/schema';
 
-export const createProjectSchema = z
+export const createChallenge = z
 	.object({
 		name: z.string().min(3),
 		startsAt: z.date(),
@@ -36,4 +36,8 @@ export const newEntry = z.object({
 	disciplineId: z.string(),
 	amount: z.number().step(0.01).min(0.01),
 	date: z.string().date()
+});
+
+export const editClub = z.object({
+	name: z.string().min(5)
 });

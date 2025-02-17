@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { PlusCircle } from 'lucide-svelte';
+	import { CirclePlus, PlusCircle } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -11,7 +11,7 @@
 <h1 class="h1 mb-8">Deine Clubs</h1>
 
 {#if data.user.superUser}
-	<Button size="lg" href="/clubs/create" class="my-4">Club erstellen</Button>
+	<Button size="lg" href="/clubs/create" class="my-4"><CirclePlus />Club erstellen</Button>
 {/if}
 
 <div class="mb-6 grid gap-6 md:grid-cols-4">

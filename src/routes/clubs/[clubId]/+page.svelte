@@ -86,87 +86,9 @@
 						<DropdownMenu.GroupHeading>Mehr Optionen</DropdownMenu.GroupHeading>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Group class="flex flex-col gap-2 p-2">
-							<!-- Link generation -->
-							<Dialog.Root>
-								<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
-									><Link /> Einladungslink generieren</Dialog.Trigger
-								>
-								<Dialog.Content>
-									<Dialog.Header>
-										<Dialog.Title>Einladungslink generieren</Dialog.Title>
-										<Dialog.Description
-											>Diese Aktion generiert einen Einladungslink und einen Code.</Dialog.Description
-										>
-									</Dialog.Header>
-									{#if !inviteCode}
-										<Button type="submit" form="generateForm" variant="outline"
-											><Link /> Generieren</Button
-										>
-									{:else}
-										<div class="flex gap-4">
-											<Input value={inviteUrl} readonly />
-											<Button
-												onclick={async () => {
-													await navigator.clipboard.writeText(inviteText);
-													toast.success('Link in die Zwischenablage kopiert');
-												}}
-												variant="outline">Kopieren</Button
-											>
-										</div>
-									{/if}
-								</Dialog.Content>
-							</Dialog.Root>
-
-							<!-- Club edit -->
-							<Dialog.Root bind:open={editDialogOpen}>
-								<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
-									><Pencil /> Club bearbeiten</Dialog.Trigger
-								>
-								<Dialog.Content>
-									<Dialog.Header>
-										<Dialog.Title>Club bearbeiten</Dialog.Title>
-									</Dialog.Header>
-									<form use:editFormEnhance action="?/edit" method="post">
-										<Form.Field form={editClubForm} name="name">
-											<Form.Control>
-												{#snippet children({ props })}
-													<Form.Label>Name</Form.Label>
-													<Input
-														{...props}
-														{...$editFormContraints.name}
-														bind:value={$editFormFields.name}
-													/>
-												{/snippet}
-											</Form.Control>
-											<Form.FieldErrors />
-										</Form.Field>
-										<Button type="submit">Bearbeiten</Button>
-									</form>
-								</Dialog.Content>
-							</Dialog.Root>
-
-							<!-- Club deletion -->
-							<AlertDialog.Root bind:open={deleteDialogOpen}>
-								<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
-									<Trash2 />Club löschen
-								</AlertDialog.Trigger>
-								<AlertDialog.Content>
-									<AlertDialog.Header>
-										<AlertDialog.Title>Club "{club.name}" löschen?</AlertDialog.Title>
-										<AlertDialog.Description>
-											Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion kann
-											nicht rückgängig gemacht werden.
-										</AlertDialog.Description>
-									</AlertDialog.Header>
-									<AlertDialog.Footer>
-										<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-										<AlertDialog.Action
-											form="deleteForm"
-											class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
-										>
-									</AlertDialog.Footer>
-								</AlertDialog.Content>
-							</AlertDialog.Root>
+							{@render linkDialog()}
+							{@render editDialog()}
+							{@render deleteDialog()}
 						</DropdownMenu.Group>
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
@@ -254,3 +176,81 @@
 <form id="generateForm" action="?/getCode" method="post" use:enhance hidden></form>
 <form id="deleteForm" action="?/deleteClub" method="post" use:enhance hidden></form>
 <form id="leaveForm" action="?/leave" method="post" use:enhance hidden></form>
+
+{#snippet linkDialog()}
+	<Dialog.Root>
+		<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
+			><Link /> Einladungslink generieren</Dialog.Trigger
+		>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Einladungslink generieren</Dialog.Title>
+				<Dialog.Description
+					>Diese Aktion generiert einen Einladungslink und einen Code.</Dialog.Description
+				>
+			</Dialog.Header>
+			{#if !inviteCode}
+				<Button type="submit" form="generateForm" variant="outline"><Link /> Generieren</Button>
+			{:else}
+				<div class="flex gap-4">
+					<Input value={inviteUrl} readonly />
+					<Button
+						onclick={async () => {
+							await navigator.clipboard.writeText(inviteText);
+							toast.success('Link in die Zwischenablage kopiert');
+						}}
+						variant="outline">Kopieren</Button
+					>
+				</div>
+			{/if}
+		</Dialog.Content>
+	</Dialog.Root>
+{/snippet}
+
+{#snippet editDialog()}
+	<Dialog.Root bind:open={editDialogOpen}>
+		<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
+			><Pencil /> Club bearbeiten</Dialog.Trigger
+		>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Club bearbeiten</Dialog.Title>
+			</Dialog.Header>
+			<form use:editFormEnhance action="?/edit" method="post">
+				<Form.Field form={editClubForm} name="name">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Name</Form.Label>
+							<Input {...props} {...$editFormContraints.name} bind:value={$editFormFields.name} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Button type="submit">Bearbeiten</Button>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
+{/snippet}
+
+{#snippet deleteDialog()}
+	<AlertDialog.Root bind:open={deleteDialogOpen}>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
+			<Trash2 />Club löschen
+		</AlertDialog.Trigger>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Club "{club.name}" löschen?</AlertDialog.Title>
+				<AlertDialog.Description>
+					Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion kann nicht
+					rückgängig gemacht werden.
+				</AlertDialog.Description>
+			</AlertDialog.Header>
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+				<AlertDialog.Action form="deleteForm" class={buttonVariants({ variant: 'destructive' })}
+					>Löschen</AlertDialog.Action
+				>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/snippet}

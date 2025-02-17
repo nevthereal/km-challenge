@@ -36,13 +36,7 @@
 			{#each leaderboard as competitor, idx}
 				<Table.Row
 					class={cn(
-						idx === 0
-							? 'text-amber-200'
-							: idx === 1
-								? 'text-gray-200'
-								: idx === 2
-									? 'text-orange-600'
-									: ''
+						idx === 0 ? 'text-gold' : idx === 1 ? 'text-silver' : idx === 2 ? 'text-bronze' : ''
 					)}
 				>
 					<Table.Cell>

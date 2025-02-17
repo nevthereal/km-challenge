@@ -3,7 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { newEntry } from '$lib/zod';
+import { createChallenge, newEntry } from '$lib/zod';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
 import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
 import { and, eq } from 'drizzle-orm';
@@ -84,6 +84,40 @@ export const actions: Actions = {
 		await db.delete(challenge).where(eq(challenge.id, qChallenge.id));
 
 		return redirect(302, `/clubs/${qChallenge.clubId}`);
+	},
+	editChallenge: async ({ locals, url, params, request }) => {
+		const user = getUser({ locals, redirectUrl: url.pathname });
+
+		// query challenge from db
+		const qChallenge = await db.query.challenge.findFirst({
+			where: ({ id }, { eq }) => eq(id, params.challengeId)
+		});
+
+		// error if no challenge
+		if (!qChallenge) return error(404, 'Challenge existiert nicht');
+
+		// check if user is admin of challenge
+		const isAdmin = checkAdmin(qChallenge.clubId, user.id);
+
+		// error if not admin
+		if (!isAdmin) return error(401, 'Nicht erlaubt');
+
+		const form = await superValidate(request, zod(createChallenge));
+
+		if (!form.valid) return fail(400, { form });
+
+		const { name, endsAt, startsAt } = form.data;
+
+		await db
+			.update(challenge)
+			.set({
+				name,
+				endsAt,
+				startsAt
+			})
+			.where(eq(challenge.id, qChallenge.id));
+
+		return { form };
 	},
 	leave: async ({ locals, url, params }) => {
 		const user = getUser({ locals, redirectUrl: url.pathname });

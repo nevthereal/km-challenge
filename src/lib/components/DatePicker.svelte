@@ -35,10 +35,7 @@
 		{#snippet child({ props })}
 			<Button
 				variant="outline"
-				class={cn(
-					'w-[280px] justify-start text-left font-normal',
-					!value && 'text-muted-foreground'
-				)}
+				class={cn('justify-start text-left font-normal', !value && 'text-muted-foreground')}
 				{...props}
 			>
 				<CalendarIcon class="mr-2 size-4" />

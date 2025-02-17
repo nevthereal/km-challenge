@@ -208,7 +208,7 @@
 						<Form.Field form={createForm} name="startsAt" class="flex flex-col">
 							<Form.Control>
 								{#snippet children()}
-									<Form.Label>Start der Challenge</Form.Label>
+									<Form.Label>Dauer der Challenge</Form.Label>
 									<DatePicker
 										startName="startsAt"
 										endName="endsAt"
@@ -219,7 +219,7 @@
 							</Form.Control>
 							<Form.FieldErrors />
 						</Form.Field>
-						<Form.Button>Submit</Form.Button>
+						<Form.Button>Erstellen</Form.Button>
 					</form>
 				</Sheet.Header>
 			</Sheet.Content>

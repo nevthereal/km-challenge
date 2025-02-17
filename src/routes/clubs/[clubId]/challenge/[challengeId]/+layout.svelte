@@ -1,18 +1,32 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Form from '$lib/components/ui/form';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { ArrowLeft, DoorOpen, LogOut, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from 'lucide-svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn, isActive, prettyDate } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
+	import { superForm } from 'sveltekit-superforms';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import DatePicker from '$lib/components/DatePicker.svelte';
 
 	let { data, children } = $props();
 
 	let deleteDialogOpen = $state(false);
+	let editDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
 
 	const { challenge, currentUserChallenge, clubAdmin: isAdmin, challengePath } = $derived(data);
+
+	const form = superForm(data.editForm, {
+		onResult: ({ result }) => {
+			if (result.type === 'success') editDialogOpen = false;
+		}
+	});
+
+	const { form: formFields, constraints: editConstraints, enhance: editEnhance } = form;
 
 	const paths = [
 		{
@@ -53,46 +67,11 @@
 	<div class="flex justify-between max-md:flex-col max-md:gap-4">
 		<div class="flex items-center gap-2">
 			<ClubAdmin {isAdmin}>
-				<AlertDialog.Root bind:open={deleteDialogOpen}>
-					<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
-						<Trash2 /><span class="max-md:hidden">Challenge löschen</span>
-					</AlertDialog.Trigger>
-					<AlertDialog.Content>
-						<AlertDialog.Header>
-							<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
-							<AlertDialog.Description>
-								Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese
-								Aktion kann nicht rückgängig gemacht werden.
-							</AlertDialog.Description>
-						</AlertDialog.Header>
-						<AlertDialog.Footer>
-							<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-							<AlertDialog.Action
-								form="deleteForm"
-								class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
-							>
-						</AlertDialog.Footer>
-					</AlertDialog.Content>
-				</AlertDialog.Root>
+				{@render deleteDialog()}
+				{@render editDialog()}
 			</ClubAdmin>
 			{#if currentUserChallenge}
-				<AlertDialog.Root bind:open={leaveDialogOpen}>
-					<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
-						<LogOut />Verlassen
-					</AlertDialog.Trigger>
-					<AlertDialog.Content>
-						<AlertDialog.Header>
-							<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
-						</AlertDialog.Header>
-						<AlertDialog.Footer>
-							<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-							<AlertDialog.Action
-								form="leaveForm"
-								class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
-							>
-						</AlertDialog.Footer>
-					</AlertDialog.Content>
-				</AlertDialog.Root>
+				{@render leaveDialog()}
 			{:else}
 				<Button type="submit" form="joinForm"><DoorOpen />Beitreten</Button>
 			{/if}
@@ -130,3 +109,89 @@
 ></form>
 <form id="leaveForm" action="{challengePath}/?/leave" method="post" use:enhance hidden></form>
 <form id="joinForm" action="{challengePath}/?/join" method="post" use:enhance hidden></form>
+
+{#snippet editDialog()}
+	<Dialog.Root bind:open={editDialogOpen}>
+		<Dialog.Trigger class={buttonVariants({ variant: 'secondary' })}
+			><Pencil /> <span class="max-md:hidden">Challenge bearbeiten</span></Dialog.Trigger
+		>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Challenge bearbeiten</Dialog.Title>
+			</Dialog.Header>
+			<form
+				method="post"
+				action="{challengePath}/?/editChallenge"
+				use:editEnhance
+				class="flex max-w-xl flex-col gap-2"
+			>
+				<Form.Field {form} name="name">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Name</Form.Label>
+							<Input {...props} {...$editConstraints.name} bind:value={$formFields.name} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="startsAt" class="flex flex-col">
+					<Form.Control>
+						{#snippet children()}
+							<Form.Label>Dauer der Challenge</Form.Label>
+							<DatePicker
+								startName="startsAt"
+								endName="endsAt"
+								bind:startValue={$formFields.startsAt}
+								bind:endValue={$formFields.endsAt}
+							/>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Button>Bearbeiten</Form.Button>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
+{/snippet}
+
+{#snippet deleteDialog()}
+	<AlertDialog.Root bind:open={deleteDialogOpen}>
+		<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }), 'my-auto')}>
+			<Trash2 /><span class="max-md:hidden">Challenge löschen</span>
+		</AlertDialog.Trigger>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Challenge "{challenge.name}" löschen?</AlertDialog.Title>
+				<AlertDialog.Description>
+					Diese Aktion wird die Challenge mit allen Einträgen und Disziplinen löschen. Diese Aktion
+					kann nicht rückgängig gemacht werden.
+				</AlertDialog.Description>
+			</AlertDialog.Header>
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+				<AlertDialog.Action form="deleteForm" class={buttonVariants({ variant: 'destructive' })}
+					>Löschen</AlertDialog.Action
+				>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/snippet}
+
+{#snippet leaveDialog()}
+	<AlertDialog.Root bind:open={leaveDialogOpen}>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+			<LogOut />Verlassen
+		</AlertDialog.Trigger>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Challenge "{challenge.name}" verlassen?</AlertDialog.Title>
+			</AlertDialog.Header>
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+				<AlertDialog.Action form="leaveForm" class={buttonVariants({ variant: 'destructive' })}
+					>Verlassen</AlertDialog.Action
+				>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/snippet}

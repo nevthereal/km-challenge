@@ -1,7 +1,6 @@
 <script>
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
-	import { prettyDate } from '$lib/utils';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	let { data } = $props();
@@ -21,9 +20,9 @@
 	</section>
 	<section>
 		<h2 class="h2 mb-2">Neuste Aktivitäten</h2>
-		<ul class="space-y-2 p-2">
+		<ul class="space-y-2">
 			{#each lastActivities as activity}
-				<li>
+				<li class="mx-2">
 					<Badge class="mr-2"
 						>{Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short' }).format(
 							activity.createdAt
@@ -42,6 +41,8 @@
 					>
 					<span class="text-muted-foreground">eingetragen</span>
 				</li>
+			{:else}
+				<p>Noch keine Aktivitäten</p>
 			{/each}
 		</ul>
 	</section>

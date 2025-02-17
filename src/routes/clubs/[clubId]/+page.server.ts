@@ -4,7 +4,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { club, challenge, inviteCode, clubMember } from '$lib/db/schema';
 import { error } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
-import { createProjectSchema } from '$lib/zod';
+import { createChallenge, editClub } from '$lib/zod';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -32,18 +32,24 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 	)
 		return redirect(302, '/clubs');
 
-	const createForm = await superValidate(zod(createProjectSchema));
+	const createForm = await superValidate(zod(createChallenge));
+
+	const editClubForm = await superValidate(zod(editClub), {
+		defaults: {
+			name: qClub.name
+		}
+	});
 
 	const clubAdmin = await checkAdmin(params.clubId, user.id);
 
-	return { qClub, createForm, user, clubAdmin };
+	return { qClub, createForm, user, clubAdmin, editClubForm };
 };
 
 export const actions: Actions = {
 	createChallenge: async ({ locals, request, url, params }) => {
 		const user = getUser({ locals, redirectUrl: url.pathname });
 
-		const form = await superValidate(request, zod(createProjectSchema));
+		const form = await superValidate(request, zod(createChallenge));
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -79,16 +85,15 @@ export const actions: Actions = {
 		return { code };
 	},
 	deleteClub: async ({ locals, url, params }) => {
-		console.log('hit');
 		const user = getUser({ locals, redirectUrl: url.pathname });
 
-		// query challenge from db
+		// query club from db
 		const qClub = await db.query.club.findFirst({
 			where: ({ id }, { eq }) => eq(id, params.clubId)
 		});
 
 		// error if no club
-		if (!qClub) return error(404, 'Challenge existiert nicht');
+		if (!qClub) return error(404, 'Club existiert nicht');
 
 		// check if user is admin of club
 		const isAdmin = checkAdmin(qClub.id, user.id);
@@ -113,5 +118,36 @@ export const actions: Actions = {
 		await db.delete(clubMember).where(eq(clubMember.id, qClubMember.id));
 
 		return redirect(302, '/clubs');
+	},
+	edit: async ({ locals, url, params, request }) => {
+		const user = getUser({ locals, redirectUrl: url.pathname });
+
+		const form = await superValidate(request, zod(editClub));
+
+		if (!form.valid) return fail(400, { form });
+
+		// query club from db
+		const qClub = await db.query.club.findFirst({
+			where: ({ id }, { eq }) => eq(id, params.clubId)
+		});
+
+		// error if no club
+		if (!qClub) return error(404, 'Club existiert nicht');
+
+		// check if user is admin of club
+		const isAdmin = checkAdmin(qClub.id, user.id);
+
+		// error if not admin
+		if (!isAdmin) return error(401, 'Nicht erlaubt');
+
+		// actually delete
+		await db
+			.update(club)
+			.set({
+				name: form.data.name
+			})
+			.where(eq(club.id, qClub.id));
+
+		return { form };
 	}
 };

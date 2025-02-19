@@ -7,6 +7,7 @@
 	import { authClient } from '$lib/auth/client';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { page } from '$app/state';
+	import { dev } from '$app/environment';
 
 	let { children, data } = $props();
 
@@ -15,6 +16,9 @@
 
 <Toaster />
 <ModeWatcher defaultMode="system" />
+{#if dev}
+	<div class="w-screen bg-destructive p-2 text-center text-lg font-bold">Dev mode</div>
+{/if}
 <nav class="flex items-center justify-between p-6">
 	<div class="flex gap-4">
 		<a href="/" class="text-4xl font-bold">Start</a>

@@ -23,7 +23,7 @@
 		<ul class="space-y-2">
 			{#each lastActivities as activity}
 				<li class="mx-2">
-					<Badge class="mr-2"
+					<Badge class="mr-2 font-mono"
 						>{Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short' }).format(
 							activity.createdAt
 						)}</Badge

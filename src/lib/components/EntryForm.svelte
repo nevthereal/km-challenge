@@ -34,12 +34,20 @@
 
 	const entryForm = superForm(formData, {
 		onResult: ({ result }) => {
-			if (result.type === 'success') dialogOpen = !dialogOpen;
+			if (result.type === 'success') {
+				dialogOpen = false;
+				resetForm();
+			}
 		},
-		id: `entry-${challenge.id}`
+		id: `entry-${challenge.id}`,
+		multipleSubmits: 'prevent'
 	});
 
-	const { enhance, form, constraints } = entryForm;
+	const { enhance, form, constraints, reset } = entryForm;
+
+	function resetForm() {
+		reset();
+	}
 
 	const df = new DateFormatter('de', {
 		dateStyle: 'long'
@@ -77,7 +85,7 @@
 		><PlusCircle />
 		{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}
 	</Dialog.Trigger>
-	<Dialog.Content class="">
+	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
 			<!-- <SuperDebug data={$form} /> -->

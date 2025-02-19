@@ -14,6 +14,8 @@
 	}
 
 	let { entry, discipline, edit, challengePath }: Props = $props();
+
+	let open = $state(false);
 </script>
 
 <Card.Root>
@@ -30,30 +32,35 @@
 			<span class="font-mono text-muted-foreground">({entry.amount}km)</span>
 		</p>
 		{#if edit}
-			<AlertDialog.Root>
-				<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive', size: 'icon' })}>
-					<Trash />
-				</AlertDialog.Trigger>
-				<AlertDialog.Content>
-					<AlertDialog.Header>
-						<AlertDialog.Title>Disziplin löschen?</AlertDialog.Title>
-						<AlertDialog.Description
-							>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialog.Description
-						>
-					</AlertDialog.Header>
-					<AlertDialog.Footer>
-						<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-						<AlertDialog.Action
-							value={entry.id}
-							name="id"
-							form="deleteForm"
-							class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
-						>
-					</AlertDialog.Footer>
-				</AlertDialog.Content>
-			</AlertDialog.Root>
+			{@render deleteDialog()}
 		{/if}
 	</Card.Content>
 </Card.Root>
 
 <form use:enhance method="post" id="deleteForm" action="{challengePath}/activity/?/delete"></form>
+
+{#snippet deleteDialog()}
+	<AlertDialog.Root bind:open>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive', size: 'icon' })}>
+			<Trash />
+		</AlertDialog.Trigger>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Disziplin löschen?</AlertDialog.Title>
+				<AlertDialog.Description
+					>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialog.Description
+				>
+			</AlertDialog.Header>
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
+				<AlertDialog.Action
+					value={entry.id}
+					name="id"
+					form="deleteForm"
+					onclick={() => (open = false)}
+					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
+				>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/snippet}

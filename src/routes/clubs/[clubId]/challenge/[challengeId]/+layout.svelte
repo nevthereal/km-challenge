@@ -138,6 +138,10 @@
 					<Form.Control>
 						{#snippet children()}
 							<Form.Label>Dauer der Challenge</Form.Label>
+							<Form.Description
+								>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
+								00:00 gesetzt wird.</Form.Description
+							>
 							<DatePicker
 								startName="startsAt"
 								endName="endsAt"

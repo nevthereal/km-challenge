@@ -23,7 +23,7 @@
 		<Card.Title
 			>{discipline?.name ?? 'Aktivität'} am {Intl.DateTimeFormat('de', {
 				dateStyle: 'medium'
-			}).format(entry.createdAt)}</Card.Title
+			}).format(entry.date)}</Card.Title
 		>
 	</Card.Header>
 	<Card.Content class="flex items-center justify-between">

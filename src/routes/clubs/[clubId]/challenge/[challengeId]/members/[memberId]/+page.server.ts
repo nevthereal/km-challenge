@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 						with: {
 							discipline: true
 						},
-						orderBy: (fields, operators) => operators.desc(fields.createdAt)
+						orderBy: (fields, operators) => operators.desc(fields.date)
 					}
 				}
 			}

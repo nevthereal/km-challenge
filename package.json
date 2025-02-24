@@ -62,7 +62,7 @@
 		"@tailwindcss/typography": "^0.5.16",
 		"@tanstack/table-core": "^8.20.5",
 		"arctic": "^3.1.2",
-		"better-auth": "^1.1.20",
+		"better-auth": "^1.1.21",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^0.38.4",
 		"drizzle-zod": "^0.6.1"

@@ -16,7 +16,7 @@
 			await authClient(page.url.origin).signIn.social({
 				provider: 'google',
 				callbackURL: redirectUrl || '/',
-				newUserCallbackURL: `/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
+				newUserCallbackURL: `${page.url.origin}/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
 			});
 		}}><GoogleLogo />Mit Google anmelden</Button
 	>

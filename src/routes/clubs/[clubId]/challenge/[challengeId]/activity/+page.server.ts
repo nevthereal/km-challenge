@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 			discipline: true
 		},
 		orderBy(fields, operators) {
-			return operators.desc(fields.createdAt);
+			return operators.desc(fields.date);
 		}
 	});
 

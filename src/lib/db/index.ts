@@ -1,12 +1,25 @@
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
-import { DATABASE_URL } from '$env/static/private';
+import {
+	DATABASE_URL,
+	UPSTASH_REDIS_REST_URL,
+	UPSTASH_REDIS_REST_TOKEN
+} from '$env/static/private';
 import * as schema from './schema';
 import * as relations from './relations';
 import { sql, eq, desc, and, getTableColumns } from 'drizzle-orm';
+import { upstashCache } from 'drizzle-orm/cache/upstash';
 
 const client = neon(DATABASE_URL);
-export const db = drizzle(client, { casing: 'snake_case', schema: { ...schema, ...relations } });
+export const db = drizzle(client, {
+	casing: 'snake_case',
+	cache: upstashCache({
+		url: UPSTASH_REDIS_REST_URL,
+		token: UPSTASH_REDIS_REST_TOKEN,
+		global: true
+	}),
+	schema: { ...schema, ...relations }
+});
 
 export async function getLeaderBoard(challengeId: string, limit?: number) {
 	const lb = db

@@ -31,6 +31,11 @@ export const auth = betterAuth({
 				required: false
 			}
 		}
+	},
+	session: {
+		cookieCache: {
+			enabled: true
+		}
 	}
 });
 

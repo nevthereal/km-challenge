@@ -115,7 +115,7 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field form={entryForm} name="disciplineId" class="flex-grow">
+					<Form.Field form={entryForm} name="disciplineId" class="grow">
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Disziplin</Form.Label>
@@ -146,8 +146,8 @@
 								<Popover.Trigger
 									{...props}
 									class={cn(
-										buttonVariants({ variant: 'outline' }),
-										'justify-start text-left font-normal md:flex-grow',
+										buttonVariants({ variant: 'outline-solid' }),
+										'justify-start text-left font-normal md:grow',
 										!value && 'text-muted-foreground'
 									)}
 								>

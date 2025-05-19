@@ -63,7 +63,7 @@
 		{/if}
 		<ClubAdmin {isAdmin}>
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
+				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline-solid' })}
 					><Ellipsis />Optionen
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
@@ -250,7 +250,7 @@
 
 {#snippet leaveDialog()}
 	<AlertDialog.Root bind:open={leaveDialogOpen}>
-		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline-solid' })}>
 			<LogOut />Club verlassen
 		</AlertDialog.Trigger>
 		<AlertDialog.Content>

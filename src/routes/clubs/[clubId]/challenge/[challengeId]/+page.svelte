@@ -8,7 +8,7 @@
 	let { challenge, leaderboard, lastActivities, challengePath } = $derived(data);
 </script>
 
-<main class="flex-grow">
+<main class="grow">
 	<section class="mb-8">
 		<div
 			class="mb-4 flex items-center justify-between gap-2 max-md:items-start max-md:portrait:flex-col"

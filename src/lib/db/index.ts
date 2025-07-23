@@ -2,13 +2,14 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { DATABASE_URL } from '$env/static/private';
 import * as schema from './schema';
-import * as relations from './relations';
-import { sql, eq, desc, and, getTableColumns } from 'drizzle-orm';
+import relations from './relations';
+import { sql, eq, desc, getTableColumns } from 'drizzle-orm';
 
 const client = neon(DATABASE_URL);
 export const db = drizzle(client, {
 	casing: 'snake_case',
-	schema: { ...schema, ...relations }
+	schema: schema,
+	relations
 });
 
 export async function getLeaderBoard(challengeId: string, limit?: number) {
@@ -38,10 +39,15 @@ export type Leaderboard = ReturnType<typeof getLeaderBoard>;
 
 export async function checkAdmin(clubId: string, userId: string) {
 	const query = await db.query.clubAdmin.findFirst({
-		where: and(eq(schema.clubAdmin.userId, userId), eq(schema.clubAdmin.clubId, clubId))
+		where: {
+			userId,
+			clubId
+		}
 	});
 
 	if (query) return true;
 
 	return false;
 }
+
+// and(eq(schema.clubAdmin.userId, userId), eq(schema.clubAdmin.clubId, clubId))

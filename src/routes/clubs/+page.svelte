@@ -2,17 +2,17 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { CirclePlus, PlusCircle } from 'lucide-svelte';
-
-	let { data } = $props();
-
-	const { usersClubs } = data;
+	import { getUsersClubs } from './clubs.remote';
+	import { getUser } from '$lib/auth.remote';
 </script>
 
 <h1 class="h1 mb-8">Deine Clubs</h1>
 
-{#if data.user.superUser}
-	<Button size="lg" href="/clubs/create" class="my-4"><CirclePlus />Club erstellen</Button>
-{/if}
+{#await getUser('/clubs') then user}
+	{#if user.superUser}
+		<Button size="lg" href="/clubs/create" class="my-4"><CirclePlus />Club erstellen</Button>
+	{/if}
+{/await}
 
 <div class="mb-6 grid gap-6 md:grid-cols-4">
 	<Card.Root>
@@ -25,26 +25,30 @@
 			</Card.Content>
 		</a>
 	</Card.Root>
-	{#each usersClubs as club}
-		<Card.Root>
-			<a href="/clubs/{club.id}">
-				<Card.Header>
-					<Card.Title>
-						{club.name}
-					</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<p>{club.challenges.length || 'Keine'} Challenges</p>
-					<p>{club.members.length || 'Keine'} Mitglieder</p>
-				</Card.Content>
-			</a>
-		</Card.Root>
-	{:else}
-		<p class="text-center my-auto">
-			Du bist momentan in keinem Club. Du kannst aber einem <a
-				class="underline font-medium"
-				href="/clubs/join">beitreten</a
-			>.
-		</p>
-	{/each}
+	{#await getUsersClubs('/clubs')}
+		<p>Loading clubs...</p>
+	{:then clubs}
+		{#each clubs as club}
+			<Card.Root>
+				<a href="/clubs/{club.id}">
+					<Card.Header>
+						<Card.Title>
+							{club.name}
+						</Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<p>{club.challenges.length || 'Keine'} Challenges</p>
+						<p>{club.members.length || 'Keine'} Mitglieder</p>
+					</Card.Content>
+				</a>
+			</Card.Root>
+		{:else}
+			<p class="text-center my-auto">
+				Du bist momentan in keinem Club. Du kannst aber einem <a
+					class="underline font-medium"
+					href="/clubs/join">beitreten</a
+				>.
+			</p>
+		{/each}
+	{/await}
 </div>

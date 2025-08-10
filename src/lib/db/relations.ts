@@ -15,7 +15,8 @@ const relations = defineRelations(schema, (r) => ({
 		}),
 		adminOf: r.many.club({
 			from: r.user.id.through(r.clubAdmin.userId),
-			to: r.club.id.through(r.clubAdmin.clubId)
+			to: r.club.id.through(r.clubAdmin.clubId),
+			alias: 'admin'
 		}),
 		entries: r.many.entry(),
 		challenges: r.many.challenge({
@@ -58,9 +59,14 @@ const relations = defineRelations(schema, (r) => ({
 	},
 	club: {
 		challenges: r.many.challenge(),
-		admins: r.many.clubAdmin(),
+		admins: r.many.user({
+			where: {
+				admin: true
+			},
+			alias: 'admin'
+		}),
 		codes: r.many.inviteCode(),
-		members: r.many.clubMember()
+		members: r.many.user()
 	}
 }));
 

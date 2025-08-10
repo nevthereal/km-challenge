@@ -10,17 +10,6 @@ export function prettyDate(date: Date) {
 	return Intl.DateTimeFormat('de', { dateStyle: 'long' }).format(date);
 }
 
-export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectUrl: string }) {
-	const { user } = locals;
-
-	if (!user) return redirect(302, `/signin?redirect=${redirectUrl}`);
-
-	const superUser = user.admin || user.role === 'Coach';
-	const completedProfile = user.role != null && user.gender != null;
-
-	return { ...user, superUser, completedProfile };
-}
-
 export function isActive({ start, finish }: { start: Date; finish: Date }) {
 	const now = new Date();
 	return start <= now && finish >= now;

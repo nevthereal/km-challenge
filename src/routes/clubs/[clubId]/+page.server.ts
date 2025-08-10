@@ -3,16 +3,18 @@ import { and, eq } from 'drizzle-orm';
 import type { PageServerLoad, Actions } from './$types';
 import { club, challenge, inviteCode, clubMember } from '$lib/db/schema';
 import { error } from '@sveltejs/kit';
-import { getUser } from '$lib/utils';
+import { getUser } from '$lib/auth.remote';
 import { createChallenge, editClub } from '$lib/zod';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = getUser({ locals, redirectUrl: url.pathname });
+	const user = await getUser(url.pathname);
 	const qClub = await db.query.club.findFirst({
-		where: eq(club.id, params.clubId),
+		where: {
+			id: params.clubId
+		},
 		with: {
 			challenges: {
 				with: {
@@ -27,7 +29,16 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	if (
 		!(await db.query.clubMember.findFirst({
-			where: and(eq(clubMember.clubId, qClub.id), eq(clubMember.userId, user.id))
+			where: {
+				AND: [
+					{
+						clubId: qClub.id
+					},
+					{
+						userId: user.id
+					}
+				]
+			}
 		}))
 	)
 		return redirect(302, '/clubs');

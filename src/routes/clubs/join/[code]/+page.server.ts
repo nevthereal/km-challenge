@@ -1,5 +1,5 @@
 import { db } from '$lib/db';
-import { getUser } from '$lib/auth.remote';
+import { getUser } from '$lib/remote/auth.remote';
 import type { PageServerLoad } from './$types';
 import { clubMember } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';

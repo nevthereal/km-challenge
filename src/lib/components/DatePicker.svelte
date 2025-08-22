@@ -4,7 +4,7 @@
 		type DateValue,
 		DateFormatter,
 		getLocalTimeZone,
-		parseDate
+		parseAbsolute
 	} from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -25,8 +25,8 @@
 	let value = $state({ start: startValue, end: endValue });
 
 	$effect(() => {
-		value.start = startValue ? parseDate(startValue.toString()) : undefined;
-		value.end = endValue ? parseDate(endValue.toString()) : undefined;
+		value.start = startValue ? parseAbsolute(startValue.toString(), getLocalTimeZone()) : undefined;
+		value.end = endValue ? parseAbsolute(endValue.toString(), getLocalTimeZone()) : undefined;
 	});
 </script>
 

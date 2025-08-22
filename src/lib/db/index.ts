@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless';
 import { DATABASE_URL } from '$env/static/private';
 import * as schema from './schema';
 import relations from './relations';
-import { sql, eq, desc, getTableColumns } from 'drizzle-orm';
+import { sql, eq, desc, asc, getTableColumns } from 'drizzle-orm';
 
 const client = neon(DATABASE_URL);
 export const db = drizzle(client, {
@@ -17,7 +17,7 @@ export async function getLeaderBoard(challengeId: string, limit?: number) {
 		.select({
 			...getTableColumns(schema.user),
 			score:
-				sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
+				sql<number>`round(sum(COALESCE(${schema.entry.amount}, 0) * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
 					'score'
 				),
 			totalEntries: sql<number>`count(${schema.entry.id})`.as('total_entries'),
@@ -28,9 +28,9 @@ export async function getLeaderBoard(challengeId: string, limit?: number) {
 		.innerJoin(schema.user, eq(schema.entry.userId, schema.user.id))
 		.where(eq(schema.entry.challengeId, challengeId))
 		.groupBy(schema.user.id)
-		.orderBy(desc(sql`score`));
+		.orderBy(desc(sql`score`), asc(schema.user.id));
 
-	if (limit) return await lb.limit(limit);
+	if (typeof limit === 'number') return await lb.limit(Math.max(0, limit));
 
 	return await lb;
 }

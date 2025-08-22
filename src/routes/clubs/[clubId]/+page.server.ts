@@ -3,62 +3,27 @@ import { and, eq } from 'drizzle-orm';
 import type { PageServerLoad, Actions } from './$types';
 import { club, challenge, inviteCode, clubMember } from '$lib/db/schema';
 import { error } from '@sveltejs/kit';
-import { getUser } from '$lib/auth.remote';
+import { getUser } from '$lib/remote/auth.remote';
 import { createChallenge, editClub } from '$lib/zod';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = await getUser(url.pathname);
-	const qClub = await db.query.club.findFirst({
-		where: {
-			id: params.clubId
-		},
-		with: {
-			challenges: {
-				with: {
-					members: true
-				}
-			},
-			members: true
-		}
-	});
-
-	if (!qClub) return error(404, 'Dieser Club existiert nicht');
-
-	if (
-		!(await db.query.clubMember.findFirst({
-			where: {
-				AND: [
-					{
-						clubId: qClub.id
-					},
-					{
-						userId: user.id
-					}
-				]
-			}
-		}))
-	)
-		return redirect(302, '/clubs');
+	const user = await getUser();
 
 	const createForm = await superValidate(zod(createChallenge));
 
-	const editClubForm = await superValidate(zod(editClub), {
-		defaults: {
-			name: qClub.name
-		}
-	});
+	const editClubForm = await superValidate(zod(editClub), {});
 
 	const clubAdmin = await checkAdmin(params.clubId, user.id);
 
-	return { qClub, createForm, user, clubAdmin, editClubForm };
+	return { createForm, user, clubAdmin, editClubForm };
 };
 
 export const actions: Actions = {
 	createChallenge: async ({ locals, request, url, params }) => {
-		const user = getUser({ locals, redirectUrl: url.pathname });
+		const user = getUser();
 
 		const form = await superValidate(request, zod(createChallenge));
 
@@ -83,7 +48,7 @@ export const actions: Actions = {
 		redirect(302, `/clubs/${params.clubId}/challenge/${challengeId}`);
 	},
 	getCode: async ({ locals, params, url }) => {
-		const user = getUser({ locals, redirectUrl: url.pathname });
+		const user = getUser();
 		if (!checkAdmin(params.clubId, user.id)) return error(401, 'Nicht erlaubt.');
 
 		const [{ code }] = await db
@@ -96,7 +61,7 @@ export const actions: Actions = {
 		return { code };
 	},
 	deleteClub: async ({ locals, url, params }) => {
-		const user = getUser({ locals, redirectUrl: url.pathname });
+		const user = getUser();
 
 		// query club from db
 		const qClub = await db.query.club.findFirst({
@@ -118,7 +83,7 @@ export const actions: Actions = {
 		return redirect(302, '/clubs');
 	},
 	leave: async ({ locals, url, params }) => {
-		const user = getUser({ locals, redirectUrl: url.pathname });
+		const user = getUser();
 
 		const qClubMember = await db.query.clubMember.findFirst({
 			where: and(eq(clubMember.clubId, params.clubId), eq(clubMember.userId, user.id))
@@ -131,7 +96,7 @@ export const actions: Actions = {
 		return redirect(302, '/clubs');
 	},
 	edit: async ({ locals, url, params, request }) => {
-		const user = getUser({ locals, redirectUrl: url.pathname });
+		const user = getUser();
 
 		const form = await superValidate(request, zod(editClub));
 

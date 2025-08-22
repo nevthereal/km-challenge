@@ -2,7 +2,7 @@ import { fail, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import { getUser } from '$lib/auth.remote';
+import { getUser } from '$lib/remote/auth.remote';
 import { redirect } from '@sveltejs/kit';
 
 const schema = z.object({
@@ -10,7 +10,7 @@ const schema = z.object({
 });
 
 export const load: PageServerLoad = async ({ url }) => {
-	const user = await getUser(url.pathname);
+	const user = await getUser();
 
 	const form = await superValidate(zod(schema));
 

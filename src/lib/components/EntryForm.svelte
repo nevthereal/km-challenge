@@ -14,10 +14,9 @@
 	import {
 		DateFormatter,
 		getLocalTimeZone,
-		parseDate,
+		parseAbsolute,
 		today,
-		type DateValue,
-		parseDateTime
+		type DateValue
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
 
@@ -60,7 +59,7 @@
 	});
 
 	$effect(() => {
-		value = $form.date ? parseDate($form.date.toString()) : undefined;
+		value = $form.date ? parseAbsolute($form.date.toString(), getLocalTimeZone()) : undefined;
 	});
 
 	let placeholder = $state<DateValue>();
@@ -159,7 +158,7 @@
 										type="single"
 										value={value as DateValue}
 										bind:placeholder
-										minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
+										minValue={parseAbsolute(challenge.startsAt.toISOString(), getLocalTimeZone())}
 										maxValue={today(getLocalTimeZone())}
 										calendarLabel="Tag des Eintrags"
 										onValueChange={(v) => {

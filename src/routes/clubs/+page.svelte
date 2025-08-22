@@ -2,17 +2,18 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { CirclePlus, PlusCircle } from 'lucide-svelte';
-	import { getUsersClubs } from './clubs.remote';
-	import { getUser } from '$lib/auth.remote';
+	import { getUsersClubs } from '$lib/remote/clubs.remote';
+	import { getUser } from '$lib/remote/auth.remote';
 </script>
 
 <h1 class="h1 mb-8">Deine Clubs</h1>
 
-{#await getUser('/clubs') then user}
-	{#if user.superUser}
+<svelte:boundary>
+	{#snippet pending()}{/snippet}
+	{#if (await getUser()).superUser}
 		<Button size="lg" href="/clubs/create" class="my-4"><CirclePlus />Club erstellen</Button>
 	{/if}
-{/await}
+</svelte:boundary>
 
 <div class="mb-6 grid gap-6 md:grid-cols-4">
 	<Card.Root>
@@ -25,7 +26,7 @@
 			</Card.Content>
 		</a>
 	</Card.Root>
-	{#await getUsersClubs('/clubs')}
+	{#await getUsersClubs()}
 		<p>Loading clubs...</p>
 	{:then clubs}
 		{#each clubs as club}

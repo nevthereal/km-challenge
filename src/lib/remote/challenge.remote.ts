@@ -1,13 +1,14 @@
-import { form, getRequestEvent, query } from '$app/server';
+import { command, form, getRequestEvent, query } from '$app/server';
 import * as schema from '$lib/db/schema';
 import { db } from '$lib/db';
-import { getTableColumns, sql, eq, asc, desc } from 'drizzle-orm';
+import { getTableColumns, sql, eq, asc, desc, and } from 'drizzle-orm';
 import z from 'zod';
 import { getUser } from './auth.remote';
 import { error, redirect } from '@sveltejs/kit';
 import { validator } from 'svelte-checkmate';
 import { newChallenge, newEntry } from '$lib/zod';
 import { isActive } from '$lib/utils';
+import { checkAdmin } from './clubs.remote';
 
 export const getLeaderBoard = query(
 	z.object({ challengeId: z.string(), limit: z.number().nullable() }),
@@ -96,3 +97,102 @@ export const createChallenge = form(async (formData) => {
 
 	redirect(302, `/clubs/${clubId}/challenge/${challengeId}`);
 });
+
+export const deleteChallenge = command(z.string(), async (challengeId) => {
+	const user = await getUser();
+
+	// query challenge from db
+	const qChallenge = await db.query.challenge.findFirst({
+		where: {
+			id: challengeId
+		}
+	});
+
+	// error if no challenge
+	if (!qChallenge) return error(404, 'Challenge existiert nicht');
+
+	// check if user is admin of challenge
+	const isAdmin = checkAdmin(qChallenge.clubId);
+
+	// error if not admin
+	if (!isAdmin) return error(401, 'Nicht erlaubt');
+
+	// actually delete
+	await db.delete(schema.challenge).where(eq(schema.challenge.id, qChallenge.id));
+
+	return redirect(302, `/clubs/${qChallenge.clubId}`); // edit redirect here TODO
+});
+
+export const editChallenge = form(async (formData) => {
+	const user = await getUser();
+
+	const form = await validator({ formData, schema: newChallenge });
+
+	if (!form.success) return error(400, { form });
+
+	const { data } = form;
+
+	// query challenge from db
+	const qChallenge = await db.query.challenge.findFirst({
+		where: {
+			id: data.clubId
+		}
+	});
+
+	// error if no challenge
+	if (!qChallenge) return error(404, 'Challenge existiert nicht');
+
+	// check if user is admin of challenge
+	const isAdmin = checkAdmin(qChallenge.clubId);
+
+	// error if not admin
+	if (!isAdmin) return error(401, 'Nicht erlaubt');
+
+	const { name, endsAt, startsAt } = data;
+
+	await db
+		.update(schema.challenge)
+		.set({
+			name,
+			endsAt,
+			startsAt
+		})
+		.where(eq(schema.challenge.id, qChallenge.id));
+
+	return { form };
+});
+
+export const leaveChallenge = command(z.string(), async (challengeId) => {
+	const user = await getUser();
+	try {
+		await db
+			.delete(schema.challengeMember)
+			.where(
+				and(eq(schema.challengeMember.id, challengeId), eq(schema.challengeMember.userId, user.id))
+			);
+	} catch (e) {
+		console.error(e);
+		return error(404, 'Du bist kein Mitglied dieser Challenge');
+	}
+});
+
+export const joinChallenge = command(
+	z.object({ clubId: z.string(), challengeId: z.string() }),
+	async (ids) => {
+		const user = await getUser();
+
+		const clubRel = await db.query.clubMember.findFirst({
+			where: {
+				userId: user.id,
+				clubId: ids.clubId
+			}
+		});
+
+		if (!clubRel) return error(401, 'Du bist kein Mitglied des Clubs');
+
+		await db.insert(schema.challengeMember).values({
+			challengeId: ids.challengeId,
+			userId: user.id
+		});
+	}
+);

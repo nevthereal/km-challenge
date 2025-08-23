@@ -6,7 +6,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { createChallenge } from '$lib/zod';
+import { newChallenge } from '$lib/zod';
 
 export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 	const user = getUser({ locals, redirectUrl: url.pathname });
@@ -44,7 +44,7 @@ export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 
 	const challengePath = `/clubs/${params.clubId}/challenge/${params.challengeId}`;
 
-	const editForm = await superValidate(zod(createChallenge));
+	const editForm = await superValidate(zod(newChallenge));
 
 	return {
 		challenge: qChallenge,

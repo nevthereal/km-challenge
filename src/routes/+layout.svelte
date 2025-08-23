@@ -33,7 +33,7 @@
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'default' })}>
 					<User /><span class="max-md:hidden">
-						{session.user.name}
+						{session.name}
 					</span>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>

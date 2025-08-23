@@ -15,9 +15,9 @@
 	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
-	import { getClub } from '$lib/remote/clubs.remote.js';
+	import { checkAdmin, getClub } from '$lib/remote/clubs.remote.js';
 
-	let { data, form: formData, params } = $props();
+	let { data, params } = $props();
 
 	const createForm = superForm(data.createForm);
 	const editClubForm = superForm(data.editClubForm, {
@@ -33,14 +33,13 @@
 		constraints: editFormContraints
 	} = editClubForm;
 
-	let inviteCode = $derived(formData?.code);
 	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
-
-	const isAdmin = data.clubAdmin;
 
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
 	let editDialogOpen = $state(false);
+
+	const isAdmin = checkAdmin(params.clubId);
 </script>
 
 <nav class="mb-4 flex">
@@ -60,7 +59,7 @@
 			{#if !isAdmin}
 				{@render leaveDialog()}
 			{/if}
-			<ClubAdmin {isAdmin}>
+			<ClubAdmin isAdmin={isAdmin.current}>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><Ellipsis />Optionen

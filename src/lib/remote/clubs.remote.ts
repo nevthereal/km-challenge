@@ -1,4 +1,5 @@
-import { command, query } from '$app/server';
+import { command, form, query } from '$app/server';
+import { validator } from 'svelte-checkmate';
 import * as schema from '$lib/db/schema';
 import { db } from '$lib/db';
 import { inviteCode } from '$lib/db/schema';
@@ -7,21 +8,20 @@ import { error, redirect } from '@sveltejs/kit';
 import { getTableColumns, sql, eq, desc, asc, and, lte, gte } from 'drizzle-orm';
 import { z } from 'zod';
 
-export const checkAdmin = query(
-	z.object({ clubId: z.string(), userId: z.string() }),
-	async ({ clubId, userId }) => {
-		const query = await db.query.clubAdmin.findFirst({
-			where: {
-				userId,
-				clubId
-			}
-		});
+export const checkAdmin = query(z.string(), async (clubId) => {
+	const user = await getUser();
 
-		if (query) return true;
+	const query = await db.query.clubAdmin.findFirst({
+		where: {
+			userId: user.id,
+			clubId
+		}
+	});
 
-		return false;
-	}
-);
+	if (query) return true;
+
+	return false;
+});
 
 export const getUsersClubs = query(async () => {
 	const user = await getUser();
@@ -140,9 +140,7 @@ export const getActiveChallengeWithLeaderBoard = query(async () => {
 // export type LeaderBoard = Awaited<ReturnType<typeof getLeaderBoard>>
 
 export const createInviteCode = command(z.string(), async (clubId) => {
-	const user = await getUser();
-
-	if (!checkAdmin({ clubId, userId: user.id })) return error(401, 'Nicht erlaubt.');
+	if (!checkAdmin(clubId)) return error(401, 'Nicht erlaubt.');
 
 	const [{ code }] = await db
 		.insert(inviteCode)
@@ -152,4 +150,33 @@ export const createInviteCode = command(z.string(), async (clubId) => {
 		.returning();
 
 	return { code };
+});
+
+export const createClub = form(async (formData) => {
+	const user = await getUser();
+
+	if (!user.superUser) return redirect(302, '/clubs');
+
+	const validation = await validator({ schema: z.object({ name: z.string() }), formData });
+
+	if (!validation.success) return error(400);
+
+	const [createdClub] = await db
+		.insert(schema.club)
+		.values({
+			name: validation.data.name
+		})
+		.returning();
+
+	await db.insert(schema.clubAdmin).values({
+		clubId: createdClub.id,
+		userId: user.id
+	});
+
+	await db.insert(schema.clubMember).values({
+		clubId: createdClub.id,
+		userId: user.id
+	});
+
+	return redirect(302, `/clubs/${createdClub.id}`);
 });

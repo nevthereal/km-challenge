@@ -16,9 +16,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
 	const editClubForm = await superValidate(zod(editClub), {});
 
-	const clubAdmin = await checkAdmin(params.clubId, user.id);
-
-	return { createForm, user, clubAdmin, editClubForm };
+	return { createForm, user, editClubForm };
 };
 
 export const actions: Actions = {

@@ -1,6 +1,5 @@
 import { getRequestEvent, query } from '$app/server';
 import { redirect } from '@sveltejs/kit';
-import { z } from 'zod';
 
 export const getUser = query(async () => {
 	const {

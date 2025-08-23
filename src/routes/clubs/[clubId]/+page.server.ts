@@ -47,19 +47,6 @@ export const actions: Actions = {
 
 		redirect(302, `/clubs/${params.clubId}/challenge/${challengeId}`);
 	},
-	getCode: async ({ locals, params, url }) => {
-		const user = getUser();
-		if (!checkAdmin(params.clubId, user.id)) return error(401, 'Nicht erlaubt.');
-
-		const [{ code }] = await db
-			.insert(inviteCode)
-			.values({
-				clubId: params.clubId
-			})
-			.returning();
-
-		return { code };
-	},
 	deleteClub: async ({ locals, url, params }) => {
 		const user = getUser();
 

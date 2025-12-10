@@ -36,13 +36,8 @@ export const getLeaderBoard = query(
 	}
 );
 
-export const createEntry = form(async (formData) => {
+export const createEntry = form(newEntry, async (data) => {
 	const user = await getUser();
-	const form = await validator({ schema: newEntry, formData });
-
-	if (!form.success) return error(400);
-
-	const { data } = form;
 
 	const qDiscipline = await db.query.discipline.findFirst({
 		where: {
@@ -74,16 +69,12 @@ export const createEntry = form(async (formData) => {
 	});
 });
 
-export const createChallenge = form(async (formData) => {
+export const createChallenge = form(newChallenge, async (data) => {
 	const user = await getUser();
-
-	const form = await validator({ schema: newChallenge, formData });
-
-	if (!form.success) return error(400);
 
 	if (!user.superUser) return error(401, 'Nicht erlaubt.');
 
-	const { endsAt, name, startsAt, clubId } = form.data;
+	const { endsAt, name, startsAt, clubId } = data;
 
 	const [{ id: challengeId }] = await db
 		.insert(schema.challenge)
@@ -99,7 +90,7 @@ export const createChallenge = form(async (formData) => {
 });
 
 export const deleteChallenge = command(z.string(), async (challengeId) => {
-	const user = await getUser();
+	await getUser();
 
 	// query challenge from db
 	const qChallenge = await db.query.challenge.findFirst({
@@ -123,14 +114,8 @@ export const deleteChallenge = command(z.string(), async (challengeId) => {
 	return redirect(302, `/clubs/${qChallenge.clubId}`); // edit redirect here TODO
 });
 
-export const editChallenge = form(async (formData) => {
-	const user = await getUser();
-
-	const form = await validator({ formData, schema: newChallenge });
-
-	if (!form.success) return error(400, { form });
-
-	const { data } = form;
+export const editChallenge = form(newChallenge, async (data) => {
+	await getUser();
 
 	// query challenge from db
 	const qChallenge = await db.query.challenge.findFirst({
@@ -154,8 +139,8 @@ export const editChallenge = form(async (formData) => {
 		.update(schema.challenge)
 		.set({
 			name,
-			endsAt,
-			startsAt
+			endsAt: new Date(endsAt),
+			startsAt: new Date(startsAt)
 		})
 		.where(eq(schema.challenge.id, qChallenge.id));
 
@@ -181,18 +166,43 @@ export const joinChallenge = command(
 	async (ids) => {
 		const user = await getUser();
 
-		const clubRel = await db.query.clubMember.findFirst({
-			where: {
-				userId: user.id,
-				clubId: ids.clubId
+		await db.transaction(async (tx) => {
+			const clubRel = await tx.query.clubMember.findFirst({
+				where: {
+					userId: user.id,
+					clubId: ids.clubId
+				}
+			});
+
+			if (!clubRel) return error(401, 'Du bist kein Mitglied des Clubs');
+
+			// Try upsert to avoid duplicates. Requires a unique constraint on (user_id, challenge_id).
+			try {
+				await tx
+					.insert(schema.challengeMember)
+					.values({
+						challengeId: ids.challengeId,
+						userId: user.id
+					})
+					.onConflictDoNothing({
+						target: [schema.challengeMember.userId, schema.challengeMember.challengeId]
+					});
+			} catch (e) {
+				console.warn('joinChallenge upsert failed; falling back to check-then-insert', e);
+				// Fallback if constraint is missing: check-then-insert.
+				const existing = await tx.query.challengeMember.findFirst({
+					where: {
+						userId: user.id,
+						challengeId: ids.challengeId
+					}
+				});
+				if (!existing) {
+					await tx.insert(schema.challengeMember).values({
+						challengeId: ids.challengeId,
+						userId: user.id
+					});
+				}
 			}
-		});
-
-		if (!clubRel) return error(401, 'Du bist kein Mitglied des Clubs');
-
-		await db.insert(schema.challengeMember).values({
-			challengeId: ids.challengeId,
-			userId: user.id
 		});
 	}
 );

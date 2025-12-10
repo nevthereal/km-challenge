@@ -4,8 +4,8 @@ import { gender, roles } from './db/schema';
 export const newChallenge = z
 	.object({
 		name: z.string().min(3),
-		startsAt: z.date(),
-		endsAt: z.date(),
+		startsAt: z.iso.date(),
+		endsAt: z.iso.date(),
 		clubId: z.string()
 	})
 	.refine((data) => data.endsAt > data.startsAt, {

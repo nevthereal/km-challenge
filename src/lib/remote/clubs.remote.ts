@@ -1,14 +1,13 @@
 import { command, form, query } from '$app/server';
-import { validator } from 'svelte-checkmate';
 import * as schema from '$lib/db/schema';
 import { db } from '$lib/db';
 import { inviteCode } from '$lib/db/schema';
 import { getUser } from '$lib/remote/auth.remote';
 import { error, redirect } from '@sveltejs/kit';
-import { getTableColumns, sql, eq, desc, asc, and, lte, gte } from 'drizzle-orm';
+import { getTableColumns, eq, and, lte, gte } from 'drizzle-orm';
 import { z } from 'zod';
-import { editClub, newEntry } from '$lib/zod';
-import { isActive } from '$lib/utils';
+import { editClub } from '$lib/zod';
+import { getLeaderBoard } from './challenge.remote';
 
 export const checkAdmin = query(z.string(), async (clubId) => {
 	const user = await getUser();
@@ -82,33 +81,33 @@ export const getClub = query(z.string(), async (clubId) => {
 	return qClub;
 });
 
-export const createClub = form(async (formData) => {
+export const createClub = form(z.object({ name: z.string() }), async (data) => {
 	const user = await getUser();
 
 	if (!user.superUser) return redirect(302, '/clubs');
 
-	const form = await validator({ schema: z.object({ name: z.string() }), formData });
+	const createdClubId = await db.transaction(async (tx) => {
+		const [createdClub] = await tx
+			.insert(schema.club)
+			.values({
+				name: data.name
+			})
+			.returning();
 
-	if (!form.success) return error(400);
+		await tx.insert(schema.clubAdmin).values({
+			clubId: createdClub.id,
+			userId: user.id
+		});
 
-	const [createdClub] = await db
-		.insert(schema.club)
-		.values({
-			name: form.data.name
-		})
-		.returning();
+		await tx.insert(schema.clubMember).values({
+			clubId: createdClub.id,
+			userId: user.id
+		});
 
-	await db.insert(schema.clubAdmin).values({
-		clubId: createdClub.id,
-		userId: user.id
+		return createdClub.id;
 	});
 
-	await db.insert(schema.clubMember).values({
-		clubId: createdClub.id,
-		userId: user.id
-	});
-
-	return redirect(302, `/clubs/${createdClub.id}`);
+	return redirect(302, `/clubs/${createdClubId}`);
 });
 
 export const getActiveChallengeWithLeaderBoard = query(async () => {
@@ -158,7 +157,7 @@ export const createInviteCode = command(z.string(), async (clubId) => {
 });
 
 export const deleteClub = command(z.string(), async (clubId) => {
-	const user = await getUser();
+	await getUser();
 
 	// query club from db
 	const qClub = await db.query.club.findFirst({
@@ -201,14 +200,8 @@ export const leaveClub = command(z.string(), async (clubId) => {
 	return redirect(302, '/clubs');
 });
 
-export const renameClub = form(async (formData) => {
-	const user = await getUser();
-
-	const form = await validator({ schema: editClub, formData });
-
-	if (!form.success) return error(400);
-
-	const { data } = form;
+export const renameClub = form(editClub, async (data) => {
+	await getUser();
 
 	// query club from db
 	const qClub = await db.query.club.findFirst({
@@ -221,7 +214,7 @@ export const renameClub = form(async (formData) => {
 	if (!qClub) return error(404, 'Club existiert nicht');
 
 	// check if user is admin of club
-	const isAdmin = checkAdmin(qClub.id, user.id);
+	const isAdmin = checkAdmin(qClub.id);
 
 	// error if not admin
 	if (!isAdmin) return error(401, 'Nicht erlaubt');
@@ -230,9 +223,15 @@ export const renameClub = form(async (formData) => {
 	await db
 		.update(schema.club)
 		.set({
-			name: form.data.name
+			name: data.name
 		})
 		.where(eq(schema.club.id, qClub.id));
 
 	return { form };
+});
+
+export const joinWithCode = form(z.object({ code: z.string() }), async (data) => {
+	const { code } = data;
+
+	return redirect(302, `/clubs/join/${code}`);
 });

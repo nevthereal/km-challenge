@@ -17,23 +17,9 @@
 	import { page } from '$app/state';
 	import { checkAdmin, getClub } from '$lib/remote/clubs.remote.js';
 
-	let { data, params } = $props();
+	let { params } = $props();
 
-	const createForm = superForm(data.createForm);
-	const editClubForm = superForm(data.editClubForm, {
-		onResult: ({ result }) => {
-			if (result.type === 'success') editDialogOpen = !editDialogOpen;
-		}
-	});
-
-	const { form: createFormFields, enhance: createEnhance } = createForm;
-	const {
-		form: editFormFields,
-		enhance: editFormEnhance,
-		constraints: editFormContraints
-	} = editClubForm;
-
-	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
+	// let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
 
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
@@ -59,7 +45,7 @@
 			{#if !isAdmin}
 				{@render leaveDialog()}
 			{/if}
-			<ClubAdmin isAdmin={isAdmin.current}>
+			<ClubAdmin isAdmin={await isAdmin}>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><Ellipsis />Optionen
@@ -81,7 +67,7 @@
 	</div>
 
 	<div class="mt-6 grid gap-4 md:grid-cols-3">
-		<ClubAdmin {isAdmin}>
+		<ClubAdmin isAdmin={await isAdmin}>
 			{@render challengeSheet()}
 		</ClubAdmin>
 		{#each club.challenges as challenge}
@@ -111,10 +97,6 @@
 		{/each}
 	</div>
 
-	<form id="generateForm" action="?/getCode" method="post" use:enhance hidden></form>
-	<form id="deleteForm" action="?/deleteClub" method="post" use:enhance hidden></form>
-	<form id="leaveForm" action="?/leave" method="post" use:enhance hidden></form>
-
 	{#snippet challengeSheet()}
 		<Sheet.Root>
 			<Sheet.Trigger>
@@ -129,39 +111,19 @@
 			</Sheet.Trigger>
 			<Sheet.Content>
 				<Sheet.Header>
-					<form
-						method="post"
-						action="?/createChallenge"
-						use:createEnhance
-						class="flex max-w-xl flex-col gap-2"
-					>
-						<Form.Field form={createForm} name="name">
-							<Form.Control>
-								{#snippet children({ props })}
-									<Form.Label>Name</Form.Label>
-									<Input {...props} bind:value={$createFormFields.name} />
-								{/snippet}
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<Form.Field form={createForm} name="startsAt" class="flex flex-col">
-							<Form.Control>
-								{#snippet children()}
-									<Form.Label>Dauer der Challenge</Form.Label>
-									<Form.Description
-										>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit
-										auf 00:00 gesetzt wird.</Form.Description
-									>
-									<DatePicker
-										startName="startsAt"
-										endName="endsAt"
-										bind:startValue={$createFormFields.startsAt}
-										bind:endValue={$createFormFields.endsAt}
-									/>
-								{/snippet}
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
+					<form method="post" action="?/createChallenge" class="flex max-w-xl flex-col gap-2">
+						<Form.Label>Name</Form.Label>
+						<Input />
+
+						<Form.Label>Dauer der Challenge</Form.Label>
+						<Form.Description
+							>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
+							00:00 gesetzt wird.</Form.Description
+						>
+						<DatePicker startName="startsAt" endName="endsAt" />
+
+						<Form.FieldErrors />
+
 						<Form.Button>Erstellen</Form.Button>
 					</form>
 				</Sheet.Header>

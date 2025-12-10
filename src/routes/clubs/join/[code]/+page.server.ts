@@ -4,8 +4,8 @@ import type { PageServerLoad } from './$types';
 import { clubMember } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params, url }) => {
-	const user = await getUser(url.pathname);
+export const load: PageServerLoad = async ({ params }) => {
+	const user = await getUser();
 
 	const qClub = await db.query.inviteCode.findFirst({
 		where: {
@@ -15,25 +15,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	if (!qClub) return error(404, 'Einladungscode ungültig');
 
-	const alreadyJoined = await db.query.clubMember.findFirst({
-		where: {
-			AND: [
-				{
-					clubId: qClub.clubId
-				},
-				{
-					userId: user.id
-				}
-			]
-		}
+	await db.transaction(async (tx) => {
+		await tx
+			.insert(clubMember)
+			.values({
+				clubId: qClub.clubId,
+				userId: user.id
+			})
+			.onConflictDoNothing({
+				target: [clubMember.userId, clubMember.clubId]
+			});
 	});
-
-	if (!alreadyJoined) {
-		await db.insert(clubMember).values({
-			clubId: qClub.clubId,
-			userId: user.id
-		});
-	}
 
 	return redirect(302, `/clubs/${qClub.clubId}`);
 };

@@ -7,7 +7,8 @@ import {
 	pgEnum,
 	numeric,
 	date,
-	index
+	index,
+	uniqueIndex
 } from 'drizzle-orm/pg-core';
 
 export const challenge = pgTable(
@@ -203,7 +204,8 @@ export const clubMember = pgTable(
 	},
 	(table) => [
 		index('club_member_user_id_idx').on(table.userId),
-		index('club_member_club_id_idx').on(table.clubId)
+		index('club_member_club_id_idx').on(table.clubId),
+		uniqueIndex('club_member_user_club_unique').on(table.userId, table.clubId)
 	]
 );
 
@@ -224,6 +226,7 @@ export const challengeMember = pgTable(
 	},
 	(table) => [
 		index('challenge_member_user_id_idx').on(table.userId),
-		index('challenge_member_challenge_id_idx').on(table.challengeId)
+		index('challenge_member_challenge_id_idx').on(table.challengeId),
+		uniqueIndex('challenge_member_user_challenge_unique').on(table.userId, table.challengeId)
 	]
 );

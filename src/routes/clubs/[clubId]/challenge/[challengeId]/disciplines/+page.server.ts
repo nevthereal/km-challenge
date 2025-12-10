@@ -33,13 +33,15 @@ export const actions: Actions = {
 
 		if (!form.valid) return fail(400, { form });
 
-		for (const d of form.data.discipline) {
-			await db.insert(discipline).values({
-				factor: d.multiplier.toString(),
-				name: d.name,
-				challengeId: params.challengeId
-			});
-		}
+		const values = form.data.discipline.map((d) => ({
+			factor: d.multiplier.toString(),
+			name: d.name,
+			challengeId: params.challengeId
+		}));
+
+		await db.transaction(async (tx) => {
+			await tx.insert(discipline).values(values);
+		});
 		return { form };
 	},
 	delete: async ({ request, params, locals, url }) => {

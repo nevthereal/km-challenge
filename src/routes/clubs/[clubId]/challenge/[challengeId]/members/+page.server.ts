@@ -1,12 +1,10 @@
 import { db } from '$lib/db';
-import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import { challengeMember } from '$lib/db/schema';
 
 export const load: PageServerLoad = async ({ parent, params }) => {
 	const { challenge } = await parent();
 	const members = await db.query.challengeMember.findMany({
-		where: eq(challengeMember.challengeId, challenge.id),
+		where: { challengeId: challenge.id },
 		with: {
 			user: {
 				columns: {
@@ -24,7 +22,9 @@ export const load: PageServerLoad = async ({ parent, params }) => {
 	});
 
 	const admins = await db.query.clubAdmin.findMany({
-		where: ({ clubId }, { eq }) => eq(clubId, params.clubId)
+		where: {
+			clubId: params.clubId
+		}
 	});
 
 	return { members, admins };

@@ -1,11 +1,12 @@
 import { checkAdmin, db } from '$lib/db';
-import { and, eq } from 'drizzle-orm';
+import { zod4 } from 'sveltekit-superforms/adapters';
+
 import type { LayoutServerLoad } from './$types';
-import { challenge, challengeMember, clubMember } from '$lib/db/schema';
+
 import { error, redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/utils';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+
 import { createChallenge } from '$lib/zod';
 
 export const load: LayoutServerLoad = async ({ params, locals, url }) => {
@@ -15,7 +16,7 @@ export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 	if (!user.completedProfile) return redirect(302, '/profile/edit');
 
 	const qChallenge = await db.query.challenge.findFirst({
-		where: eq(challenge.id, challengeId),
+		where: { id: challengeId },
 		with: {
 			members: true,
 			entries: {
@@ -31,11 +32,11 @@ export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 	if (!qChallenge) return error(404, 'Challenge nicht gefunden');
 
 	const currentUserChallenge = await db.query.challengeMember.findFirst({
-		where: and(eq(challengeMember.challengeId, challengeId), eq(challengeMember.userId, user.id))
+		where: { challengeId, userId: user.id }
 	});
 
 	const currentUserClub = await db.query.clubMember.findFirst({
-		where: and(eq(clubMember.clubId, qChallenge.clubId), eq(clubMember.userId, user.id))
+		where: { clubId: qChallenge.clubId, userId: user.id }
 	});
 
 	if (!currentUserClub) return redirect(302, '/clubs');
@@ -44,7 +45,7 @@ export const load: LayoutServerLoad = async ({ params, locals, url }) => {
 
 	const challengePath = `/clubs/${params.clubId}/challenge/${params.challengeId}`;
 
-	const editForm = await superValidate(zod(createChallenge));
+	const editForm = await superValidate(zod4(createChallenge));
 
 	return {
 		challenge: qChallenge,

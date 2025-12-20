@@ -2,7 +2,7 @@ import { getUser } from '$lib/utils';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { db } from '$lib/db';
 import { club, clubAdmin, clubMember } from '$lib/db/schema';
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	if (!superUser) return redirect(302, '/clubs');
 
-	const form = await superValidate(zod(clubSchema));
+	const form = await superValidate(zod4(clubSchema));
 
 	return { user, form };
 };
@@ -31,7 +31,7 @@ export const actions: Actions = {
 
 		if (!superUser) return redirect(302, '/clubs');
 
-		const form = await superValidate(request, zod(clubSchema));
+		const form = await superValidate(request, zod4(clubSchema));
 
 		if (!form.valid) return fail(400, { form });
 

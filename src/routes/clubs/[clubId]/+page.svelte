@@ -48,7 +48,7 @@
 </script>
 
 <nav class="mb-4 flex">
-	<a href="/clubs" class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+	<a href="/clubs" class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 		><ArrowLeft strokeWidth={3} /> Alle Clubs</a
 	>
 </nav>
@@ -63,7 +63,7 @@
 		{/if}
 		<ClubAdmin {isAdmin}>
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline-solid' })}
+				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 					><Ellipsis />Optionen
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
@@ -250,7 +250,7 @@
 
 {#snippet leaveDialog()}
 	<AlertDialog.Root bind:open={leaveDialogOpen}>
-		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline-solid' })}>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
 			<LogOut />Club verlassen
 		</AlertDialog.Trigger>
 		<AlertDialog.Content>

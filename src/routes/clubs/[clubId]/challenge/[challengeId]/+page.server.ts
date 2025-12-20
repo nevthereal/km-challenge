@@ -2,7 +2,7 @@ import { getUser, isActive } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { createChallenge, newEntry } from '$lib/zod';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
 import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
@@ -12,11 +12,11 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const { challenge } = await parent();
 
 	const leaderboard = getLeaderBoard(challenge.id);
-	const newEntryForm = await superValidate(zod(newEntry));
+	const newEntryForm = await superValidate(zod4(newEntry));
 
 	const lastActivities = await db.query.entry.findMany({
-		where(fields, operators) {
-			return operators.eq(fields.challengeId, challenge.id);
+		where: {
+			challengeId: challenge.id
 		},
 		limit: 10,
 		orderBy(fields, operators) {
@@ -34,18 +34,22 @@ export const load: PageServerLoad = async ({ parent }) => {
 export const actions: Actions = {
 	newEntry: async ({ request, params, locals, url }) => {
 		const user = getUser({ locals, redirectUrl: url.pathname });
-		const form = await superValidate(request, zod(newEntry));
+		const form = await superValidate(request, zod4(newEntry));
 
 		if (!form.valid) return fail(400, { form });
 
 		const qDiscipline = await db.query.discipline.findFirst({
-			where: eq(discipline.id, form.data.disciplineId)
+			where: {
+				id: form.data.disciplineId
+			}
 		});
 
 		if (!qDiscipline) return error(404, 'Disziplin nicht gefunden');
 
 		const qChallenge = await db.query.challenge.findFirst({
-			where: eq(challenge.id, qDiscipline?.challengeId)
+			where: {
+				id: qDiscipline.challengeId
+			}
 		});
 
 		if (!qChallenge) return error(404, 'Challenge nicht gefunden');
@@ -68,7 +72,9 @@ export const actions: Actions = {
 
 		// query challenge from db
 		const qChallenge = await db.query.challenge.findFirst({
-			where: ({ id }, { eq }) => eq(id, params.challengeId)
+			where: {
+				id: params.challengeId
+			}
 		});
 
 		// error if no challenge
@@ -90,7 +96,9 @@ export const actions: Actions = {
 
 		// query challenge from db
 		const qChallenge = await db.query.challenge.findFirst({
-			where: ({ id }, { eq }) => eq(id, params.challengeId)
+			where: {
+				id: params.challengeId
+			}
 		});
 
 		// error if no challenge
@@ -102,7 +110,7 @@ export const actions: Actions = {
 		// error if not admin
 		if (!isAdmin) return error(401, 'Nicht erlaubt');
 
-		const form = await superValidate(request, zod(createChallenge));
+		const form = await superValidate(request, zod4(createChallenge));
 
 		if (!form.valid) return fail(400, { form });
 
@@ -123,10 +131,9 @@ export const actions: Actions = {
 		const user = getUser({ locals, redirectUrl: url.pathname });
 
 		const qChallengeMember = await db.query.challengeMember.findFirst({
-			where: and(
-				eq(challengeMember.challengeId, params.challengeId),
-				eq(challengeMember.userId, user.id)
-			)
+			where: {
+				AND: [{ challengeId: params.challengeId }, { userId: user.id }]
+			}
 		});
 
 		if (!qChallengeMember) return error(404, 'Du bist kein Mitglied dieser Challenge');
@@ -137,7 +144,7 @@ export const actions: Actions = {
 		const user = getUser({ locals, redirectUrl: url.pathname });
 
 		const clubRel = await db.query.clubMember.findFirst({
-			where: and(eq(clubMember.userId, user.id), eq(clubMember.clubId, params.clubId))
+			where: { AND: [{ userId: user.id }, { clubId: params.clubId }] }
 		});
 
 		if (!clubRel) return error(401, 'Du bist kein Mitglied des Clubs');

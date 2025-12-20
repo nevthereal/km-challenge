@@ -1,100 +1,149 @@
-import { relations } from 'drizzle-orm';
-import {
-	challenge,
-	club,
-	clubAdmin,
-	clubMember,
-	discipline,
-	entry,
-	inviteCode,
-	user,
-	challengeMember
-} from './schema';
+import * as schema from './schema';
+import { defineRelations } from 'drizzle-orm';
 
-export const codeRelation = relations(inviteCode, ({ one }) => ({
-	club: one(club, {
-		fields: [inviteCode.clubId],
-		references: [club.id]
-	})
-}));
+export default defineRelations(schema, (r) => ({
+	inviteCode: {
+		club: r.one.club({
+			from: r.inviteCode.clubId,
+			to: r.club.id
+		})
+	},
 
-export const userRelation = relations(user, ({ many }) => ({
-	participations: many(entry),
-	entries: many(entry),
-	adminOf: many(clubAdmin),
-	memberOf: many(clubMember),
-	challenges: many(challengeMember)
-}));
+	user: {
+		entries: r.many.entry({
+			from: r.user.id,
+			to: r.entry.userId
+		}),
+		adminOf: r.many.clubAdmin({
+			from: r.user.id,
+			to: r.clubAdmin.userId
+		}),
+		memberOf: r.many.clubMember({
+			from: r.user.id,
+			to: r.clubMember.userId
+		}),
+		challenges: r.many.challengeMember({
+			from: r.user.id,
+			to: r.challengeMember.userId
+		}),
+		sessions: r.many.session({
+			from: r.user.id,
+			to: r.session.userId
+		}),
+		accounts: r.many.account({
+			from: r.user.id,
+			to: r.account.userId
+		})
+	},
 
-export const challengeRelation = relations(challenge, ({ many, one }) => ({
-	entries: many(entry),
-	disciplines: many(discipline),
-	members: many(challengeMember),
-	club: one(club, {
-		fields: [challenge.clubId],
-		references: [club.id]
-	})
-}));
+	challenge: {
+		entries: r.many.entry({
+			from: r.challenge.id,
+			to: r.entry.challengeId
+		}),
+		disciplines: r.many.discipline({
+			from: r.challenge.id,
+			to: r.discipline.challengeId
+		}),
+		members: r.many.challengeMember({
+			from: r.challenge.id,
+			to: r.challengeMember.challengeId
+		}),
+		club: r.one.club({
+			from: r.challenge.clubId,
+			to: r.club.id
+		})
+	},
 
-export const entryRelation = relations(entry, ({ one }) => ({
-	user: one(user, {
-		fields: [entry.userId],
-		references: [user.id]
-	}),
-	challenge: one(challenge, {
-		fields: [entry.challengeId],
-		references: [challenge.id]
-	}),
-	discipline: one(discipline, {
-		fields: [entry.disciplineId],
-		references: [discipline.id]
-	})
-}));
+	discipline: {
+		challenge: r.one.challenge({
+			from: r.discipline.challengeId,
+			to: r.challenge.id
+		}),
+		entries: r.many.entry({
+			from: r.discipline.id,
+			to: r.entry.disciplineId
+		})
+	},
 
-export const disciplineRelation = relations(discipline, ({ one, many }) => ({
-	challenge: one(challenge, {
-		fields: [discipline.challengeId],
-		references: [challenge.id]
-	}),
-	entries: many(entry)
-}));
+	entry: {
+		user: r.one.user({
+			from: r.entry.userId,
+			to: r.user.id
+		}),
+		challenge: r.one.challenge({
+			from: r.entry.challengeId,
+			to: r.challenge.id
+		}),
+		discipline: r.one.discipline({
+			from: r.entry.disciplineId,
+			to: r.discipline.id
+		})
+	},
 
-export const clubRelation = relations(club, ({ many }) => ({
-	challenges: many(challenge),
-	admins: many(clubAdmin),
-	codes: many(inviteCode),
-	members: many(clubMember)
-}));
+	club: {
+		challenges: r.many.challenge({
+			from: r.club.id,
+			to: r.challenge.clubId
+		}),
+		admins: r.many.clubAdmin({
+			from: r.club.id,
+			to: r.clubAdmin.clubId
+		}),
+		codes: r.many.inviteCode({
+			from: r.club.id,
+			to: r.inviteCode.clubId
+		}),
+		members: r.many.clubMember({
+			from: r.club.id,
+			to: r.clubMember.clubId
+		})
+	},
 
-export const clubAdminRelation = relations(clubAdmin, ({ one }) => ({
-	club: one(club, {
-		fields: [clubAdmin.clubId],
-		references: [club.id]
-	}),
-	user: one(user, {
-		fields: [clubAdmin.userId],
-		references: [user.id]
-	})
-}));
+	clubAdmin: {
+		club: r.one.club({
+			from: r.clubAdmin.clubId,
+			to: r.club.id
+		}),
+		user: r.one.user({
+			from: r.clubAdmin.userId,
+			to: r.user.id
+		})
+	},
 
-export const clubMemberRelation = relations(clubMember, ({ one }) => ({
-	club: one(club, {
-		fields: [clubMember.clubId],
-		references: [club.id]
-	}),
-	user: one(user, {
-		fields: [clubMember.userId],
-		references: [user.id]
-	})
-}));
+	clubMember: {
+		club: r.one.club({
+			from: r.clubMember.clubId,
+			to: r.club.id
+		}),
+		user: r.one.user({
+			from: r.clubMember.userId,
+			to: r.user.id
+		})
+	},
 
-export const challengeMemberRelation = relations(challengeMember, ({ one }) => ({
-	challenge: one(challenge, {
-		fields: [challengeMember.challengeId],
-		references: [challenge.id]
-	}),
-	user: one(user, {
-		fields: [challengeMember.userId],
-		references: [user.id]
-	})
+	challengeMember: {
+		challenge: r.one.challenge({
+			from: r.challengeMember.challengeId,
+			to: r.challenge.id
+		}),
+		user: r.one.user({
+			from: r.challengeMember.userId,
+			to: r.user.id
+		})
+	},
+
+	session: {
+		user: r.one.user({
+			from: r.session.userId,
+			to: r.user.id
+		})
+	},
+
+	account: {
+		user: r.one.user({
+			from: r.account.userId,
+			to: r.user.id
+		})
+	}
 }));

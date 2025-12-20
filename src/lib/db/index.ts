@@ -1,18 +1,19 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { DATABASE_URL } from '$env/static/private';
+import relations from './relations';
+import { sql, eq, desc, getColumns } from 'drizzle-orm';
 import * as schema from './schema';
-import * as relations from './relations';
-import { sql, eq, desc, and, getTableColumns } from 'drizzle-orm';
 
 export const db = drizzle(DATABASE_URL, {
 	casing: 'snake_case',
-	schema: { ...schema, ...relations }
+	schema,
+	relations
 });
 
 export async function getLeaderBoard(challengeId: string, limit?: number) {
 	const lb = db
 		.select({
-			...getTableColumns(schema.user),
+			...getColumns(schema.user),
 			score:
 				sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
 					'score'
@@ -36,10 +37,8 @@ export type Leaderboard = ReturnType<typeof getLeaderBoard>;
 
 export async function checkAdmin(clubId: string, userId: string) {
 	const query = await db.query.clubAdmin.findFirst({
-		where: and(eq(schema.clubAdmin.userId, userId), eq(schema.clubAdmin.clubId, clubId))
+		where: { userId, clubId }
 	});
 
-	if (query) return true;
-
-	return false;
+	return !!query;
 }

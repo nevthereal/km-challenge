@@ -8,13 +8,14 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 	const { challengeId: currentChallengeId, memberId } = params;
 
 	const qMember = await db.query.challengeMember.findFirst({
-		where: ({ challengeId, userId }, { and, eq }) =>
-			and(eq(userId, memberId), eq(challengeId, currentChallengeId)),
+		where: { AND: [{ userId: memberId }, { challengeId: currentChallengeId }] },
 		with: {
 			user: {
 				with: {
 					entries: {
-						where: ({ challengeId }, { eq }) => eq(challengeId, currentChallengeId),
+						where: {
+							challengeId: currentChallengeId
+						},
 						with: {
 							discipline: true
 						},

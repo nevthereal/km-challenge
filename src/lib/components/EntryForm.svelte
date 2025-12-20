@@ -95,7 +95,7 @@
 				method="post"
 				class="text-left"
 			>
-				<p class="mb-4 text-balance text-sm text-muted-foreground max-md:text-center">
+				<p class="text-muted-foreground mb-4 text-sm text-balance max-md:text-center">
 					Bitte Kilometer roh eintragen, die Punkte werden später verrechnet
 				</p>
 
@@ -146,7 +146,7 @@
 								<Popover.Trigger
 									{...props}
 									class={cn(
-										buttonVariants({ variant: 'outline-solid' }),
+										buttonVariants({ variant: 'outline' }),
 										'justify-start text-left font-normal md:grow',
 										!value && 'text-muted-foreground'
 									)}

@@ -2,14 +2,14 @@ import { getUser } from '$lib/utils';
 import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { addDisciplines } from '$lib/zod';
 import { checkAdmin, db } from '$lib/db';
 import { discipline } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async () => {
-	const addDisciplineForm = await superValidate(zod(addDisciplines), {
+	const addDisciplineForm = await superValidate(zod4(addDisciplines), {
 		defaults: {
 			discipline: [
 				{
@@ -29,7 +29,7 @@ export const actions: Actions = {
 
 		if (!checkAdmin(params.clubId, user.id)) return error(401);
 
-		const form = await superValidate(request, zod(addDisciplines));
+		const form = await superValidate(request, zod4(addDisciplines));
 
 		if (!form.valid) return fail(400, { form });
 
@@ -52,8 +52,8 @@ export const actions: Actions = {
 		if (!dId) return error(404);
 
 		const qDiscipline = await db.query.discipline.findFirst({
-			where(fields, op) {
-				return op.and(op.eq(fields.id, dId), op.eq(fields.challengeId, params.challengeId));
+			where: {
+				AND: [{ id: dId }, { challengeId: params.challengeId }]
 			}
 		});
 

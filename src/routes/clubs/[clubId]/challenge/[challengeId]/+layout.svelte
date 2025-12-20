@@ -53,7 +53,7 @@
 <nav class="mb-4 flex gap-4">
 	<a
 		href="/clubs/{challenge.clubId}"
-		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+		class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 		><ArrowLeft strokeWidth={3} /> Zum Club</a
 	>
 </nav>
@@ -88,7 +88,7 @@
 				<a
 					class={cn(
 						'p-2 font-bold',
-						page.url.pathname === `${challengePath}${path.href}` && 'rounded-b-md bg-muted'
+						page.url.pathname === `${challengePath}${path.href}` && 'bg-muted rounded-b-md'
 					)}
 					href="{challengePath}{path.href}">{path.name}</a
 				>
@@ -183,7 +183,7 @@
 
 {#snippet leaveDialog()}
 	<AlertDialog.Root bind:open={leaveDialogOpen}>
-		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline-solid' })}>
+		<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
 			<LogOut />Verlassen
 		</AlertDialog.Trigger>
 		<AlertDialog.Content>

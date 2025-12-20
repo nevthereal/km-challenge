@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
 import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { entry } from '$lib/db/schema';
 import { getUser } from '$lib/utils';
 
@@ -9,26 +9,20 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const { challenge, user } = await parent();
 
 	const entries = await db.query.entry.findMany({
-		where(fields, operators) {
-			return operators.and(
-				operators.eq(fields.userId, user.id),
-				operators.eq(fields.challengeId, challenge.id)
-			);
+		where: {
+			userId: user.id,
+			challengeId: challenge.id
 		},
 		with: {
 			discipline: true
 		},
-		orderBy(fields, operators) {
-			return operators.desc(fields.date);
-		}
+		orderBy: { date: 'desc' }
 	});
 
 	const membership = await db.query.challengeMember.findFirst({
-		where(fields, operators) {
-			return operators.and(
-				operators.eq(fields.userId, user.id),
-				operators.eq(fields.challengeId, challenge.id)
-			);
+		where: {
+			userId: user.id,
+			challengeId: challenge.id
 		},
 		with: {
 			user: true
@@ -48,7 +42,10 @@ export const actions: Actions = {
 		if (!formDataId) return error(400);
 
 		const qEntry = await db.query.entry.findFirst({
-			where: and(eq(entry.id, formDataId.toString()), eq(entry.challengeId, params.challengeId))
+			where: {
+				id: formDataId.toString(),
+				challengeId: params.challengeId
+			}
 		});
 
 		if (!qEntry) return error(404);

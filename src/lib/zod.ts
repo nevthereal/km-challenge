@@ -24,18 +24,17 @@ export const addDisciplines = z.object({
 			name: z.string(),
 			multiplier: z
 				.number({
-					required_error: 'Der Multiplikator fehlt',
-					invalid_type_error: 'Der Multiplikator muss eine Zahl sein'
+					error: (issue) => (issue.input === undefined ? 'This field is required' : 'Not a string')
 				})
-				.step(0.1)
+				.multipleOf(0.1)
 		})
 		.array()
 });
 
 export const newEntry = z.object({
 	disciplineId: z.string(),
-	amount: z.number().step(0.01).min(0.01),
-	date: z.string().date()
+	amount: z.number().multipleOf(0.01).min(0.01),
+	date: z.iso.date()
 });
 
 export const editClub = z.object({

@@ -1,6 +1,6 @@
 import { fail, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { getUser } from '$lib/utils';
 import { redirect } from '@sveltejs/kit';
@@ -12,14 +12,14 @@ const schema = z.object({
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = getUser({ locals, redirectUrl: url.pathname });
 
-	const form = await superValidate(zod(schema));
+	const form = await superValidate(zod4(schema));
 
 	return { form, user };
 };
 
 export const actions: Actions = {
 	default: async ({ request }) => {
-		const form = await superValidate(request, zod(schema));
+		const form = await superValidate(request, zod4(schema));
 
 		if (!form.valid) return fail(400, { form });
 

@@ -2,7 +2,7 @@ import { getUser } from '$lib/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { userSetup } from '$lib/zod';
 import type { Actions } from './$types';
 import { db } from '$lib/db';
@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm';
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = getUser({ locals, redirectUrl: url.pathname });
 
-	const form = await superValidate(zod(userSetup), {
+	const form = await superValidate(zod4(userSetup), {
 		defaults: {
 			gender: user.gender as string | undefined,
 			role: user.role as string | undefined,
@@ -27,7 +27,7 @@ export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
 		const currentUser = getUser({ locals, redirectUrl: url.pathname });
 
-		const form = await superValidate(request, zod(userSetup));
+		const form = await superValidate(request, zod4(userSetup));
 
 		if (!form.valid) {
 			return fail(400, { form });

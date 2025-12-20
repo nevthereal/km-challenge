@@ -1,9 +1,9 @@
 import { db, getLeaderBoard } from '$lib/db';
 import { challenge, challengeMember } from '$lib/db/schema';
-import { lte, gte, and, getTableColumns, eq } from 'drizzle-orm';
+import { lte, gte, and, getColumns, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { newEntry } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (user) {
 		const activeChallenges = await db
 			.select({
-				...getTableColumns(challenge)
+				...getColumns(challenge)
 			})
 			.from(challengeMember)
 			.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
@@ -25,11 +25,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 			)
 			.groupBy(challenge.id);
 
-		const newEntryForm = await superValidate(zod(newEntry));
+		const newEntryForm = await superValidate(zod4(newEntry));
 
 		const challengesWithLeaderboards = activeChallenges.map(async (c) => {
 			const disciplines = await db.query.discipline.findMany({
-				where: ({ challengeId }, { eq }) => eq(challengeId, c.id)
+				where: {
+					challengeId: c.id
+				}
 			});
 			const leaderboard = getLeaderBoard(c.id, 5);
 			return { ...c, leaderboard, disciplines };

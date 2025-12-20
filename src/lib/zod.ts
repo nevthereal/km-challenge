@@ -37,5 +37,5 @@ export const newEntry = z.object({
 
 export const editClub = z.object({
 	name: z.string().min(5),
-	clubId: z.string()
+	id: z.string()
 });

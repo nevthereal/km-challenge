@@ -2,8 +2,7 @@
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { toast } from 'svelte-sonner';
 	import DatePicker from '$lib/components/DatePicker.svelte';
-	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
+	import * as Field from '$lib/components/ui/field';
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
 	import { cn, isActive, prettyDate } from '$lib/utils';
@@ -13,9 +12,8 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from 'lucide-svelte';
-	import { enhance } from '$app/forms';
-	import { page } from '$app/state';
-	import { checkAdmin, getClub } from '$lib/remote/clubs.remote.js';
+	import { checkAdmin, editClub, getClub } from '$lib/remote/clubs.remote.js';
+	import { createChallenge } from '$lib/remote/challenge.remote.js';
 
 	let { params } = $props();
 
@@ -111,20 +109,27 @@
 			</Sheet.Trigger>
 			<Sheet.Content>
 				<Sheet.Header>
-					<form method="post" action="?/createChallenge" class="flex max-w-xl flex-col gap-2">
-						<Form.Label>Name</Form.Label>
-						<Input />
+					<form {...createChallenge} class="flex max-w-xl flex-col gap-2">
+						<Field.Set>
+							<Field.Group>
+								<Field.Field>
+									<Field.Label for="name">Name</Field.Label>
+									<Input {...createChallenge.fields.name.as('text')} />
+									<Field.Description>Name der Challenge.</Field.Description>
+								</Field.Field>
+								<Field.Field>
+									<Field.Label for="username">Dauer der Challenge</Field.Label>
+									<DatePicker startName="startsAt" endName="endsAt" />
 
-						<Form.Label>Dauer der Challenge</Form.Label>
-						<Form.Description
-							>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
-							00:00 gesetzt wird.</Form.Description
-						>
-						<DatePicker startName="startsAt" endName="endsAt" />
-
-						<Form.FieldErrors />
-
-						<Form.Button>Erstellen</Form.Button>
+									<Field.Description
+										>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit
+										auf 00:00 gesetzt wird.</Field.Description
+									>
+								</Field.Field>
+							</Field.Group>
+						</Field.Set>
+						<p>{JSON.stringify(createChallenge.fields.allIssues())}</p>
+						<Button type="submit">Erstellen</Button>
 					</form>
 				</Sheet.Header>
 			</Sheet.Content>
@@ -172,16 +177,17 @@
 				<Dialog.Header>
 					<Dialog.Title>Club bearbeiten</Dialog.Title>
 				</Dialog.Header>
-				<form use:editFormEnhance action="?/edit" method="post">
-					<Form.Field form={editClubForm} name="name">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Name</Form.Label>
-								<Input {...props} {...$editFormContraints.name} bind:value={$editFormFields.name} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
+				<form {...editClub.for(club.id)}>
+					<Field.Set>
+						<Field.Group>
+							<Field.Field>
+								<Field.Label for="name">Name</Field.Label>
+								<Input {...editClub.fields.name.as('text')} />
+							</Field.Field>
+						</Field.Group>
+					</Field.Set>
+					<!-- <Input {...props} {...$editFormContraints.name} bind:value={$editFormFields.name} /> -->
+
 					<Button type="submit">Bearbeiten</Button>
 				</form>
 			</Dialog.Content>

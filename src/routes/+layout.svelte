@@ -11,7 +11,7 @@
 
 	let { children, data } = $props();
 
-	let { session } = data;
+	let { session } = $derived(data);
 </script>
 
 <Toaster />

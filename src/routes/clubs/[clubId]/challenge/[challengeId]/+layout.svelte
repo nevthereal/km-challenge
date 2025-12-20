@@ -142,6 +142,7 @@
 								>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
 								00:00 gesetzt wird.</Form.Description
 							>
+							<!-- Hier auch überarbeiten -->
 							<DatePicker
 								startName="startsAt"
 								endName="endsAt"

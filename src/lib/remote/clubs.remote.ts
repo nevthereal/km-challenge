@@ -6,7 +6,7 @@ import { getUser } from '$lib/remote/auth.remote';
 import { error, redirect } from '@sveltejs/kit';
 import { getTableColumns, eq, and, lte, gte } from 'drizzle-orm';
 import { z } from 'zod';
-import { editClub } from '$lib/zod';
+import { editClub as zodEditClub } from '$lib/zod';
 import { getLeaderBoard } from './challenge.remote';
 
 export const checkAdmin = query(z.string(), async (clubId) => {
@@ -200,13 +200,13 @@ export const leaveClub = command(z.string(), async (clubId) => {
 	return redirect(302, '/clubs');
 });
 
-export const renameClub = form(editClub, async (data) => {
+export const editClub = form(zodEditClub, async (data) => {
 	await getUser();
 
 	// query club from db
 	const qClub = await db.query.club.findFirst({
 		where: {
-			id: data.clubId
+			id: data.id
 		}
 	});
 

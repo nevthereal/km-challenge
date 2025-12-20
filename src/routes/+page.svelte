@@ -32,7 +32,7 @@
 								</span>
 								<SquareArrowOutUpRight />
 							</a>
-							<EntryForm {challenge} disciplines={challenge.disciplines} formData={newEntryForm} />
+							<EntryForm {challenge} disciplines={challenge.disciplines} />
 						</div>
 						<Leaderboard currentChallenge={challenge} leaderboard={challenge.leaderboard} />
 						<Button

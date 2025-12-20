@@ -10,6 +10,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { RangeCalendar } from './ui/range-calendar';
+	import type { DateRange } from 'bits-ui';
 
 	const df = new DateFormatter('de', {
 		dateStyle: 'long'
@@ -20,14 +21,30 @@
 		endValue = $bindable<DateValue | undefined>(),
 		startName,
 		endName
+	}: {
+		startValue: DateValue | undefined;
+		endValue: DateValue | undefined;
+		startName: string;
+		endName: string;
 	} = $props();
 
-	let value = $state({ start: startValue, end: endValue });
+	let value = $state<DateRange>({ start: startValue, end: endValue });
 
-	$effect(() => {
-		value.start = startValue ? parseAbsolute(startValue.toString(), getLocalTimeZone()) : undefined;
-		value.end = endValue ? parseAbsolute(endValue.toString(), getLocalTimeZone()) : undefined;
-	});
+	// Expose ISO date strings via accessors on a form object (zod-compatible)
+	const form = {
+		get startsAt() {
+			return startValue ? startValue.toDate(getLocalTimeZone()).toISOString() : '';
+		},
+		set startsAt(v) {
+			startValue = v ? parseAbsolute(v, getLocalTimeZone()) : undefined;
+		},
+		get endsAt() {
+			return endValue ? endValue.toDate(getLocalTimeZone()).toISOString() : '';
+		},
+		set endsAt(v) {
+			endValue = v ? parseAbsolute(v, getLocalTimeZone()) : undefined;
+		}
+	};
 </script>
 
 <Popover.Root>
@@ -52,8 +69,8 @@
 				{:else}
 					Start- und Enddatum
 				{/if}
-				<input hidden value={startValue} name={startName} />
-				<input hidden value={endValue} name={endName} />
+				<input hidden value={form.startsAt} name={startName} />
+				<input hidden value={form.endsAt} name={endName} />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>

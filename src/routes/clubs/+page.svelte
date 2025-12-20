@@ -26,19 +26,21 @@
 		</a>
 	</Card.Root>
 	{#each usersClubs as { club }}
-		<Card.Root>
-			<a href="/clubs/{club.id}">
-				<Card.Header>
-					<Card.Title>
-						{club.name}
-					</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<p>{club.challenges.length || 'Keine'} Challenges</p>
-					<p>{club.members.length || 'Keine'} Mitglieder</p>
-				</Card.Content>
-			</a>
-		</Card.Root>
+		{#if club}
+			<Card.Root>
+				<a href="/clubs/{club.id}">
+					<Card.Header>
+						<Card.Title>
+							{club.name}
+						</Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<p>{club.challenges.length || 'Keine'} Challenges</p>
+						<p>{club.members.length || 'Keine'} Mitglieder</p>
+					</Card.Content>
+				</a>
+			</Card.Root>
+		{/if}
 	{:else}
 		<p class="text-center my-auto">
 			Du bist momentan in keinem Club. Du kannst aber einem <a

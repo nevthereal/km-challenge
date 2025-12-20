@@ -30,7 +30,7 @@
 					>
 					<span class="font-medium"
 						><a class="underline" href="{challengePath}/members/{activity.userId}"
-							>{activity.user.name}</a
+							>{activity.user?.name ?? 'Unbekannter/Gelöschter Benutzer'}</a
 						></span
 					>
 					<span class="text-muted-foreground">hat</span>

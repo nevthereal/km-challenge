@@ -16,8 +16,7 @@
 		getLocalTimeZone,
 		parseDate,
 		today,
-		type DateValue,
-		parseDateTime
+		type DateValue
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
 

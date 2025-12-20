@@ -9,14 +9,16 @@
 	<ul class="list-inside list-disc">
 		{#each members as member}
 			{@const { user } = member}
-			<li>
-				<a class="link" href="{challengePath}/members/{user.id}">
-					{user.name}
-					{#if admins.some((a) => a.userId === user.id)}
-						<span>(Admin)</span>
-					{/if}
-				</a>
-			</li>
+			{#if user}
+				<li>
+					<a class="link" href="{challengePath}/members/{user.id}">
+						{user.name}
+						{#if admins.some((a) => a.userId === user.id)}
+							<span>(Admin)</span>
+						{/if}
+					</a>
+				</li>
+			{/if}
 		{/each}
 	</ul>
 </main>

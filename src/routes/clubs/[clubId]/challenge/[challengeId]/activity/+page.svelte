@@ -15,11 +15,11 @@
 		},
 		{
 			name: 'Kategorie',
-			content: membership.user.role ?? 'Nicht angegeben'
+			content: membership.user?.role ?? 'Nicht angegeben'
 		},
 		{
 			name: 'Geschlecht',
-			content: membership.user.gender ?? 'Nicht angegeben'
+			content: membership.user?.gender ?? 'Nicht angegeben'
 		}
 	]);
 </script>

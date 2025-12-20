@@ -52,12 +52,10 @@
 		"tw-animate-css": "^1.3.0",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
-		"vite": "^5.4.19",
-		"zod": "^4.2.1"
+		"vite": "^5.4.19"
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "^1.1.12",
-		"@neondatabase/serverless": "^0.10.4",
 		"@nevthereal/random-utils": "^1.0.11",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
@@ -66,11 +64,12 @@
 		"@tanstack/table-core": "^8.20.5",
 		"@upstash/redis": "^1.34.8",
 		"arctic": "^3.1.2",
-		"better-auth": "^1.3.26",
+		"better-auth": "^1.4.7",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^1.0.0-beta.3-702eadc",
 		"drizzle-zod": "^0.6.1",
-		"pg": "^8.16.3"
+		"pg": "^8.16.3",
+		"zod": "^4.2.1"
 	},
 	"packageManager": "bun@1.3.5"
 }

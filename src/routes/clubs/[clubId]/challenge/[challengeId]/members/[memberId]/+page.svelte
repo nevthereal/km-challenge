@@ -15,11 +15,11 @@
 		},
 		{
 			name: 'Kategorie',
-			content: member.user.role ?? 'Nicht angegeben'
+			content: member.user?.role ?? 'Nicht angegeben'
 		},
 		{
 			name: 'Geschlecht',
-			content: member.user.gender ?? 'Nicht angegeben'
+			content: member.user?.gender ?? 'Nicht angegeben'
 		}
 	]);
 </script>
@@ -27,22 +27,22 @@
 <div class="mb-4 flex">
 	<a
 		href="{data.challengePath}/members"
-		class="flex items-center gap-2 text-xl font-bold text-muted-foreground"
+		class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 		><ArrowLeft strokeWidth={3} /> Alle Mitglieder</a
 	>
 </div>
 <h1 class="h1 mb-4">
-	{member.user.name}
+	{member.user?.name ?? 'Unbekannt'}
 </h1>
 <div class="mt-2">
 	<NiceList {listItems} />
 </div>
 
 <h2 class="h2 my-4">
-	Einträge ({member.user.entries.length != 0 ? member.user.entries.length.toString() : 'keine'}):
+	Einträge ({member.user?.entries.length ?? 0}):
 </h2>
 <div class="mt-4 flex flex-col gap-4">
-	{#each member.user.entries as entry}
+	{#each member.user?.entries ?? [] as entry}
 		<EntryCard {entry} discipline={entry.discipline} edit={false} {challengePath} />
 	{:else}
 		<p class="italic font-mono font-bold">Noch keine Aktivität</p>

@@ -13,10 +13,12 @@
 		variant="outline"
 		size="lg"
 		onclick={async () => {
+			const editString = `${page.url.origin}/profile/edit`;
 			await authClient(page.url.origin).signIn.social({
 				provider: 'google',
 				callbackURL: redirectUrl || '/',
-				newUserCallbackURL: `${page.url.origin}/profile/edit${redirectUrl && `?redirect=${redirectUrl}`}`
+				newUserCallbackURL:
+					redirectUrl != null ? editString + `?redirect=${redirectUrl}` : editString
 			});
 		}}><GoogleLogo />Mit Google anmelden</Button
 	>

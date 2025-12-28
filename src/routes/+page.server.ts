@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 					challengeId: c.id
 				}
 			});
-			const leaderboard = getLeaderBoard(c.id, 5);
+			const leaderboard = getLeaderBoard.execute({ challengeId: c.id, limit: 5 });
 			return { ...c, leaderboard, disciplines };
 		});
 

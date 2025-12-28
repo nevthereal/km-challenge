@@ -11,7 +11,11 @@ import { and, eq } from 'drizzle-orm';
 export const load: PageServerLoad = async ({ parent }) => {
 	const { challenge } = await parent();
 
-	const leaderboard = getLeaderBoard(challenge.id);
+	const leaderboard = getLeaderBoard.execute({
+		challengeId: challenge.id,
+		limit: challenge.members.length
+	});
+
 	const newEntryForm = await superValidate(zod4(newEntry));
 
 	const lastActivities = await db.query.entry.findMany({

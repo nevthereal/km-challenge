@@ -10,30 +10,26 @@ export const db = drizzle(DATABASE_URL, {
 	relations
 });
 
-export async function getLeaderBoard(challengeId: string, limit?: number) {
-	const lb = db
-		.select({
-			...getColumns(schema.user),
-			score:
-				sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
-					'score'
-				),
-			totalEntries: sql<number>`count(${schema.entry.id})`.as('total_entries'),
-			lastActivity: sql<string>`max(${schema.entry.date})`.as('last_activity')
-		})
-		.from(schema.entry)
-		.leftJoin(schema.discipline, eq(schema.entry.disciplineId, schema.discipline.id))
-		.innerJoin(schema.user, eq(schema.entry.userId, schema.user.id))
-		.where(eq(schema.entry.challengeId, challengeId))
-		.groupBy(schema.user.id)
-		.orderBy(desc(sql`score`));
+export const getLeaderBoard = db
+	.select({
+		...getColumns(schema.user),
+		score:
+			sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
+				'score'
+			),
+		totalEntries: sql<number>`count(${schema.entry.id})`.as('total_entries'),
+		lastActivity: sql<string>`max(${schema.entry.date})`.as('last_activity')
+	})
+	.from(schema.entry)
+	.leftJoin(schema.discipline, eq(schema.entry.disciplineId, schema.discipline.id))
+	.innerJoin(schema.user, eq(schema.entry.userId, schema.user.id))
+	.where(eq(schema.entry.challengeId, sql.placeholder('challengeId')))
+	.groupBy(schema.user.id)
+	.orderBy(desc(sql`score`))
+	.limit(sql.placeholder('limit'))
+	.prepare('leaderboard');
 
-	if (limit) return await lb.limit(limit);
-
-	return await lb;
-}
-
-export type Leaderboard = ReturnType<typeof getLeaderBoard>;
+export type Leaderboard = ReturnType<typeof getLeaderBoard.execute>;
 
 export async function checkAdmin(clubId: string, userId: string) {
 	const query = await db.query.clubAdmin.findFirst({

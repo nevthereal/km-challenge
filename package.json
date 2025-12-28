@@ -31,7 +31,7 @@
 		"bits-ui": "1.5.2",
 		"clsx": "^2.1.1",
 		"daisyui": "^4.12.23",
-		"drizzle-kit": "^1.0.0-beta.3-702eadc",
+		"drizzle-kit": "^1.0.0-beta.6-4414a19",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
@@ -67,7 +67,7 @@
 		"arctic": "^3.1.2",
 		"better-auth": "^1.4.7",
 		"dotenv": "^16.4.7",
-		"drizzle-orm": "^1.0.0-beta.3-702eadc",
+		"drizzle-orm": "^1.0.0-beta.6-4414a19",
 		"drizzle-zod": "^0.6.1",
 		"pg": "^8.16.3",
 		"zod": "^4.2.1"

@@ -3,7 +3,6 @@
 	import type { Leaderboard } from '$lib/db';
 	import type { challenge } from '$lib/db/schema';
 	import { cn } from '$lib/utils';
-	import { SquareArrowOutUpRight } from 'lucide-svelte';
 	import { Skeleton } from './ui/skeleton';
 
 	let {
@@ -68,6 +67,6 @@
 		{/await}
 	</Table.Body>
 </Table.Root>
-<p class="my-4 hidden text-center font-mono italic text-destructive max-md:portrait:block">
+<p class="text-destructive my-4 hidden text-center font-mono italic max-md:portrait:block">
 	Bildschirm drehen um Tabelle anzuzeigen
 </p>

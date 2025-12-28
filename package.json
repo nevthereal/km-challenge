@@ -65,7 +65,7 @@
 		"@tanstack/table-core": "^8.20.5",
 		"@upstash/redis": "^1.34.8",
 		"arctic": "^3.1.2",
-		"better-auth": "^1.4.7",
+		"better-auth": "^1.4.9",
 		"dayjs": "^1.11.19",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^1.0.0-beta.6-4414a19",

@@ -15,13 +15,14 @@
 	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
+	import dayjs from 'dayjs';
 
 	let { data, form: formData } = $props();
 
 	const createForm = superForm(data.createForm);
 	const editClubForm = superForm(data.editClubForm, {
 		onResult: ({ result }) => {
-			if ((result.type = 'success')) editDialogOpen = !editDialogOpen;
+			if (result.type === 'success') editDialogOpen = !editDialogOpen;
 		}
 	});
 
@@ -45,6 +46,22 @@
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
 	let editDialogOpen = $state(false);
+
+	const activeChallenges = $derived(
+		club.challenges.filter((challenge) => {
+			const now = dayjs();
+			const endsAt = dayjs(challenge.endsAt);
+			return now.isBefore(endsAt.endOf('day'));
+		})
+	);
+
+	const pastChallenges = $derived(
+		club.challenges.filter((challenge) => {
+			const now = dayjs();
+			const endsAt = dayjs(challenge.endsAt);
+			return now.isAfter(endsAt.endOf('day'));
+		})
+	);
 </script>
 
 <nav class="mb-4 flex">
@@ -82,34 +99,65 @@
 	</div>
 </div>
 
-<div class="mt-6 grid gap-4 md:grid-cols-3">
-	<ClubAdmin {isAdmin}>
-		{@render challengeSheet()}
-	</ClubAdmin>
-	{#each club.challenges as challenge}
-		<a href="/clubs/{club.id}/challenge/{challenge.id}">
-			<Card.Root>
-				<Card.Header>
-					<Card.Title>{challenge.name}</Card.Title>
-					<Card.Description
-						class={cn(
-							isActive({ finish: challenge.endsAt, start: challenge.startsAt }) && 'text-green-500'
-						)}
-						>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
-							new Date(challenge.endsAt)
-						)}</Card.Description
-					>
-				</Card.Header>
-				<Card.Footer>
-					<p class="mt-4">
-						{challenge.members.length} Teilnehmer
-					</p>
-				</Card.Footer>
-			</Card.Root>
-		</a>
-	{:else}
-		<p class="text-center">Dieser Club hat noch keine Challenges.</p>
-	{/each}
+<div class="mt-6">
+	<!-- Active Challenges Section -->
+	<h2 class="mb-4 text-2xl font-bold">Aktive Challenges</h2>
+	<div class="grid gap-4 md:grid-cols-3">
+		<ClubAdmin {isAdmin}>
+			{@render challengeSheet()}
+		</ClubAdmin>
+		{#each activeChallenges as challenge}
+			<a href="/clubs/{club.id}/challenge/{challenge.id}">
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>{challenge.name}</Card.Title>
+						<Card.Description
+							class={cn(
+								isActive({ finish: challenge.endsAt, start: challenge.startsAt }) &&
+									'text-green-500'
+							)}
+							>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
+								new Date(challenge.endsAt)
+							)}</Card.Description
+						>
+					</Card.Header>
+					<Card.Footer>
+						<p class="mt-4">
+							{challenge.members.length} Teilnehmer
+						</p>
+					</Card.Footer>
+				</Card.Root>
+			</a>
+		{:else}
+			<p class="text-muted-foreground">Keine aktiven Challenges.</p>
+		{/each}
+	</div>
+
+	<!-- Past Challenges Section -->
+	{#if pastChallenges.length > 0}
+		<h2 class="mt-8 mb-4 text-2xl font-bold">Vergangene Challenges</h2>
+		<div class="grid gap-4 md:grid-cols-3">
+			{#each pastChallenges as challenge}
+				<a href="/clubs/{club.id}/challenge/{challenge.id}">
+					<Card.Root class="opacity-75 duration-200 ease-in-out hover:opacity-100">
+						<Card.Header>
+							<Card.Title>{challenge.name}</Card.Title>
+							<Card.Description
+								>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
+									new Date(challenge.endsAt)
+								)}</Card.Description
+							>
+						</Card.Header>
+						<Card.Footer>
+							<p class="mt-4">
+								{challenge.members.length} Teilnehmer
+							</p>
+						</Card.Footer>
+					</Card.Root>
+				</a>
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <form id="generateForm" action="?/getCode" method="post" use:enhance hidden></form>

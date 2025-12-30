@@ -3,7 +3,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from './ui/button/button.svelte';
-	import { Trash } from 'lucide-svelte';
+	import { Trash } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
 
 	interface Props {
@@ -29,7 +29,7 @@
 	<Card.Content class="flex items-center justify-between">
 		<p>
 			{(Number(entry.amount) * Number(discipline?.factor ?? 1)).toFixed(1)} Punkte
-			<span class="font-mono text-muted-foreground">({entry.amount}km)</span>
+			<span class="text-muted-foreground font-mono">({entry.amount}km)</span>
 		</p>
 		{#if edit}
 			{@render deleteDialog()}

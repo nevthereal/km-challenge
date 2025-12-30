@@ -3,7 +3,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Form from '$lib/components/ui/form';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from 'lucide-svelte';
+	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from '@lucide/svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
 	import { cn, isActive, prettyDate } from '$lib/utils';
 	import { enhance } from '$app/forms';

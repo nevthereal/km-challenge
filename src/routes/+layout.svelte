@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { LogOut, User } from 'lucide-svelte';
+	import { LogOut, User } from '@lucide/svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
@@ -17,7 +17,7 @@
 <Toaster />
 <ModeWatcher defaultMode="system" />
 {#if dev}
-	<div class="w-screen bg-destructive p-2 text-center text-lg font-bold">Dev mode</div>
+	<div class="bg-destructive w-screen p-2 text-center text-lg font-bold">Dev mode</div>
 {/if}
 <nav class="flex items-center justify-between p-6">
 	<div class="flex gap-4">

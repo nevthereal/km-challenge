@@ -4,7 +4,7 @@
 
 	import Button from '$lib/components/ui/button/button.svelte';
 
-	import { SquareArrowOutUpRight } from 'lucide-svelte';
+	import { SquareArrowOutUpRight } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>

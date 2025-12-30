@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { CirclePlus, PlusCircle } from 'lucide-svelte';
+	import { CirclePlus, PlusCircle } from '@lucide/svelte';
 
 	let { data } = $props();
 

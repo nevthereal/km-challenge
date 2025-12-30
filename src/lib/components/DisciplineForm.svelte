@@ -5,7 +5,7 @@
 	import * as Form from './ui/form';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { addDisciplines } from '$lib/zod';
-	import { MinusCircle, PlusCircle } from 'lucide-svelte';
+	import { MinusCircle, PlusCircle } from '@lucide/svelte';
 
 	let { formData }: { formData: SuperValidated<Infer<typeof addDisciplines>> } = $props();
 

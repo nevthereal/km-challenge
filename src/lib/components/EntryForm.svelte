@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CalendarIcon, PlusCircle } from 'lucide-svelte';
+	import { CalendarIcon, PlusCircle } from '@lucide/svelte';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import * as Form from './ui/form';

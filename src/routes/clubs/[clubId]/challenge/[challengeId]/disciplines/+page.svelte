@@ -4,7 +4,7 @@
 	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { Trash2 } from 'lucide-svelte';
+	import { Trash2 } from '@lucide/svelte';
 
 	let { data } = $props();
 	const { challenge, clubAdmin: isAdmin, currentUserChallenge } = $derived(data);

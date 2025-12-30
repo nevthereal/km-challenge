@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowLeft } from 'lucide-svelte';
+	import { ArrowLeft } from '@lucide/svelte';
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import { prettyDate } from '$lib/utils';
 	import EntryCard from '$lib/components/EntryCard.svelte';

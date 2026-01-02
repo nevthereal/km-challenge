@@ -21,7 +21,63 @@ export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectU
 	return { ...user, superUser, completedProfile };
 }
 
-export function isActive({ start, finish }: { start: Date; finish: Date }) {
+/**
+ * Challenge status utilities
+ * These functions handle challenge date logic ensuring challenges remain active through the entire end date
+ */
+
+/**
+ * Sets time to start of day (00:00:00.000)
+ */
+function startOfDay(date: Date): Date {
+	const d = new Date(date);
+	d.setHours(0, 0, 0, 0);
+	return d;
+}
+
+/**
+ * Sets time to end of day (23:59:59.999)
+ */
+function endOfDay(date: Date): Date {
+	const d = new Date(date);
+	d.setHours(23, 59, 59, 999);
+	return d;
+}
+
+/**
+ * Checks if a challenge is currently active
+ * A challenge is active if the current time is between the start date (00:00) and end date (23:59:59.999)
+ * This ensures the challenge remains active throughout the entire last day
+ */
+export function isChallengeActive(challenge: { startsAt: Date; endsAt: Date }): boolean {
 	const now = new Date();
-	return start <= now && finish >= now;
+	const start = startOfDay(challenge.startsAt);
+	const end = endOfDay(challenge.endsAt);
+	return now >= start && now <= end;
+}
+
+/**
+ * Checks if a challenge is upcoming (hasn't started yet)
+ */
+export function isChallengeUpcoming(challenge: { startsAt: Date; endsAt: Date }): boolean {
+	const now = new Date();
+	const start = startOfDay(challenge.startsAt);
+	return now < start;
+}
+
+/**
+ * Checks if a challenge has ended
+ */
+export function isChallengePast(challenge: { startsAt: Date; endsAt: Date }): boolean {
+	const now = new Date();
+	const end = endOfDay(challenge.endsAt);
+	return now > end;
+}
+
+/**
+ * Legacy function for backwards compatibility
+ * @deprecated Use isChallengeActive instead
+ */
+export function isActive({ start, finish }: { start: Date; finish: Date }) {
+	return isChallengeActive({ startsAt: start, endsAt: finish });
 }

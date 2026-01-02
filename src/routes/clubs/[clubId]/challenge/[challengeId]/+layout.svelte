@@ -5,7 +5,7 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from '@lucide/svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { cn, isActive, prettyDate } from '$lib/utils';
+	import { cn, isChallengeActive, prettyDate } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import { superForm } from 'sveltekit-superforms';
@@ -47,7 +47,7 @@
 		}
 	];
 
-	const active = $derived(isActive({ start: challenge.startsAt, finish: challenge.endsAt }));
+	const active = $derived(isChallengeActive(challenge));
 </script>
 
 <nav class="mb-4 flex gap-4">

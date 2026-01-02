@@ -24,23 +24,26 @@ export function getUser({ locals, redirectUrl }: { locals: App.Locals; redirectU
 /**
  * Challenge status utilities
  * These functions handle challenge date logic ensuring challenges remain active through the entire end date
+ * All day boundaries are calculated using UTC timezone for consistency across servers
  */
 
 /**
- * Sets time to start of day (00:00:00.000)
+ * Sets time to start of day (00:00:00.000 UTC)
+ * Uses UTC timezone to ensure consistent day boundaries across all servers
  */
 function startOfDay(date: Date): Date {
 	const d = new Date(date);
-	d.setHours(0, 0, 0, 0);
+	d.setUTCHours(0, 0, 0, 0);
 	return d;
 }
 
 /**
- * Sets time to end of day (23:59:59.999)
+ * Sets time to end of day (23:59:59.999 UTC)
+ * Uses UTC timezone to ensure consistent day boundaries across all servers
  */
 function endOfDay(date: Date): Date {
 	const d = new Date(date);
-	d.setHours(23, 59, 59, 999);
+	d.setUTCHours(23, 59, 59, 999);
 	return d;
 }
 

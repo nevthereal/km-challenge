@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 					// Challenge starts at or before end of today
 					lte(challenge.startsAt, endOfToday),
 					// Challenge ends at or after start of today
-					gte(sql`date(${challenge.endsAt})`, sql`date(${startOfToday})`)
+					gte(challenge.endsAt, startOfToday)
 				)
 			)
 			.groupBy(challenge.id);

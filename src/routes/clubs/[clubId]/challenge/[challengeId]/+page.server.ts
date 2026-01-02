@@ -1,4 +1,4 @@
-import { getUser, isActive } from '$lib/utils';
+import { getUser, isChallengeActive } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -58,8 +58,7 @@ export const actions: Actions = {
 
 		if (!qChallenge) return error(404, 'Challenge nicht gefunden');
 
-		if (!isActive({ start: qChallenge.startsAt, finish: qChallenge.endsAt }))
-			return error(403, 'Challenge ist nicht aktiv');
+		if (!isChallengeActive(qChallenge)) return error(403, 'Challenge ist nicht aktiv');
 
 		if (!qDiscipline) return setError(form, 'disciplineId', 'Disziplin wählen');
 

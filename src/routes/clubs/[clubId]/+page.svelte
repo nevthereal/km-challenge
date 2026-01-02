@@ -6,7 +6,7 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
-	import { cn, isActive, prettyDate } from '$lib/utils';
+	import { cn, isChallengeActive, isChallengePast, prettyDate } from '$lib/utils';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
@@ -15,7 +15,6 @@
 	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
-	import dayjs from 'dayjs';
 
 	let { data, form: formData } = $props();
 
@@ -48,19 +47,11 @@
 	let editDialogOpen = $state(false);
 
 	const activeChallenges = $derived(
-		club.challenges.filter((challenge) => {
-			const now = dayjs();
-			const endsAt = dayjs(challenge.endsAt);
-			return now.isBefore(endsAt.endOf('day'));
-		})
+		club.challenges.filter((challenge) => !isChallengePast(challenge))
 	);
 
 	const pastChallenges = $derived(
-		club.challenges.filter((challenge) => {
-			const now = dayjs();
-			const endsAt = dayjs(challenge.endsAt);
-			return now.isAfter(endsAt.endOf('day'));
-		})
+		club.challenges.filter((challenge) => isChallengePast(challenge))
 	);
 </script>
 
@@ -111,11 +102,7 @@
 				<Card.Root>
 					<Card.Header>
 						<Card.Title>{challenge.name}</Card.Title>
-						<Card.Description
-							class={cn(
-								isActive({ finish: challenge.endsAt, start: challenge.startsAt }) &&
-									'text-green-500'
-							)}
+						<Card.Description class={cn(isChallengeActive(challenge) && 'text-green-500')}
 							>{prettyDate(new Date(challenge.startsAt))} - {prettyDate(
 								new Date(challenge.endsAt)
 							)}</Card.Description

@@ -65,12 +65,14 @@ export const actions: Actions = {
 		const challengeStart = new Date(qChallenge.startsAt);
 		challengeStart.setUTCHours(0, 0, 0, 0);
 		const challengeEnd = new Date(qChallenge.endsAt);
+		// Add 2-day grace period for entries
+		challengeEnd.setUTCDate(challengeEnd.getUTCDate() + 2);
 		challengeEnd.setUTCHours(23, 59, 59, 999);
 
 		if (entryDate < challengeStart || entryDate > challengeEnd) {
 			return error(
 				400,
-				`Einträge können nur zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(qChallenge.endsAt)} erstellt werden`
+				`Einträge können nur zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(new Date(qChallenge.endsAt.getTime() + 2 * 24 * 60 * 60 * 1000))} erstellt werden`
 			);
 		}
 

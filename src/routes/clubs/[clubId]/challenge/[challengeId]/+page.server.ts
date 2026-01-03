@@ -1,18 +1,12 @@
-import {
-	getUser,
-	isChallengeActive,
-	prettyDate,
-	getDaysRemainingForEntry,
-	canAddEntries
-} from '$lib/utils';
+import { getUser, prettyDate, getDaysRemainingForEntry, canAddEntries } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { createChallenge, newEntry } from '$lib/zod';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
-import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { challenge, challengeMember, entry } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const { challenge } = await parent();

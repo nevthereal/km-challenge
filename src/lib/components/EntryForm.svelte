@@ -9,7 +9,7 @@
 	import { newEntry } from '$lib/zod';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import * as Popover from './ui/popover';
-	import { cn, isChallengeActive } from '$lib/utils';
+	import { cn, canAddEntries } from '$lib/utils';
 
 	import {
 		DateFormatter,
@@ -77,7 +77,7 @@
 		if (!qDiscipline) return null;
 		return `${qDiscipline.name} (x${qDiscipline.factor})`;
 	}
-	const active = isChallengeActive(challenge);
+	const active = canAddEntries(challenge);
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>

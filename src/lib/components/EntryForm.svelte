@@ -20,6 +20,15 @@
 	} from '@internationalized/date';
 	import { Calendar } from './ui/calendar';
 
+	/**
+	 * Calculate the max date for entry submission (challenge end + 2 days grace period)
+	 */
+	function getMaxDateForEntry(endsAt: Date): DateValue {
+		const maxDate = new Date(endsAt);
+		maxDate.setUTCDate(maxDate.getUTCDate() + 2);
+		return parseDate(maxDate.toISOString().split('T')[0]);
+	}
+
 	interface Props {
 		formData: SuperValidated<Infer<typeof newEntry>>;
 		disciplines: (typeof disciplineTable.$inferSelect)[];
@@ -159,7 +168,7 @@
 										value={value as DateValue}
 										bind:placeholder
 										minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
-										maxValue={today(getLocalTimeZone())}
+										maxValue={getMaxDateForEntry(challenge.endsAt)}
 										calendarLabel="Tag des Eintrags"
 										onValueChange={(v) => {
 											if (v) {

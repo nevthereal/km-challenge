@@ -5,6 +5,7 @@ import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { newEntry } from '$lib/zod';
+import { getDaysRemainingForEntry, canAddEntries } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
@@ -48,6 +49,40 @@ export const load: PageServerLoad = async ({ locals }) => {
 			return { ...c, leaderboard, disciplines };
 		});
 
-		return { challengesWithLeaderboards, user, newEntryForm };
+		// Fetch challenges still open for entries (within 2-day grace period after end date)
+		const gracePeriodEnd = new Date();
+		gracePeriodEnd.setUTCDate(gracePeriodEnd.getUTCDate() + 2);
+		gracePeriodEnd.setUTCHours(23, 59, 59, 999);
+
+		const openForEntriesChallenges = await db
+			.select({
+				...getColumns(challenge)
+			})
+			.from(challengeMember)
+			.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
+			.where(
+				and(
+					eq(challengeMember.userId, user.id),
+					// Challenge has ended
+					lte(challenge.endsAt, endOfToday),
+					// Challenge is still within grace period
+					gte(challenge.endsAt, new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000))
+				)
+			)
+			.groupBy(challenge.id);
+
+		const openForEntriesChallengesWithDays = openForEntriesChallenges
+			.filter((c) => canAddEntries(c))
+			.map((c) => ({
+				...c,
+				daysRemaining: getDaysRemainingForEntry(c)
+			}));
+
+		return {
+			challengesWithLeaderboards,
+			user,
+			newEntryForm,
+			openForEntriesChallenges: openForEntriesChallengesWithDays
+		};
 	}
 };

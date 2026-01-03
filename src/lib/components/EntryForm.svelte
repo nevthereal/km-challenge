@@ -168,7 +168,7 @@
 										value={value as DateValue}
 										bind:placeholder
 										minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
-										maxValue={getMaxDateForEntry(challenge.endsAt)}
+										maxValue={parseDate(challenge.endsAt.toISOString().split('T')[0]))}
 										calendarLabel="Tag des Eintrags"
 										onValueChange={(v) => {
 											if (v) {

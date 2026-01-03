@@ -3,10 +3,17 @@
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Card from '$lib/components/ui/card';
 
 	import { SquareArrowOutUpRight } from '@lucide/svelte';
+	import { canAddEntries, prettyDate } from '$lib/utils';
 
 	let { data } = $props();
+
+	// Filter challenges that still accept entries
+	const openForEntriesChallenges = $derived(
+		data.openForEntriesChallenges.filter((c) => canAddEntries(c))
+	);
 </script>
 
 {#if data.user}
@@ -58,6 +65,35 @@
 				</p>
 			</div>
 		{/each}
+
+		<!-- Section for challenges still open for entries -->
+		{#if openForEntriesChallenges.length > 0}
+			<div>
+				<h2 class="mb-4 text-2xl font-bold">Offen für Einträge</h2>
+				<div class="grid gap-4 md:grid-cols-3">
+					{#each openForEntriesChallenges as openChallenge}
+						<a href="/clubs/{openChallenge.clubId}/challenge/{openChallenge.id}">
+							<Card.Root>
+								<Card.Header>
+									<Card.Title>{openChallenge.name}</Card.Title>
+									<Card.Description
+										>{prettyDate(new Date(openChallenge.startsAt))} - {prettyDate(
+											new Date(openChallenge.endsAt)
+										)}</Card.Description
+									>
+								</Card.Header>
+								<Card.Footer>
+									<p class="mt-4 text-red-500">
+										{openChallenge.daysRemaining}
+										{openChallenge.daysRemaining === 1 ? 'Tag' : 'Tage'} noch
+									</p>
+								</Card.Footer>
+							</Card.Root>
+						</a>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 {:else}
 	<section>

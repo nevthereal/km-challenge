@@ -50,13 +50,19 @@ function endOfDay(date: Date): Date {
 /**
  * Checks if a challenge is currently active
  * A challenge is active if the current time is between the start date (00:00) and end date (23:59:59.999)
- * This ensures the challenge remains active throughout the entire last day
+ * Additionally, entries can be added for 2 days after the challenge ends
+ * This ensures the challenge remains active throughout the entire last day plus a 2-day grace period
  */
 export function isChallengeActive(challenge: { startsAt: Date; endsAt: Date }): boolean {
 	const now = new Date();
 	const start = startOfDay(challenge.startsAt);
 	const end = endOfDay(challenge.endsAt);
-	return now >= start && now <= end;
+
+	// Add 2 days to the end date for the grace period
+	const gracePeriodEnd = new Date(end);
+	gracePeriodEnd.setUTCDate(gracePeriodEnd.getUTCDate() + 2);
+
+	return now >= start && now <= gracePeriodEnd;
 }
 
 /**
@@ -75,6 +81,30 @@ export function isChallengePast(challenge: { startsAt: Date; endsAt: Date }): bo
 	const now = new Date();
 	const end = endOfDay(challenge.endsAt);
 	return now > end;
+}
+
+/**
+ * Calculates the number of days remaining for entry submissions (grace period)
+ * Returns the number of days until entries can no longer be added (grace period ends)
+ * Returns 0 or negative if the grace period has already ended
+ */
+export function getDaysRemainingForEntry(challenge: { endsAt: Date }): number {
+	const now = new Date();
+	const gracePeriodEnd = new Date(challenge.endsAt);
+	gracePeriodEnd.setUTCDate(gracePeriodEnd.getUTCDate() + 2);
+	gracePeriodEnd.setUTCHours(23, 59, 59, 999);
+
+	const millisecondsRemaining = gracePeriodEnd.getTime() - now.getTime();
+	const daysRemaining = Math.ceil(millisecondsRemaining / (1000 * 60 * 60 * 24));
+
+	return daysRemaining;
+}
+
+/**
+ * Checks if entries can still be added to a challenge (within grace period after end date)
+ */
+export function canAddEntries(challenge: { endsAt: Date }): boolean {
+	return getDaysRemainingForEntry(challenge) > 0;
 }
 
 /**

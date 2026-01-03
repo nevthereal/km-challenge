@@ -1,4 +1,4 @@
-import { getUser, isChallengeActive } from '$lib/utils';
+import { getUser, isChallengeActive, prettyDate } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -59,6 +59,20 @@ export const actions: Actions = {
 		if (!qChallenge) return error(404, 'Challenge nicht gefunden');
 
 		if (!isChallengeActive(qChallenge)) return error(403, 'Challenge ist nicht aktiv');
+
+		// Validate entry date is within challenge range (entries can only be backdated within the challenge period)
+		const entryDate = new Date(form.data.date);
+		const challengeStart = new Date(qChallenge.startsAt);
+		challengeStart.setUTCHours(0, 0, 0, 0);
+		const challengeEnd = new Date(qChallenge.endsAt);
+		challengeEnd.setUTCHours(23, 59, 59, 999);
+
+		if (entryDate < challengeStart || entryDate > challengeEnd) {
+			return error(
+				400,
+				`Einträge können nur zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(qChallenge.endsAt)} erstellt werden`
+			);
+		}
 
 		if (!qDiscipline) return setError(form, 'disciplineId', 'Disziplin wählen');
 

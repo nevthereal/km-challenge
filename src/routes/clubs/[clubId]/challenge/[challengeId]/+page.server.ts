@@ -60,19 +60,17 @@ export const actions: Actions = {
 
 		if (!isChallengeActive(qChallenge)) return error(403, 'Challenge ist nicht aktiv');
 
-		// Validate entry date is within challenge range (entries can only be backdated within the challenge period)
+		// Validate entry date is within challenge range (activity date must be during the challenge, not after)
 		const entryDate = new Date(form.data.date);
 		const challengeStart = new Date(qChallenge.startsAt);
 		challengeStart.setUTCHours(0, 0, 0, 0);
 		const challengeEnd = new Date(qChallenge.endsAt);
-		// Add 2-day grace period for entries
-		challengeEnd.setUTCDate(challengeEnd.getUTCDate() + 2);
 		challengeEnd.setUTCHours(23, 59, 59, 999);
 
 		if (entryDate < challengeStart || entryDate > challengeEnd) {
 			return error(
 				400,
-				`Einträge können nur zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(new Date(qChallenge.endsAt.getTime() + 2 * 24 * 60 * 60 * 1000))} erstellt werden`
+				`Die Aktivität muss zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(qChallenge.endsAt)} stattgefunden haben`
 			);
 		}
 

@@ -21,12 +21,10 @@
 	import { Calendar } from './ui/calendar';
 
 	/**
-	 * Calculate the max date for entry submission (challenge end + 2 days grace period)
+	 * Calculate the max date for activity (must be within challenge period, not grace period)
 	 */
 	function getMaxDateForEntry(endsAt: Date): DateValue {
-		const maxDate = new Date(endsAt);
-		maxDate.setUTCDate(maxDate.getUTCDate() + 2);
-		return parseDate(maxDate.toISOString().split('T')[0]);
+		return parseDate(endsAt.toISOString().split('T')[0]);
 	}
 
 	interface Props {
@@ -149,7 +147,7 @@
 				<Form.Field form={entryForm} name="date" class="flex flex-col">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label>Datum</Form.Label>
+							<Form.Label>Datum der Aktivität</Form.Label>
 							<Popover.Root>
 								<Popover.Trigger
 									{...props}

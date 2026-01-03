@@ -48,21 +48,15 @@ function endOfDay(date: Date): Date {
 }
 
 /**
- * Checks if a challenge is currently active
+ * Checks if a challenge is currently active (running)
  * A challenge is active if the current time is between the start date (00:00) and end date (23:59:59.999)
- * Additionally, entries can be added for 2 days after the challenge ends
- * This ensures the challenge remains active throughout the entire last day plus a 2-day grace period
+ * This ensures the challenge remains active throughout the entire last day
  */
 export function isChallengeActive(challenge: { startsAt: Date; endsAt: Date }): boolean {
 	const now = new Date();
 	const start = startOfDay(challenge.startsAt);
 	const end = endOfDay(challenge.endsAt);
-
-	// Add 2 days to the end date for the grace period
-	const gracePeriodEnd = new Date(end);
-	gracePeriodEnd.setUTCDate(gracePeriodEnd.getUTCDate() + 2);
-
-	return now >= start && now <= gracePeriodEnd;
+	return now >= start && now <= end;
 }
 
 /**

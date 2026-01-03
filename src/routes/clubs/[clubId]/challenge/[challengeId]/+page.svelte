@@ -2,10 +2,13 @@
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { canAddEntries, prettyDate } from '$lib/utils';
 
 	let { data } = $props();
 
 	let { challenge, leaderboard, lastActivities, challengePath } = $derived(data);
+
+	const canStillAddEntries = $derived(canAddEntries(challenge));
 </script>
 
 <main class="grow">
@@ -22,6 +25,8 @@
 		<h2 class="h2 mb-2">Neuste Aktivitäten</h2>
 		<ul class="space-y-2">
 			{#each lastActivities as activity}
+				{@const points = Number(activity.amount) * Number(activity.discipline?.factor)}
+				{@const pointString = isNaN(points) ? 'gelöschte Disziplin' : `${points}p`}
 				<li class="mx-2">
 					<Badge class="mr-2 font-mono"
 						>{Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short' }).format(
@@ -33,13 +38,9 @@
 							>{activity.user?.name ?? 'Unbekannter/Gelöschter Benutzer'}</a
 						></span
 					>
-					<span class="text-muted-foreground">hat</span>
-					<span class="font-medium">{activity.amount}km</span>
-					<span class="text-muted-foreground">in</span>
-					<span class="font-medium"
-						>{activity.discipline ? activity.discipline.name : 'gelöschte Aktivität'}</span
-					>
-					<span class="text-muted-foreground">eingetragen</span>
+					{activity.amount}km ({pointString}) in {activity.discipline
+						? activity.discipline.name
+						: 'gelöschte Disziplin'} am {prettyDate(activity.date)}
 				</li>
 			{:else}
 				<p>Noch keine Aktivitäten</p>

@@ -5,7 +5,14 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from '@lucide/svelte';
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { cn, isChallengeActive, prettyDate } from '$lib/utils';
+	import {
+		cn,
+		isChallengeActive,
+		prettyDate,
+		canAddEntries,
+		getDaysRemainingForEntry
+	} from '$lib/utils';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import { superForm } from 'sveltekit-superforms';
@@ -48,6 +55,8 @@
 	];
 
 	const active = $derived(isChallengeActive(challenge));
+	const canStillAddEntries = $derived(canAddEntries(challenge));
+	const daysRemaining = $derived(canStillAddEntries ? getDaysRemainingForEntry(challenge) : 0);
 </script>
 
 <nav class="mb-4 flex gap-4">
@@ -60,9 +69,17 @@
 <div class="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start">
 	<div>
 		<h1 class="h1 mb-4">{challenge.name}</h1>
-		<p class={cn(active && 'my-2 text-green-500')}>
-			{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}
-		</p>
+		<div class="flex items-center gap-3">
+			<p class={cn(active && 'my-2 text-green-500')}>
+				{prettyDate(challenge.startsAt)} - {prettyDate(challenge.endsAt)}
+			</p>
+			{#if canStillAddEntries && daysRemaining > 0}
+				<Badge variant="secondary">
+					{daysRemaining}
+					{daysRemaining === 1 ? 'Tag' : 'Tage'} offen
+				</Badge>
+			{/if}
+		</div>
 	</div>
 	<div class="flex justify-between max-md:flex-col max-md:gap-4">
 		<div class="flex items-center gap-2">

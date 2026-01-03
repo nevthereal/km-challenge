@@ -1,4 +1,10 @@
-import { getUser, isChallengeActive, prettyDate } from '$lib/utils';
+import {
+	getUser,
+	isChallengeActive,
+	prettyDate,
+	getDaysRemainingForEntry,
+	canAddEntries
+} from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -32,7 +38,9 @@ export const load: PageServerLoad = async ({ parent }) => {
 		}
 	});
 
-	return { leaderboard, newEntryForm, lastActivities };
+	const daysRemainingForEntry = canAddEntries(challenge) ? getDaysRemainingForEntry(challenge) : 0;
+
+	return { leaderboard, newEntryForm, lastActivities, daysRemainingForEntry };
 };
 
 export const actions: Actions = {
@@ -58,7 +66,8 @@ export const actions: Actions = {
 
 		if (!qChallenge) return error(404, 'Challenge nicht gefunden');
 
-		if (!isChallengeActive(qChallenge)) return error(403, 'Challenge ist nicht aktiv');
+		if (!canAddEntries(qChallenge))
+			return error(403, 'Diese Challenge akzeptiert keine Einträge mehr');
 
 		// Validate entry date is within challenge range (activity date must be during the challenge, not after)
 		const entryDate = new Date(form.data.date);

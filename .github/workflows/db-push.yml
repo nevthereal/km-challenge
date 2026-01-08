@@ -1,0 +1,30 @@
+name: Drizzle DB Push
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  push-db:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Push database schema (Drizzle)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: bun db:push --force

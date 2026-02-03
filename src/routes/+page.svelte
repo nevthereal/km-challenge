@@ -12,7 +12,7 @@
 
 	// Filter challenges that still accept entries
 	const openForEntriesChallenges = $derived(
-		data.openForEntriesChallenges.filter((c) => canAddEntries(c))
+		data.openForEntriesChallenges?.filter((c) => canAddEntries(c)) ?? []
 	);
 </script>
 

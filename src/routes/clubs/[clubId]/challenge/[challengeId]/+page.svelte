@@ -7,37 +7,7 @@
 
 	let { data } = $props();
 
-	let { challenge, leaderboard, lastActivities, challengePath } = $derived(data);
-
-	const recentNames = $derived(
-		Array.from(
-			new Set(
-				lastActivities
-					.map((activity) => activity.user?.name)
-					.filter((name) => typeof name === 'string' && name.length > 0)
-			)
-		)
-	);
-	const awards = $derived([
-		{
-			title: 'Konstanz König:in',
-			subtitle: 'Immer konstant am Start',
-			winner: recentNames[0] ?? 'Offen',
-			runnerUp: recentNames[1] ?? recentNames[0] ?? 'Offen'
-		},
-		{
-			title: 'KM-Meister',
-			subtitle: 'Sammelt die meisten Kilometer',
-			winner: recentNames[1] ?? recentNames[0] ?? 'Offen',
-			runnerUp: recentNames[2] ?? recentNames[0] ?? 'Offen'
-		},
-		{
-			title: 'Aktivitäts-Champion',
-			subtitle: 'Meiste Aktivitäten insgesamt',
-			winner: recentNames[2] ?? recentNames[0] ?? 'Offen',
-			runnerUp: recentNames[3] ?? recentNames[1] ?? 'Offen'
-		}
-	]);
+	let { challenge, leaderboard, lastActivities, challengePath, awards } = $derived(data);
 </script>
 
 <main class="grow">

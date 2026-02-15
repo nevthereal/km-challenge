@@ -99,7 +99,9 @@
 {#if !currentUserChallenge}
 	<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 {:else}
-	<nav class="my-2 overflow-x-scroll border-t-2">
+	<nav
+		class="my-2 overflow-x-auto border-t-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+	>
 		<ul class="flex whitespace-nowrap">
 			{#each paths as path}
 				<a

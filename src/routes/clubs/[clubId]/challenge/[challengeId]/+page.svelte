@@ -2,13 +2,42 @@
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { canAddEntries, prettyDate } from '$lib/utils';
+	import { prettyDate } from '$lib/utils';
+	import EntryMetricsChart from '$lib/components/EntryMetricsChart.svelte';
 
 	let { data } = $props();
 
 	let { challenge, leaderboard, lastActivities, challengePath } = $derived(data);
 
-	const canStillAddEntries = $derived(canAddEntries(challenge));
+	const recentNames = $derived(
+		Array.from(
+			new Set(
+				lastActivities
+					.map((activity) => activity.user?.name)
+					.filter((name) => typeof name === 'string' && name.length > 0)
+			)
+		)
+	);
+	const awards = $derived([
+		{
+			title: 'Konstanz König:in',
+			subtitle: 'Immer konstant am Start',
+			winner: recentNames[0] ?? 'Offen',
+			runnerUp: recentNames[1] ?? recentNames[0] ?? 'Offen'
+		},
+		{
+			title: 'KM-Meister',
+			subtitle: 'Sammelt die meisten Kilometer',
+			winner: recentNames[1] ?? recentNames[0] ?? 'Offen',
+			runnerUp: recentNames[2] ?? recentNames[0] ?? 'Offen'
+		},
+		{
+			title: 'Aktivitäts-Champion',
+			subtitle: 'Meiste Aktivitäten insgesamt',
+			winner: recentNames[2] ?? recentNames[0] ?? 'Offen',
+			runnerUp: recentNames[3] ?? recentNames[1] ?? 'Offen'
+		}
+	]);
 </script>
 
 <main class="grow">
@@ -20,6 +49,33 @@
 			<EntryForm {challenge} disciplines={challenge.disciplines} formData={data.newEntryForm} />
 		</div>
 		<Leaderboard currentChallenge={challenge} {leaderboard} />
+	</section>
+	<EntryMetricsChart
+		title="Challenge Gesamtfortschritt (Einträge, Kilometer, Punkte)"
+		entries={challenge.entries ?? []}
+	/>
+	<section class="my-8">
+		<h2 class="h2 mb-3">Auszeichnungen</h2>
+		<div class="flex flex-col gap-3 md:flex-row">
+			{#each awards as award}
+				<div
+					class="flex-1 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-4 text-slate-100 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-400/50 hover:shadow-md"
+				>
+					<div class="mb-2 flex items-center justify-between gap-2">
+						<p class="font-semibold text-slate-100">{award.title}</p>
+					</div>
+					<p class="text-sm text-slate-300">{award.subtitle}</p>
+					<p class="mt-3 text-sm">
+						<span class="text-slate-400">Sieger:in:</span>
+						<span class="font-semibold text-amber-200">{award.winner}</span>
+					</p>
+					<p class="mt-1 text-sm">
+						<span class="text-slate-400">Runner-up:</span>
+						<span class="font-medium text-slate-200">{award.runnerUp}</span>
+					</p>
+				</div>
+			{/each}
+		</div>
 	</section>
 	<section>
 		<h2 class="h2 mb-2">Neuste Aktivitäten</h2>

@@ -34,7 +34,84 @@ export const load: PageServerLoad = async ({ parent }) => {
 
 	const daysRemainingForEntry = canAddEntries(challenge) ? getDaysRemainingForEntry(challenge) : 0;
 
-	return { leaderboard, newEntryForm, lastActivities, daysRemainingForEntry };
+	type MemberStats = {
+		userId: string;
+		name: string;
+		totalKm: number;
+		activityCount: number;
+		activeDays: Set<string>;
+	};
+
+	const statsByUser = new Map<string, MemberStats>();
+	for (const challengeEntry of challenge.entries ?? []) {
+		const userId = challengeEntry.userId;
+		if (!statsByUser.has(userId)) {
+			statsByUser.set(userId, {
+				userId,
+				name: challengeEntry.user?.name ?? 'Unbekannt',
+				totalKm: 0,
+				activityCount: 0,
+				activeDays: new Set<string>()
+			});
+		}
+
+		const stats = statsByUser.get(userId);
+		if (!stats) continue;
+
+		stats.totalKm += Number(challengeEntry.amount);
+		stats.activityCount += 1;
+		stats.activeDays.add(new Date(challengeEntry.date).toISOString().slice(0, 10));
+	}
+
+	const rankedMembers = Array.from(statsByUser.values());
+	const getPodium = (items: MemberStats[]) => ({
+		winner: items[0]?.name ?? 'Offen',
+		runnerUp: items[1]?.name ?? 'Offen'
+	});
+
+	const consistencyRanking = [...rankedMembers].sort((a, b) => {
+		return (
+			b.activeDays.size - a.activeDays.size ||
+			b.activityCount - a.activityCount ||
+			b.totalKm - a.totalKm
+		);
+	});
+
+	const kmRanking = [...rankedMembers].sort((a, b) => {
+		return (
+			b.totalKm - a.totalKm ||
+			b.activityCount - a.activityCount ||
+			b.activeDays.size - a.activeDays.size
+		);
+	});
+
+	const activityRanking = [...rankedMembers].sort((a, b) => {
+		return (
+			b.activityCount - a.activityCount ||
+			b.activeDays.size - a.activeDays.size ||
+			b.totalKm - a.totalKm
+		);
+	});
+
+	const awards = [
+		{
+			title: 'Consistency-King/Queen',
+			subtitle: 'An den meisten Tagen aktiv',
+			...getPodium(consistencyRanking)
+		},
+		{
+			title: 'KM-Master',
+			subtitle: 'Sammelt die meisten Kilometer',
+			...getPodium(kmRanking)
+		},
+		{
+			title: 'Aktivitäts-Champion',
+			subtitle: 'Meiste Aktivitäten insgesamt',
+			...getPodium(activityRanking)
+		}
+	];
+
+	return { leaderboard, newEntryForm, lastActivities, daysRemainingForEntry, awards };
 };
 
 export const actions: Actions = {

@@ -3,6 +3,7 @@
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import { prettyDate } from '$lib/utils';
 	import EntryCard from '$lib/components/EntryCard.svelte';
+	import EntryMetricsChart from '$lib/components/EntryMetricsChart.svelte';
 
 	let { data } = $props();
 
@@ -37,6 +38,8 @@
 <div class="mt-2">
 	<NiceList {listItems} />
 </div>
+
+<EntryMetricsChart title="Fortschritt (Einträge, Kilometer, Punkte)" entries={member.user?.entries ?? []} />
 
 <h2 class="h2 my-4">
 	Einträge ({member.user?.entries.length ?? 0}):

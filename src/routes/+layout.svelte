@@ -12,12 +12,17 @@
 	let { children, data } = $props();
 
 	let { session } = data;
+
+	async function signOut() {
+		await authClient(page.url.origin).signOut();
+		location.reload();
+	}
 </script>
 
 <Toaster />
 <ModeWatcher defaultMode="system" />
 {#if dev}
-	<div class="bg-destructive w-screen p-2 text-center text-lg font-bold">Dev mode</div>
+	<div class="bg-destructive w-full max-w-full p-2 text-center text-lg font-bold">Dev mode</div>
 {/if}
 <nav class="flex items-center justify-between p-6">
 	<div class="flex gap-4">
@@ -44,13 +49,7 @@
 						<DropdownMenu.Item
 							><a class="w-full" href="/profile/edit">Bearbeiten</a></DropdownMenu.Item
 						>
-						<Button
-							class="m-2"
-							variant="destructive"
-							onclick={async () => {
-								await authClient(page.url.origin).signOut();
-								location.reload();
-							}}
+						<Button class="m-2" variant="destructive" onclick={signOut}
 							><LogOut /><span> Ausloggen </span>
 						</Button>
 					</DropdownMenu.Group>
@@ -59,6 +58,6 @@
 		</div>
 	{/if}
 </nav>
-<div class="mx-8 my-4">
+<div class="mx-8 my-4 max-w-full min-w-0 overflow-x-clip">
 	{@render children()}
 </div>

@@ -16,7 +16,7 @@
 		"push": "drizzle-kit push",
 		"generate": "drizzle-kit generate",
 		"studio": "drizzle-kit studio",
-		"start": "bun /build"
+		"start": "PORT=8080 bun /build"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",

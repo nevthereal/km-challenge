@@ -16,7 +16,7 @@
 		"push": "drizzle-kit push",
 		"generate": "drizzle-kit generate",
 		"studio": "drizzle-kit studio",
-		"start": "bun build/index.js"
+		"start": "bun ./build/index.js"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",

@@ -39,7 +39,7 @@
 	<NiceList {listItems} />
 </div>
 
-<EntryMetricsChart title="Fortschritt (Einträge, Kilometer, Punkte)" entries={member.user?.entries ?? []} />
+<EntryMetricsChart title="Fortschritt (Kilometer, Punkte)" entries={member.user?.entries ?? []} />
 
 <h2 class="h2 my-4">
 	Einträge ({member.user?.entries.length ?? 0}):

@@ -21,7 +21,7 @@
 		<Leaderboard currentChallenge={challenge} {leaderboard} />
 	</section>
 	<EntryMetricsChart
-		title="Challenge Gesamtfortschritt (Einträge, Kilometer, Punkte)"
+		title="Challenge Gesamtfortschritt (Kilometer, Punkte)"
 		entries={challenge.entries ?? []}
 	/>
 	<section class="my-8">

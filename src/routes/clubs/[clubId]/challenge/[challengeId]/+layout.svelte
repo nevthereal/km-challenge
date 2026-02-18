@@ -12,9 +12,14 @@
 	import * as Field from '$lib/components/ui/field';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import {
+		getChallengeAwardsData,
 		deleteChallenge,
 		editChallenge,
 		getChallengeLayoutData,
+		getChallengeLastActivitiesData,
+		getChallengeLeaderboardData,
+		getHomeActiveChallengesData,
+		getHomeOpenEntriesData,
 		joinChallenge,
 		leaveChallenge
 	} from '$lib/remote/challenge.remote';
@@ -92,8 +97,14 @@
 				<Button
 					type="button"
 					onclick={async () => {
-						await joinChallenge({ clubId, challengeId });
-						location.reload();
+						await joinChallenge({ clubId, challengeId }).updates(
+							getChallengeLayoutData({ clubId, challengeId }),
+							getChallengeLeaderboardData({ clubId, challengeId }),
+							getChallengeLastActivitiesData({ clubId, challengeId }),
+							getChallengeAwardsData({ clubId, challengeId }),
+							getHomeActiveChallengesData(),
+							getHomeOpenEntriesData()
+						);
 					}}><DoorOpen />Beitreten</Button
 				>
 			{/if}
@@ -124,9 +135,15 @@
 			<Dialog.Header><Dialog.Title>Challenge bearbeiten</Dialog.Title></Dialog.Header>
 			<form
 				{...editChallenge.enhance(async ({ submit }) => {
-					await submit();
+					await submit().updates(
+						getChallengeLayoutData({ clubId, challengeId }),
+						getChallengeLeaderboardData({ clubId, challengeId }),
+						getChallengeLastActivitiesData({ clubId, challengeId }),
+						getChallengeAwardsData({ clubId, challengeId }),
+						getHomeActiveChallengesData(),
+						getHomeOpenEntriesData()
+					);
 					editDialogOpen = false;
-					location.reload();
 				})}
 				class="flex max-w-xl flex-col gap-2"
 			>
@@ -180,8 +197,14 @@
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 				<AlertDialog.Action
 					onclick={async () => {
-						await leaveChallenge({ challengeId });
-						location.reload();
+						await leaveChallenge({ challengeId }).updates(
+							getChallengeLayoutData({ clubId, challengeId }),
+							getChallengeLeaderboardData({ clubId, challengeId }),
+							getChallengeLastActivitiesData({ clubId, challengeId }),
+							getChallengeAwardsData({ clubId, challengeId }),
+							getHomeActiveChallengesData(),
+							getHomeOpenEntriesData()
+						);
 					}}
 					class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
 				>

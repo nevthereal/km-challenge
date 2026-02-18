@@ -243,7 +243,20 @@
 			<Dialog.Header>
 				<Dialog.Title>Club bearbeiten</Dialog.Title>
 			</Dialog.Header>
-			<form {...editClubDetails}>
+			<form
+				{...editClubDetails.enhance(async ({ submit }) => {
+					await submit().updates(
+						getClubPageData({ clubId }).withOverride((currentData) => ({
+							...currentData,
+							qClub: {
+								...currentData.qClub,
+								name: editClubDetails.fields.name.value() || currentData.qClub.name
+							}
+						}))
+					);
+					editDialogOpen = false;
+				})}
+			>
 				<input hidden {...editClubDetails.fields.clubId.as('text')} />
 				<Field.Field>
 					<Field.FieldLabel for="club-name">Name</Field.FieldLabel>

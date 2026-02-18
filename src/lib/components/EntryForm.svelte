@@ -2,7 +2,15 @@
 	import { CalendarIcon, PlusCircle } from '@lucide/svelte';
 	import { DateFormatter, getLocalTimeZone, parseDate, today, type DateValue } from '@internationalized/date';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
-	import { addEntry } from '$lib/remote/challenge.remote';
+	import {
+		addEntry,
+		getChallengeAwardsData,
+		getChallengeLayoutData,
+		getChallengeLastActivitiesData,
+		getChallengeLeaderboardData,
+		getHomeActiveChallengesData,
+		getHomeOpenEntriesData
+	} from '$lib/remote/challenge.remote';
 	import { canAddEntries, cn } from '$lib/utils';
 	import { Button, buttonVariants } from './ui/button';
 	import { Calendar } from './ui/calendar';
@@ -16,24 +24,46 @@
 		disciplines: (typeof disciplineTable.$inferSelect)[];
 		challenge: typeof challengeTable.$inferSelect;
 		classNames?: string;
+		updateQueries?: any[];
 	}
 
-	let { disciplines, challenge, classNames }: Props = $props();
+	let { disciplines, challenge, classNames, updateQueries = [] }: Props = $props();
 
 	let dialogOpen = $state(false);
-	const entryForm = addEntry.for(challenge.id);
+	const getEntryForm = (challengeId: string) => addEntry.for(challengeId);
+	const entryForm = $derived(getEntryForm(challenge.id));
 
 	let value = $state<DateValue | undefined>();
 	let placeholder = $state<DateValue>();
 	let selectedDiscipline = $state('');
+	let initializedForChallengeId = $state<string | null>(null);
 
 	$effect(() => {
-		value = today(getLocalTimeZone());
 		entryForm.fields.challengeId.set(challenge.id);
+
+		// Initialize date once per challenge; don't overwrite user selections.
+		if (initializedForChallengeId !== challenge.id) {
+			initializedForChallengeId = challenge.id;
+			const existingDate = entryForm.fields.date.value();
+			if (existingDate) {
+				value = parseDate(existingDate.toString());
+			} else {
+				value = today(getLocalTimeZone());
+				entryForm.fields.date.set(value.toString());
+			}
+		}
+	});
+
+	$effect(() => {
+		if (value) {
+			entryForm.fields.date.set(value.toString());
+		}
 	});
 
 	const df = new DateFormatter('de', { dateStyle: 'long' });
-	const active = canAddEntries(challenge);
+	const getChallengeActiveState = (currentChallenge: typeof challengeTable.$inferSelect) =>
+		canAddEntries(currentChallenge);
+	const active = $derived(getChallengeActiveState(challenge));
 
 	function getDiscipline(id: string) {
 		const qDiscipline = disciplines.find((d) => d.id === id);
@@ -58,8 +88,21 @@
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
 			<form
 				{...entryForm.enhance(async ({ submit }) => {
-					await submit();
-					dialogOpen = false;
+					try {
+						const updates = [
+							getChallengeLayoutData({ clubId: challenge.clubId, challengeId: challenge.id }),
+							getChallengeLeaderboardData({ clubId: challenge.clubId, challengeId: challenge.id }),
+							getChallengeLastActivitiesData({ clubId: challenge.clubId, challengeId: challenge.id }),
+							getChallengeAwardsData({ clubId: challenge.clubId, challengeId: challenge.id }),
+							getHomeActiveChallengesData(),
+							getHomeOpenEntriesData(),
+							...updateQueries
+						];
+						await submit().updates(...updates);
+						dialogOpen = false;
+					} catch {
+						// Keep dialog open to show validation/server errors
+					}
 				})}
 				class="text-left"
 			>
@@ -116,17 +159,11 @@
 						<Popover.Content side="top">
 							<Calendar
 								type="single"
-								value={value as DateValue}
+								bind:value={value}
 								bind:placeholder
 								minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
 								maxValue={parseDate(challenge.endsAt.toISOString().split('T')[0])}
 								calendarLabel="Tag des Eintrags"
-								onValueChange={(v) => {
-									if (v) {
-										entryForm.fields.date.set(v.toString());
-										value = v;
-									}
-								}}
 							/>
 						</Popover.Content>
 					</Popover.Root>

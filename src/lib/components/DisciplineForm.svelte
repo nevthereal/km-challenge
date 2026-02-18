@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { MinusCircle, PlusCircle } from '@lucide/svelte';
-	import { addDisciplines } from '$lib/remote/challenge.remote';
+	import {
+		addDisciplines,
+		getChallengeAwardsData,
+		getChallengeLayoutData,
+		getChallengeLastActivitiesData,
+		getChallengeLeaderboardData
+	} from '$lib/remote/challenge.remote';
 	import { Button } from './ui/button';
 	import * as Field from './ui/field';
 	import { Input } from './ui/input';
 	import * as Sheet from './ui/sheet';
 
-	let { challengeId }: { challengeId: string } = $props();
+	let { challengeId, clubId }: { challengeId: string; clubId: string } = $props();
 
 	let sheetOpen = $state(false);
 	let rows = $state([{ name: '', multiplier: 1 }]);
@@ -27,9 +33,22 @@
 			<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
 			<form
 				{...disciplineForm.enhance(async ({ submit }) => {
-					await submit();
-					sheetOpen = false;
-					rows = [{ name: '', multiplier: 1 }];
+					try {
+						await submit().updates(
+							getChallengeLayoutData({ clubId, challengeId }),
+							getChallengeLeaderboardData({ clubId, challengeId }),
+							getChallengeLastActivitiesData({ clubId, challengeId }),
+							getChallengeAwardsData({ clubId, challengeId })
+						);
+					} catch {
+						return;
+					}
+
+					const issues = disciplineForm.fields.allIssues?.() ?? [];
+					if (issues.length === 0) {
+						sheetOpen = false;
+						rows = [{ name: '', multiplier: 1 }];
+					}
 				})}
 			>
 				<input hidden {...disciplineForm.fields.challengeId.as('text')} />
@@ -45,7 +64,7 @@
 								id={`discipline-multiplier-${i}`}
 								type="number"
 								step="0.1"
-								name={`discipline[${i}].multiplier`}
+								name={`n:discipline[${i}].multiplier`}
 								bind:value={row.multiplier}
 							/>
 						</Field.Field>

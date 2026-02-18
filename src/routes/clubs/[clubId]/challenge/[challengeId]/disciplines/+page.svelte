@@ -44,7 +44,7 @@
 	</div>
 	{#if currentUserChallenge}
 		<div class="flex gap-4 max-md:flex-col md:gap-8">
-			<div><ClubAdmin {isAdmin}><DisciplineForm challengeId={challenge.id} /></ClubAdmin></div>
+			<div><ClubAdmin {isAdmin}><DisciplineForm challengeId={challenge.id} clubId={challenge.clubId} /></ClubAdmin></div>
 		</div>
 	{/if}
 </main>

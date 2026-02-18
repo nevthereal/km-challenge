@@ -3,7 +3,16 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import * as Card from '$lib/components/ui/card';
 	import { buttonVariants } from './ui/button/button.svelte';
-	import { deleteEntry } from '$lib/remote/challenge.remote';
+	import {
+		getChallengeAwardsData,
+		deleteEntry,
+		getChallengeActivityData,
+		getChallengeLayoutData,
+		getChallengeLastActivitiesData,
+		getChallengeLeaderboardData,
+		getHomeActiveChallengesData,
+		getHomeOpenEntriesData
+	} from '$lib/remote/challenge.remote';
 	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
 
 	interface Props {
@@ -16,7 +25,9 @@
 	let { entry, discipline, edit, challengePath }: Props = $props();
 
 	let open = $state(false);
-	const challengeId = $derived(challengePath.split('/').at(-1) ?? '');
+	const pathSegments = $derived(challengePath.split('/'));
+	const clubId = $derived(pathSegments[2] ?? '');
+	const challengeId = $derived(pathSegments[4] ?? '');
 </script>
 
 <Card.Root>
@@ -54,7 +65,18 @@
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 				<AlertDialog.Action
 					onclick={async () => {
-						await deleteEntry({ challengeId, entryId: entry.id });
+						await deleteEntry({ challengeId, entryId: entry.id }).updates(
+							getChallengeActivityData({ clubId, challengeId }).withOverride((data) => ({
+								...data,
+								entries: data.entries.filter((currentEntry) => currentEntry.id !== entry.id)
+							})),
+							getChallengeLeaderboardData({ clubId, challengeId }),
+							getChallengeLastActivitiesData({ clubId, challengeId }),
+							getChallengeAwardsData({ clubId, challengeId }),
+							getChallengeLayoutData({ clubId, challengeId }),
+							getHomeActiveChallengesData(),
+							getHomeOpenEntriesData()
+						);
 						open = false;
 					}}
 					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action

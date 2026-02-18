@@ -5,22 +5,32 @@
 	import * as Card from '$lib/components/ui/card';
 	import { SquareArrowOutUpRight } from '@lucide/svelte';
 	import { canAddEntries, prettyDate } from '$lib/utils';
-	import { getHomePageData } from '$lib/remote/challenge.remote';
+	import {
+		getHomeActiveChallengesData,
+		getHomeOpenEntriesData,
+		getHomeViewerData
+	} from '$lib/remote/challenge.remote';
 
-	const data = await getHomePageData();
+	const homeViewerQuery = getHomeViewerData();
+	const { user } = await homeViewerQuery;
+	const homeActiveChallengesQuery = user ? getHomeActiveChallengesData() : null;
+	const homeOpenEntriesQuery = user ? getHomeOpenEntriesData() : null;
 
+	const challengesWithLeaderboards = $derived(
+		homeActiveChallengesQuery?.current ?? []
+	);
 	const openForEntriesChallenges = $derived(
-		data.openForEntriesChallenges?.filter((c) => canAddEntries(c)) ?? []
+		(homeOpenEntriesQuery?.current ?? []).filter((c) => canAddEntries(c))
 	);
 </script>
 
-{#if data.user}
+{#if user}
 	<div class="flex flex-col gap-8">
 		<div>
-			<p class="text-lg">Willkommen, {data.user.name}</p>
+			<p class="text-lg">Willkommen, {user.name}</p>
 			<h1 class="h1">Aktive Challenges:</h1>
 		</div>
-		{#each data.challengesWithLeaderboards as resolvedChallenge}
+		{#each challengesWithLeaderboards as resolvedChallenge}
 			<div class="border-border rounded-md border p-6">
 				<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
 					<a
@@ -30,7 +40,13 @@
 						<span class="w-fit text-2xl font-extrabold">{resolvedChallenge.name}</span>
 						<SquareArrowOutUpRight />
 					</a>
-					<EntryForm challenge={resolvedChallenge} disciplines={resolvedChallenge.disciplines} />
+					<EntryForm
+						challenge={resolvedChallenge}
+						disciplines={resolvedChallenge.disciplines}
+						updateQueries={[homeViewerQuery, homeActiveChallengesQuery, homeOpenEntriesQuery].filter(
+							Boolean
+						)}
+					/>
 				</div>
 				<Leaderboard currentChallenge={resolvedChallenge} leaderboard={resolvedChallenge.leaderboard} />
 				<Button

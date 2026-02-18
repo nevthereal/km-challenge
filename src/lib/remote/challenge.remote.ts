@@ -1,10 +1,10 @@
 import { command, form, getRequestEvent, query } from '$app/server';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
-import { challenge, challengeMember, discipline, entry, clubAdmin as clubAdminTable } from '$lib/db/schema';
+import { challenge, challengeMember, discipline, entry } from '$lib/db/schema';
 import { requireUser } from '$lib/server/auth-helpers';
 import { canAddEntries, getDaysRemainingForEntry, prettyDate } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
-import { eq, and, getColumns, gte, lte } from 'drizzle-orm';
+import { and, eq, getColumns, gte, lte } from 'drizzle-orm';
 import { z } from 'zod';
 
 const challengeInput = z.object({ challengeId: z.string() });
@@ -14,7 +14,7 @@ const addEntrySchema = z.object({
 	challengeId: z.string(),
 	disciplineId: z.string(),
 	amount: z.number().min(0.01),
-	date: z.string()
+	date: z.iso.date()
 });
 
 const editChallengeSchema = z
@@ -104,104 +104,7 @@ async function getChallengeContext(clubId: string, challengeId: string) {
 	};
 }
 
-export const getHomePageData = query(async () => {
-	const { locals } = getRequestEvent();
-	const user = locals.user;
-
-	if (!user) {
-		return {
-			user: null,
-			challengesWithLeaderboards: [],
-			openForEntriesChallenges: []
-		};
-	}
-
-	const now = new Date();
-	const startOfToday = new Date(now);
-	startOfToday.setHours(0, 0, 0, 0);
-
-	const endOfToday = new Date(now);
-	endOfToday.setHours(23, 59, 59, 999);
-
-	const activeChallenges = await db
-		.select({
-			...getColumns(challenge)
-		})
-		.from(challengeMember)
-		.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
-		.where(
-			and(
-				eq(challengeMember.userId, user.id),
-				lte(challenge.startsAt, endOfToday),
-				gte(challenge.endsAt, startOfToday)
-			)
-		)
-		.groupBy(challenge.id);
-
-	const challengesWithLeaderboards = await Promise.all(
-		activeChallenges.map(async (c) => {
-			const disciplines = await db.query.discipline.findMany({ where: { challengeId: c.id } });
-			const leaderboard = await getLeaderBoard.execute({ challengeId: c.id, limit: 5 });
-			return { ...c, leaderboard, disciplines };
-		})
-	);
-
-	const openForEntriesChallenges = await db
-		.select({
-			...getColumns(challenge)
-		})
-		.from(challengeMember)
-		.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
-		.where(
-			and(
-				eq(challengeMember.userId, user.id),
-				lte(challenge.endsAt, endOfToday),
-				gte(challenge.endsAt, new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000))
-			)
-		)
-		.groupBy(challenge.id);
-
-	const openForEntriesChallengesWithDays = openForEntriesChallenges
-		.filter((c) => canAddEntries(c))
-		.map((c) => ({
-			...c,
-			daysRemaining: getDaysRemainingForEntry(c)
-		}));
-
-	return {
-		challengesWithLeaderboards,
-		user,
-		openForEntriesChallenges: openForEntriesChallengesWithDays
-	};
-});
-
-export const getChallengeLayoutData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	return getChallengeContext(clubId, challengeId);
-});
-
-export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	const { challenge } = context;
-
-	const leaderboard = await getLeaderBoard.execute({
-		challengeId: challenge.id,
-		limit: challenge.members.length
-	});
-
-	const lastActivities = await db.query.entry.findMany({
-		where: {
-			challengeId: challenge.id
-		},
-		limit: 10,
-		orderBy(fields, operators) {
-			return operators.desc(fields.createdAt);
-		},
-		with: {
-			user: true,
-			discipline: true
-		}
-	});
-
+function computeAwards(challengeData: Awaited<ReturnType<typeof getChallengeContext>>['challenge']) {
 	type MemberStats = {
 		userId: string;
 		name: string;
@@ -211,7 +114,7 @@ export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clu
 	};
 
 	const statsByUser = new Map<string, MemberStats>();
-	for (const challengeEntry of challenge.entries ?? []) {
+	for (const challengeEntry of challengeData.entries ?? []) {
 		const userId = challengeEntry.userId;
 		if (!statsByUser.has(userId)) {
 			statsByUser.set(userId, {
@@ -261,7 +164,7 @@ export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clu
 		);
 	});
 
-	const awards = [
+	return [
 		{
 			title: 'Consistency-King/Queen',
 			subtitle: 'An den meisten Tagen aktiv',
@@ -278,10 +181,141 @@ export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clu
 			...getPodium(activityRanking)
 		}
 	];
+}
 
-	const daysRemainingForEntry = canAddEntries(challenge) ? getDaysRemainingForEntry(challenge) : 0;
+export const getHomeViewerData = query(async () => {
+	const { locals } = getRequestEvent();
+	return { user: locals.user ?? null };
+});
 
-	return { ...context, leaderboard, lastActivities, daysRemainingForEntry, awards };
+export const getHomeActiveChallengesData = query(async () => {
+	const { locals } = getRequestEvent();
+	const user = locals.user;
+	if (!user) return [];
+
+	const now = new Date();
+	const startOfToday = new Date(now);
+	startOfToday.setHours(0, 0, 0, 0);
+	const endOfToday = new Date(now);
+	endOfToday.setHours(23, 59, 59, 999);
+
+	const activeChallenges = await db
+		.select({ ...getColumns(challenge) })
+		.from(challengeMember)
+		.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
+		.where(
+			and(
+				eq(challengeMember.userId, user.id),
+				lte(challenge.startsAt, endOfToday),
+				gte(challenge.endsAt, startOfToday)
+			)
+		)
+		.groupBy(challenge.id);
+
+	return Promise.all(
+		activeChallenges.map(async (c) => {
+			const disciplines = await db.query.discipline.findMany({ where: { challengeId: c.id } });
+			const leaderboard = await getLeaderBoard.execute({ challengeId: c.id, limit: 5 });
+			return { ...c, leaderboard, disciplines };
+		})
+	);
+});
+
+export const getHomeOpenEntriesData = query(async () => {
+	const { locals } = getRequestEvent();
+	const user = locals.user;
+	if (!user) return [];
+
+	const now = new Date();
+	const endOfToday = new Date(now);
+	endOfToday.setHours(23, 59, 59, 999);
+
+	const openForEntriesChallenges = await db
+		.select({ ...getColumns(challenge) })
+		.from(challengeMember)
+		.innerJoin(challenge, eq(challengeMember.challengeId, challenge.id))
+		.where(
+			and(
+				eq(challengeMember.userId, user.id),
+				lte(challenge.endsAt, endOfToday),
+				gte(challenge.endsAt, new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000))
+			)
+		)
+		.groupBy(challenge.id);
+
+	return openForEntriesChallenges
+		.filter((c) => canAddEntries(c))
+		.map((c) => ({ ...c, daysRemaining: getDaysRemainingForEntry(c) }));
+});
+
+export const getHomePageData = query(async () => {
+	const { user } = await getHomeViewerData();
+	if (!user) {
+		return {
+			user: null,
+			challengesWithLeaderboards: [],
+			openForEntriesChallenges: []
+		};
+	}
+
+	const [challengesWithLeaderboards, openForEntriesChallenges] = await Promise.all([
+		getHomeActiveChallengesData(),
+		getHomeOpenEntriesData()
+	]);
+
+	return { user, challengesWithLeaderboards, openForEntriesChallenges };
+});
+
+export const getChallengeLayoutData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
+	return getChallengeContext(clubId, challengeId);
+});
+
+export const getChallengeLeaderboardData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
+	const { challenge } = await getChallengeContext(clubId, challengeId);
+	return getLeaderBoard.execute({ challengeId: challenge.id, limit: challenge.members.length });
+});
+
+export const getChallengeLastActivitiesData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		await getChallengeContext(clubId, challengeId);
+		return db.query.entry.findMany({
+			where: { challengeId },
+			limit: 10,
+			orderBy(fields, operators) {
+				return operators.desc(fields.createdAt);
+			},
+			with: {
+				user: true,
+				discipline: true
+			}
+		});
+	}
+);
+
+export const getChallengeAwardsData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
+	const { challenge } = await getChallengeContext(clubId, challengeId);
+	return {
+		awards: computeAwards(challenge),
+		daysRemainingForEntry: canAddEntries(challenge) ? getDaysRemainingForEntry(challenge) : 0
+	};
+});
+
+export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
+	const context = await getChallengeContext(clubId, challengeId);
+	const [leaderboard, lastActivities, awardsData] = await Promise.all([
+		getChallengeLeaderboardData({ clubId, challengeId }),
+		getChallengeLastActivitiesData({ clubId, challengeId }),
+		getChallengeAwardsData({ clubId, challengeId })
+	]);
+
+	return {
+		...context,
+		leaderboard,
+		lastActivities,
+		daysRemainingForEntry: awardsData.daysRemainingForEntry,
+		awards: awardsData.awards
+	};
 });
 
 export const getChallengeActivityData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
@@ -352,12 +386,8 @@ export const getChallengeMemberDetailsData = query(
 				user: {
 					with: {
 						entries: {
-							where: {
-								challengeId
-							},
-							with: {
-								discipline: true
-							},
+							where: { challengeId },
+							with: { discipline: true },
 							orderBy: (fields, operators) => operators.desc(fields.date)
 						}
 					}
@@ -409,6 +439,13 @@ export const addEntry = form(addEntrySchema, async ({ challengeId, disciplineId,
 		disciplineId,
 		userId: user.id
 	});
+
+	await getChallengeLayoutData({ clubId: qChallenge.clubId, challengeId }).refresh();
+	await getChallengeLeaderboardData({ clubId: qChallenge.clubId, challengeId }).refresh();
+	await getChallengeLastActivitiesData({ clubId: qChallenge.clubId, challengeId }).refresh();
+	await getChallengeAwardsData({ clubId: qChallenge.clubId, challengeId }).refresh();
+	await getHomeActiveChallengesData().refresh();
+	await getHomeOpenEntriesData().refresh();
 });
 
 export const deleteChallenge = command(clubChallengeInput, async ({ clubId, challengeId }) => {

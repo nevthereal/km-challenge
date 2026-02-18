@@ -5,21 +5,36 @@
 	import { prettyDate } from '$lib/utils';
 	import EntryMetricsChart from '$lib/components/EntryMetricsChart.svelte';
 	import { page } from '$app/state';
-	import { getChallengeOverviewData } from '$lib/remote/challenge.remote';
+	import {
+		getChallengeAwardsData,
+		getChallengeLastActivitiesData,
+		getChallengeLayoutData,
+		getChallengeLeaderboardData
+	} from '$lib/remote/challenge.remote';
 
-	const data = await getChallengeOverviewData({
-		clubId: page.params.clubId ?? '',
-		challengeId: page.params.challengeId ?? ''
-	});
+	const clubId = page.params.clubId ?? '';
+	const challengeId = page.params.challengeId ?? '';
+	const layoutQuery = getChallengeLayoutData({ clubId, challengeId });
+	const leaderboardQuery = getChallengeLeaderboardData({ clubId, challengeId });
+	const lastActivitiesQuery = getChallengeLastActivitiesData({ clubId, challengeId });
+	const awardsQuery = getChallengeAwardsData({ clubId, challengeId });
 
-	let { challenge, leaderboard, lastActivities, challengePath, awards } = data;
+	const { challenge, challengePath } = await layoutQuery;
+	const leaderboard = $derived(await leaderboardQuery);
+	const lastActivities = $derived(await lastActivitiesQuery);
+	const awardsData = $derived(await awardsQuery);
+	const awards = $derived(awardsData.awards);
 </script>
 
 <main class="grow">
 	<section class="mb-8">
 		<div class="mb-4 flex items-center justify-between gap-2 max-md:items-start max-md:portrait:flex-col">
 			<h1 class="h1">Rangliste</h1>
-			<EntryForm {challenge} disciplines={challenge.disciplines} />
+			<EntryForm
+				{challenge}
+				disciplines={challenge.disciplines}
+				updateQueries={[layoutQuery, leaderboardQuery, lastActivitiesQuery, awardsQuery]}
+			/>
 		</div>
 		<Leaderboard currentChallenge={challenge} {leaderboard} />
 	</section>

@@ -1,7 +1,7 @@
 import { form, getRequestEvent, query } from '$app/server';
 import { db } from '$lib/db';
 import { user } from '$lib/db/schema';
-import { requireUser } from '$lib/remote/auth.remote';
+import { requireUser } from '$lib/server/auth-helpers';
 import { redirect } from '@sveltejs/kit';
 import { userSetup } from '$lib/zod';
 import { eq } from 'drizzle-orm';

@@ -1,7 +1,7 @@
 import { command, form, getRequestEvent, query } from '$app/server';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
 import { challenge, challengeMember, discipline, entry, clubAdmin as clubAdminTable } from '$lib/db/schema';
-import { requireUser } from '$lib/remote/auth.remote';
+import { requireUser } from '$lib/server/auth-helpers';
 import { canAddEntries, getDaysRemainingForEntry, prettyDate } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { eq, and, getColumns, gte, lte } from 'drizzle-orm';
@@ -141,7 +141,7 @@ export const getHomePageData = query(async () => {
 	const challengesWithLeaderboards = await Promise.all(
 		activeChallenges.map(async (c) => {
 			const disciplines = await db.query.discipline.findMany({ where: { challengeId: c.id } });
-			const leaderboard = getLeaderBoard.execute({ challengeId: c.id, limit: 5 });
+			const leaderboard = await getLeaderBoard.execute({ challengeId: c.id, limit: 5 });
 			return { ...c, leaderboard, disciplines };
 		})
 	);
@@ -183,7 +183,7 @@ export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clu
 	const context = await getChallengeContext(clubId, challengeId);
 	const { challenge } = context;
 
-	const leaderboard = getLeaderBoard.execute({
+	const leaderboard = await getLeaderBoard.execute({
 		challengeId: challenge.id,
 		limit: challenge.members.length
 	});

@@ -1,7 +1,7 @@
 import { command, form, query } from '$app/server';
 import { db, checkAdmin } from '$lib/db';
 import { challenge, club, inviteCode, clubAdmin, clubMember } from '$lib/db/schema';
-import { requireUser } from '$lib/remote/auth.remote';
+import { requireUser } from '$lib/server/auth-helpers';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';

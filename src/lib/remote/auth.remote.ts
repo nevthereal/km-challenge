@@ -1,11 +1,6 @@
-import { getRequestEvent, query } from '$app/server';
+import { query, getRequestEvent } from '$app/server';
 import { auth } from '$lib/auth';
-import { getUser } from '$lib/utils';
-
-export function requireUser() {
-	const { locals, url } = getRequestEvent();
-	return getUser({ locals, redirectUrl: url.pathname });
-}
+import { requireUser } from '$lib/server/auth-helpers';
 
 export const getCurrentUser = query(async () => {
 	return { user: requireUser() };

@@ -1,16 +1,14 @@
 <script>
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
-
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
-
 	import { SquareArrowOutUpRight } from '@lucide/svelte';
 	import { canAddEntries, prettyDate } from '$lib/utils';
+	import { getHomePageData } from '$lib/remote/challenge.remote';
 
-	let { data } = $props();
+	const data = await getHomePageData();
 
-	// Filter challenges that still accept entries
 	const openForEntriesChallenges = $derived(
 		data.openForEntriesChallenges?.filter((c) => canAddEntries(c)) ?? []
 	);
@@ -22,39 +20,26 @@
 			<p class="text-lg">Willkommen, {data.user.name}</p>
 			<h1 class="h1">Aktive Challenges:</h1>
 		</div>
-		{#each data.challengesWithLeaderboards as challenge}
-			{#await challenge}
-				<p class="text-center font-mono text-lg font-bold italic">Challenge wird geladen...</p>
-			{:then resolvedChallenge}
-				<div class="border-border rounded-md border p-6">
-					<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
-						<a
-							href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
-							class="hover:text-primary flex items-center gap-2"
-						>
-							<span class="w-fit text-2xl font-extrabold">
-								{resolvedChallenge.name}
-							</span>
-							<SquareArrowOutUpRight />
-						</a>
-						<EntryForm
-							challenge={resolvedChallenge}
-							disciplines={resolvedChallenge.disciplines}
-							formData={data.newEntryForm}
-						/>
-					</div>
-					<Leaderboard
-						currentChallenge={resolvedChallenge}
-						leaderboard={resolvedChallenge.leaderboard}
-					/>
-					<Button
-						variant="link"
-						class="mt-2"
+		{#each data.challengesWithLeaderboards as resolvedChallenge}
+			<div class="border-border rounded-md border p-6">
+				<div class="mb-2 flex justify-between gap-4 max-md:flex-col">
+					<a
 						href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
-						>Komplette Rangliste</Button
+						class="hover:text-primary flex items-center gap-2"
 					>
+						<span class="w-fit text-2xl font-extrabold">{resolvedChallenge.name}</span>
+						<SquareArrowOutUpRight />
+					</a>
+					<EntryForm challenge={resolvedChallenge} disciplines={resolvedChallenge.disciplines} />
 				</div>
-			{/await}
+				<Leaderboard currentChallenge={resolvedChallenge} leaderboard={resolvedChallenge.leaderboard} />
+				<Button
+					variant="link"
+					class="mt-2"
+					href="/clubs/{resolvedChallenge.clubId}/challenge/{resolvedChallenge.id}"
+					>Komplette Rangliste</Button
+				>
+			</div>
 		{:else}
 			<div class="text-center mt-4">
 				<h2 class="h2 mb-2">Keine aktiven Challenges</h2>
@@ -66,7 +51,6 @@
 			</div>
 		{/each}
 
-		<!-- Section for challenges still open for entries -->
 		{#if openForEntriesChallenges.length > 0}
 			<div>
 				<h2 class="mb-4 text-2xl font-bold">Offen für Einträge</h2>

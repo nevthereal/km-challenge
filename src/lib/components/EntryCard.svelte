@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
-	import * as Card from '$lib/components/ui/card';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { buttonVariants } from './ui/button/button.svelte';
 	import { Trash } from '@lucide/svelte';
-	import { enhance } from '$app/forms';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as Card from '$lib/components/ui/card';
+	import { buttonVariants } from './ui/button/button.svelte';
+	import { deleteEntry } from '$lib/remote/challenge.remote';
+	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
 
 	interface Props {
 		entry: typeof dbEntry.$inferSelect;
@@ -16,6 +16,7 @@
 	let { entry, discipline, edit, challengePath }: Props = $props();
 
 	let open = $state(false);
+	const challengeId = $derived(challengePath.split('/').at(-1) ?? '');
 </script>
 
 <Card.Root>
@@ -37,8 +38,6 @@
 	</Card.Content>
 </Card.Root>
 
-<form use:enhance method="post" id="deleteForm" action="{challengePath}/activity/?/delete"></form>
-
 {#snippet deleteDialog()}
 	<AlertDialog.Root bind:open>
 		<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive', size: 'icon' })}>
@@ -54,10 +53,10 @@
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 				<AlertDialog.Action
-					value={entry.id}
-					name="id"
-					form="deleteForm"
-					onclick={() => (open = false)}
+					onclick={async () => {
+						await deleteEntry({ challengeId, entryId: entry.id });
+						open = false;
+					}}
 					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>

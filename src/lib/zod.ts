@@ -4,8 +4,8 @@ import { gender, roles } from './db/schema';
 export const createChallenge = z
 	.object({
 		name: z.string().min(3),
-		startsAt: z.date(),
-		endsAt: z.date()
+		startsAt: z.coerce.date(),
+		endsAt: z.coerce.date()
 	})
 	.refine((data) => data.endsAt > data.startsAt, {
 		message: 'endsAt must be after startsAt',
@@ -22,18 +22,14 @@ export const addDisciplines = z.object({
 	discipline: z
 		.object({
 			name: z.string(),
-			multiplier: z
-				.number({
-					error: (issue) => (issue.input === undefined ? 'This field is required' : 'Not a string')
-				})
-				.multipleOf(0.1)
+			multiplier: z.coerce.number().multipleOf(0.1)
 		})
 		.array()
 });
 
 export const newEntry = z.object({
 	disciplineId: z.string(),
-	amount: z.number().multipleOf(0.01).min(0.01),
+	amount: z.coerce.number().multipleOf(0.01).min(0.01),
 	date: z.iso.date()
 });
 

@@ -3,6 +3,7 @@
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import {
 		ArrowLeft,
 		Ellipsis,
@@ -27,6 +28,7 @@
 		deleteClub,
 		editClubDetails,
 		getClubPageData,
+		getClubsPageData,
 		getInviteCode,
 		leaveClub
 	} from '$lib/remote/club.remote';
@@ -40,15 +42,19 @@
 	let challengeStart = $state<DateValue | undefined>(parseDate(new Date().toISOString().split('T')[0]));
 	let challengeEnd = $state<DateValue | undefined>(parseDate(new Date().toISOString().split('T')[0]));
 
+	let previousClubId = $state<string | null>(null);
+
 	$effect(() => {
 		if (clubId) {
 			createChallengeInClub.fields.clubId.set(clubId);
 			editClubDetails.fields.clubId.set(clubId);
 		}
 
-		if (!editClubDetails.fields.name.value()) {
+		if (previousClubId !== null && previousClubId !== clubId) {
+			inviteCode = '';
 			editClubDetails.fields.name.set(club.name);
 		}
+		previousClubId = clubId;
 	});
 
 	const inviteUrl = $derived(
@@ -214,8 +220,12 @@
 					type="button"
 					variant="outline"
 					onclick={async () => {
-						const result = await getInviteCode({ clubId });
-						inviteCode = result.code ?? null;
+						try {
+							const result = await getInviteCode({ clubId });
+							inviteCode = result.code ?? null;
+						} catch (e) {
+							toast.error('Einladungscode konnte nicht generiert werden');
+						}
 					}}><Link /> Generieren</Button
 				>
 			{:else}
@@ -223,8 +233,12 @@
 					<Input value={inviteUrl} readonly />
 					<Button
 						onclick={async () => {
-							await navigator.clipboard.writeText(inviteText);
-							toast.success('Link in die Zwischenablage kopiert');
+							try {
+								await navigator.clipboard.writeText(inviteText);
+								toast.success('Link in die Zwischenablage kopiert');
+							} catch (e) {
+								toast.error('Link konnte nicht kopiert werden');
+							}
 						}}
 						variant="outline">Kopieren</Button
 					>
@@ -286,7 +300,15 @@
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 				<AlertDialog.Action
 					onclick={async () => {
-						await deleteClub({ clubId });
+						try {
+							await deleteClub({ clubId });
+							toast.success('Club erfolgreich gelöscht');
+							await getClubsPageData().refresh();
+							deleteDialogOpen = false;
+							goto('/clubs');
+						} catch (e) {
+							toast.error('Club konnte nicht gelöscht werden');
+						}
 					}}
 					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
 				>
@@ -308,7 +330,15 @@
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
 				<AlertDialog.Action
 					onclick={async () => {
-						await leaveClub({ clubId });
+						try {
+							await leaveClub({ clubId });
+							toast.success('Club erfolgreich verlassen');
+							await getClubsPageData().refresh();
+							leaveDialogOpen = false;
+							goto('/clubs');
+						} catch (e) {
+							toast.error('Club konnte nicht verlassen werden');
+						}
 					}}
 					class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
 				>

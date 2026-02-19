@@ -44,6 +44,7 @@
 		// Initialize date once per challenge; don't overwrite user selections.
 		if (initializedForChallengeId !== challenge.id) {
 			initializedForChallengeId = challenge.id;
+			selectedDiscipline = entryForm.fields.disciplineId.value()?.toString() ?? '';
 			const existingDate = entryForm.fields.date.value();
 			if (existingDate) {
 				value = parseDate(existingDate.toString());
@@ -58,6 +59,10 @@
 		if (value) {
 			entryForm.fields.date.set(value.toString());
 		}
+	});
+
+	$effect(() => {
+		entryForm.fields.disciplineId.set(selectedDiscipline);
 	});
 
 	const df = new DateFormatter('de', { dateStyle: 'long' });

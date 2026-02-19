@@ -17,11 +17,7 @@
 	let sheetOpen = $state(false);
 	let rows = $state([{ name: '', multiplier: 1 }]);
 
-	const disciplineForm = addDisciplines.for(challengeId);
-
-	$effect(() => {
-		disciplineForm.fields.challengeId.set(challengeId);
-	});
+	let disciplineForm = $derived(addDisciplines.for(challengeId));
 </script>
 
 <Sheet.Root bind:open={sheetOpen}>

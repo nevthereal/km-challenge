@@ -12,14 +12,17 @@
 		getChallengeLeaderboardData
 	} from '$lib/remote/challenge.remote';
 
-	const clubId = page.params.clubId ?? '';
-	const challengeId = page.params.challengeId ?? '';
-	const layoutQuery = getChallengeLayoutData({ clubId, challengeId });
-	const leaderboardQuery = getChallengeLeaderboardData({ clubId, challengeId });
-	const lastActivitiesQuery = getChallengeLastActivitiesData({ clubId, challengeId });
-	const awardsQuery = getChallengeAwardsData({ clubId, challengeId });
+	const params = $derived(page.params);
+	const clubId = $derived(params.clubId ?? '');
+	const challengeId = $derived(params.challengeId ?? '');
+	const layoutQuery = $derived(getChallengeLayoutData({ clubId, challengeId }));
+	const leaderboardQuery = $derived(getChallengeLeaderboardData({ clubId, challengeId }));
+	const lastActivitiesQuery = $derived(getChallengeLastActivitiesData({ clubId, challengeId }));
+	const awardsQuery = $derived(getChallengeAwardsData({ clubId, challengeId }));
 
-	const { challenge, challengePath } = await layoutQuery;
+	const layoutData = $derived(await layoutQuery);
+	const challenge = $derived(layoutData.challenge);
+	const challengePath = $derived(layoutData.challengePath);
 	const leaderboard = $derived(await leaderboardQuery);
 	const lastActivities = $derived(await lastActivitiesQuery);
 	const awardsData = $derived(await awardsQuery);

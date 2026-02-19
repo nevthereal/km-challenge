@@ -2,12 +2,13 @@
 	import { page } from '$app/state';
 	import { getChallengeMembersData } from '$lib/remote/challenge.remote';
 
-	const data = await getChallengeMembersData({
-		clubId: page.params.clubId ?? '',
-		challengeId: page.params.challengeId ?? ''
-	});
-
-	let { members, challengePath, admins } = data;
+	const params = $derived(page.params);
+	const clubId = $derived(params.clubId ?? '');
+	const challengeId = $derived(params.challengeId ?? '');
+	const data = $derived(await getChallengeMembersData({ clubId, challengeId }));
+	const members = $derived(data.members);
+	const challengePath = $derived(data.challengePath);
+	const admins = $derived(data.admins);
 </script>
 
 <main>

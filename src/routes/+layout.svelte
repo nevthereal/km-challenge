@@ -8,10 +8,11 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { page } from '$app/state';
 	import { dev } from '$app/environment';
+	import { getLayoutSession } from '$lib/remote/auth.remote';
 
-	let { children, data } = $props();
+	let { children } = $props();
 
-	let { session } = data;
+	const { session } = await getLayoutSession();
 
 	async function signOut() {
 		await authClient(page.url.origin).signOut();
@@ -37,18 +38,14 @@
 		<div class="flex gap-2">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'default' })}>
-					<User /><span class="max-md:hidden">
-						{session.user.name}
-					</span>
+					<User /><span class="max-md:hidden">{session.user.name}</span>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Group>
 						<DropdownMenu.GroupHeading>Profil</DropdownMenu.GroupHeading>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Item><a class="w-full" href="/profile">Übersicht</a></DropdownMenu.Item>
-						<DropdownMenu.Item
-							><a class="w-full" href="/profile/edit">Bearbeiten</a></DropdownMenu.Item
-						>
+						<DropdownMenu.Item><a class="w-full" href="/profile/edit">Bearbeiten</a></DropdownMenu.Item>
 						<Button class="m-2" variant="destructive" onclick={signOut}
 							><LogOut /><span> Ausloggen </span>
 						</Button>

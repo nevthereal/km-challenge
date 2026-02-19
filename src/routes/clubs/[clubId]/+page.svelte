@@ -1,58 +1,77 @@
 <script lang="ts">
 	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { toast } from 'svelte-sonner';
 	import DatePicker from '$lib/components/DatePicker.svelte';
-	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
-	import { Input } from '$lib/components/ui/input';
-	import * as Card from '$lib/components/ui/card';
-	import { cn, isChallengeActive, isChallengePast, prettyDate } from '$lib/utils';
-	import * as Sheet from '$lib/components/ui/sheet';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from '@lucide/svelte';
-	import { enhance } from '$app/forms';
+	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import {
+		ArrowLeft,
+		Ellipsis,
+		Link,
+		LogOut,
+		Pencil,
+		PlusCircle,
+		Trash2
+	} from '@lucide/svelte';
+	import { parseDate, type DateValue } from '@internationalized/date';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Field from '$lib/components/ui/field';
+	import { Input } from '$lib/components/ui/input';
+	import * as Sheet from '$lib/components/ui/sheet';
+	import { cn, isChallengeActive, isChallengePast, prettyDate } from '$lib/utils';
+	import {
+		createChallengeInClub,
+		deleteClub,
+		editClubDetails,
+		getClubPageData,
+		getClubsPageData,
+		getInviteCode,
+		leaveClub
+	} from '$lib/remote/club.remote';
 
-	let { data, form: formData } = $props();
-
-	const createForm = superForm(data.createForm);
-	const editClubForm = superForm(data.editClubForm, {
-		onResult: ({ result }) => {
-			if (result.type === 'success') editDialogOpen = !editDialogOpen;
-		}
-	});
-
-	const { form: createFormFields, enhance: createEnhance } = createForm;
-	const {
-		form: editFormFields,
-		enhance: editFormEnhance,
-		constraints: editFormContraints
-	} = editClubForm;
-
+	const clubId = $derived(page.params.clubId ?? '');
+	const clubData = $derived(getClubPageData({ clubId }));
+	const data = $derived(await clubData);
 	let { qClub: club } = $derived(data);
 
-	let inviteCode = $derived(formData?.code);
-	let inviteUrl = $derived(`${page.url.origin}/clubs/join/${inviteCode}`);
+	let inviteCode = $state<string | null>(null);
+	let challengeStart = $state<DateValue | undefined>(parseDate(new Date().toISOString().split('T')[0]));
+	let challengeEnd = $state<DateValue | undefined>(parseDate(new Date().toISOString().split('T')[0]));
+
+	let previousClubId = $state<string | null>(null);
+
+	$effect(() => {
+		if (clubId) {
+			createChallengeInClub.fields.clubId.set(clubId);
+			editClubDetails.fields.clubId.set(clubId);
+		}
+
+		if (previousClubId !== null && previousClubId !== clubId) {
+			inviteCode = '';
+			editClubDetails.fields.name.set(club.name);
+		}
+		previousClubId = clubId;
+	});
+
+	const inviteUrl = $derived(
+		inviteCode ? `${page.url.origin}/clubs/join/${inviteCode}` : `${page.url.origin}/clubs/join`
+	);
 	const inviteText = $derived(
 		`Trete dem Club ${club.name} bei mit dem Code ${inviteCode} oder über diesen Link: \n${inviteUrl}`
 	);
 
-	const isAdmin = data.clubAdmin;
+	const isAdmin = $derived(data.isClubAdmin);
 
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);
 	let editDialogOpen = $state(false);
 
-	const activeChallenges = $derived(
-		club.challenges.filter((challenge) => !isChallengePast(challenge))
-	);
-
-	const pastChallenges = $derived(
-		club.challenges.filter((challenge) => isChallengePast(challenge))
-	);
+	const activeChallenges = $derived(club.challenges.filter((challenge) => !isChallengePast(challenge)));
+	const pastChallenges = $derived(club.challenges.filter((challenge) => isChallengePast(challenge)));
 </script>
 
 <nav class="mb-4 flex">
@@ -91,7 +110,6 @@
 </div>
 
 <div class="mt-6">
-	<!-- Active Challenges Section -->
 	<h2 class="mb-4 text-2xl font-bold">Aktive Challenges</h2>
 	<div class="grid gap-4 md:grid-cols-3">
 		<ClubAdmin {isAdmin}>
@@ -109,9 +127,7 @@
 						>
 					</Card.Header>
 					<Card.Footer>
-						<p class="mt-4">
-							{challenge.members.length} Teilnehmer
-						</p>
+						<p class="mt-4">{challenge.members.length} Teilnehmer</p>
 					</Card.Footer>
 				</Card.Root>
 			</a>
@@ -120,7 +136,6 @@
 		{/each}
 	</div>
 
-	<!-- Past Challenges Section -->
 	{#if pastChallenges.length > 0}
 		<h2 class="mt-8 mb-4 text-2xl font-bold">Vergangene Challenges</h2>
 		<div class="grid gap-4 md:grid-cols-3">
@@ -136,9 +151,7 @@
 							>
 						</Card.Header>
 						<Card.Footer>
-							<p class="mt-4">
-								{challenge.members.length} Teilnehmer
-							</p>
+							<p class="mt-4">{challenge.members.length} Teilnehmer</p>
 						</Card.Footer>
 					</Card.Root>
 				</a>
@@ -146,10 +159,6 @@
 		</div>
 	{/if}
 </div>
-
-<form id="generateForm" action="?/getCode" method="post" use:enhance hidden></form>
-<form id="deleteForm" action="?/deleteClub" method="post" use:enhance hidden></form>
-<form id="leaveForm" action="?/leave" method="post" use:enhance hidden></form>
 
 {#snippet challengeSheet()}
 	<Sheet.Root>
@@ -165,40 +174,29 @@
 		</Sheet.Trigger>
 		<Sheet.Content>
 			<Sheet.Header>
-				<form
-					method="post"
-					action="?/createChallenge"
-					use:createEnhance
-					class="flex max-w-xl flex-col gap-2"
-				>
-					<Form.Field form={createForm} name="name">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Name</Form.Label>
-								<Input {...props} bind:value={$createFormFields.name} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field form={createForm} name="startsAt" class="flex flex-col">
-						<Form.Control>
-							{#snippet children()}
-								<Form.Label>Dauer der Challenge</Form.Label>
-								<Form.Description
-									>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
-									00:00 gesetzt wird.</Form.Description
-								>
-								<DatePicker
-									startName="startsAt"
-									endName="endsAt"
-									bind:startValue={$createFormFields.startsAt}
-									bind:endValue={$createFormFields.endsAt}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Button>Erstellen</Form.Button>
+				<form {...createChallengeInClub} class="flex max-w-xl flex-col gap-2">
+					<input hidden {...createChallengeInClub.fields.clubId.as('text')} />
+					<Field.Field>
+						<Field.FieldLabel for="challenge-name">Name</Field.FieldLabel>
+						<Input id="challenge-name" {...createChallengeInClub.fields.name.as('text')} />
+						<Field.FieldError issues={createChallengeInClub.fields.name.issues()} />
+					</Field.Field>
+					<Field.Field>
+						<Field.FieldLabel>Dauer der Challenge</Field.FieldLabel>
+						<Field.FieldDescription
+							>Bitte Enddatum im Stil "bis", anstatt "bis und mit" wählen, weil die Endzeit auf
+							00:00 gesetzt wird.</Field.FieldDescription
+						>
+						<DatePicker
+							startName={createChallengeInClub.fields.startsAt.as('text').name}
+							endName={createChallengeInClub.fields.endsAt.as('text').name}
+							bind:startValue={challengeStart}
+							bind:endValue={challengeEnd}
+						/>
+						<Field.FieldError issues={createChallengeInClub.fields.startsAt.issues()} />
+						<Field.FieldError issues={createChallengeInClub.fields.endsAt.issues()} />
+					</Field.Field>
+					<Button type="submit">Erstellen</Button>
 				</form>
 			</Sheet.Header>
 		</Sheet.Content>
@@ -218,14 +216,29 @@
 				>
 			</Dialog.Header>
 			{#if !inviteCode}
-				<Button type="submit" form="generateForm" variant="outline"><Link /> Generieren</Button>
+				<Button
+					type="button"
+					variant="outline"
+					onclick={async () => {
+						try {
+							const result = await getInviteCode({ clubId });
+							inviteCode = result.code ?? null;
+						} catch (e) {
+							toast.error('Einladungscode konnte nicht generiert werden');
+						}
+					}}><Link /> Generieren</Button
+				>
 			{:else}
 				<div class="flex gap-4">
 					<Input value={inviteUrl} readonly />
 					<Button
 						onclick={async () => {
-							await navigator.clipboard.writeText(inviteText);
-							toast.success('Link in die Zwischenablage kopiert');
+							try {
+								await navigator.clipboard.writeText(inviteText);
+								toast.success('Link in die Zwischenablage kopiert');
+							} catch (e) {
+								toast.error('Link konnte nicht kopiert werden');
+							}
 						}}
 						variant="outline">Kopieren</Button
 					>
@@ -244,16 +257,31 @@
 			<Dialog.Header>
 				<Dialog.Title>Club bearbeiten</Dialog.Title>
 			</Dialog.Header>
-			<form use:editFormEnhance action="?/edit" method="post">
-				<Form.Field form={editClubForm} name="name">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>Name</Form.Label>
-							<Input {...props} {...$editFormContraints.name} bind:value={$editFormFields.name} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
+				<form
+					{...editClubDetails.enhance(async ({ submit }) => {
+						try {
+							await submit().updates(
+								getClubPageData({ clubId }).withOverride((currentData) => ({
+									...currentData,
+									qClub: {
+										...currentData.qClub,
+										name: editClubDetails.fields.name.value() || currentData.qClub.name
+									}
+								}))
+							);
+							editDialogOpen = false;
+						} catch (e) {
+							editDialogOpen = true;
+							toast.error('Club konnte nicht bearbeitet werden');
+						}
+					})}
+				>
+				<input hidden {...editClubDetails.fields.clubId.as('text')} />
+				<Field.Field>
+					<Field.FieldLabel for="club-name">Name</Field.FieldLabel>
+					<Input id="club-name" {...editClubDetails.fields.name.as('text')} />
+					<Field.FieldError issues={editClubDetails.fields.name.issues()} />
+				</Field.Field>
 				<Button type="submit">Bearbeiten</Button>
 			</form>
 		</Dialog.Content>
@@ -275,8 +303,19 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-				<AlertDialog.Action form="deleteForm" class={buttonVariants({ variant: 'destructive' })}
-					>Löschen</AlertDialog.Action
+				<AlertDialog.Action
+					onclick={async () => {
+						try {
+							await deleteClub({ clubId });
+							toast.success('Club erfolgreich gelöscht');
+							await getClubsPageData().refresh();
+							deleteDialogOpen = false;
+							goto('/clubs');
+						} catch (e) {
+							toast.error('Club konnte nicht gelöscht werden');
+						}
+					}}
+					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
@@ -294,8 +333,19 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-				<AlertDialog.Action form="leaveForm" class={buttonVariants({ variant: 'destructive' })}
-					>Verlassen</AlertDialog.Action
+				<AlertDialog.Action
+					onclick={async () => {
+						try {
+							await leaveClub({ clubId });
+							toast.success('Club erfolgreich verlassen');
+							await getClubsPageData().refresh();
+							leaveDialogOpen = false;
+							goto('/clubs');
+						} catch (e) {
+							toast.error('Club konnte nicht verlassen werden');
+						}
+					}}
+					class={buttonVariants({ variant: 'destructive' })}>Verlassen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>

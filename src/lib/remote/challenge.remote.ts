@@ -431,9 +431,15 @@ export const addEntry = form(addEntrySchema, async ({ challengeId, disciplineId,
 
 	const qDiscipline = await db.query.discipline.findFirst({ where: { id: disciplineId } });
 	if (!qDiscipline) error(404, 'Disziplin nicht gefunden');
+	if (challengeId !== qDiscipline.challengeId) error(400, 'Ungültige Challenge für diese Disziplin');
 
 	const qChallenge = await db.query.challenge.findFirst({ where: { id: qDiscipline.challengeId } });
 	if (!qChallenge) error(404, 'Challenge nicht gefunden');
+
+	const membership = await db.query.challengeMember.findFirst({
+		where: { challengeId: qChallenge.id, userId: user.id }
+	});
+	if (!membership) error(403, 'Du bist kein Mitglied dieser Challenge');
 
 	if (!canAddEntries(qChallenge)) error(403, 'Diese Challenge akzeptiert keine Einträge mehr');
 
@@ -452,16 +458,16 @@ export const addEntry = form(addEntrySchema, async ({ challengeId, disciplineId,
 
 	await db.insert(entry).values({
 		amount: amount.toString(),
-		challengeId,
+		challengeId: qChallenge.id,
 		date: new Date(date),
 		disciplineId,
 		userId: user.id
 	});
 
-	await getChallengeLayoutData({ clubId: qChallenge.clubId, challengeId }).refresh();
-	await getChallengeLeaderboardData({ clubId: qChallenge.clubId, challengeId }).refresh();
-	await getChallengeLastActivitiesData({ clubId: qChallenge.clubId, challengeId }).refresh();
-	await getChallengeAwardsData({ clubId: qChallenge.clubId, challengeId }).refresh();
+	await getChallengeLayoutData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
+	await getChallengeLeaderboardData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
+	await getChallengeLastActivitiesData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
+	await getChallengeAwardsData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
 	await getHomeActiveChallengesData().refresh();
 	await getHomeOpenEntriesData().refresh();
 });

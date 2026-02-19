@@ -82,9 +82,9 @@ export const getClubPageData = query(clubIdSchema, async ({ clubId }) => {
 		redirect(302, '/clubs');
 	}
 
-	const clubAdmin = await checkAdmin(clubId, user.id);
+	const isClubAdmin = await checkAdmin(clubId, user.id);
 
-	return { qClub, user, clubAdmin };
+	return { qClub, user, isClubAdmin };
 });
 
 export const createClubAccess = query(async () => {

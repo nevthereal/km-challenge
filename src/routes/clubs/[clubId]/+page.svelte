@@ -58,7 +58,7 @@
 		`Trete dem Club ${club.name} bei mit dem Code ${inviteCode} oder über diesen Link: \n${inviteUrl}`
 	);
 
-	const isAdmin = $derived(data.clubAdmin);
+	const isAdmin = $derived(data.isClubAdmin);
 
 	let deleteDialogOpen = $state(false);
 	let leaveDialogOpen = $state(false);

@@ -62,9 +62,9 @@
 				{@const points = Number(activity.amount) * Number(activity.discipline?.factor)}
 				{@const pointString = isNaN(points) ? 'gelöschte Disziplin' : `${points}p`}
 				<li class="mx-2">
-					<Badge class="mr-2 font-mono">{Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short' }).format(activity.createdAt)}</Badge>
+					<Badge class="mr-2 font-mono">{Intl.DateTimeFormat('de', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(activity.createdAt))}</Badge>
 					<span class="font-medium"><a class="underline" href="{challengePath}/members/{activity.userId}">{activity.user?.name ?? 'Unbekannter/Gelöschter Benutzer'}</a></span>
-					{activity.amount}km ({pointString}) in {activity.discipline ? activity.discipline.name : 'gelöschte Disziplin'} am {prettyDate(activity.date)}
+					{activity.amount}km ({pointString}) in {activity.discipline ? activity.discipline.name : 'gelöschte Disziplin'} am {prettyDate(new Date(activity.date))}
 				</li>
 			{:else}
 				<p>Noch keine Aktivitäten</p>

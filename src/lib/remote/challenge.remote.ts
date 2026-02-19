@@ -135,7 +135,9 @@ function getChallengeAwardsDataWithContext(context: ChallengeContext) {
 	};
 }
 
-function computeAwards(challengeData: Awaited<ReturnType<typeof getChallengeContext>>['challenge']) {
+function computeAwards(
+	challengeData: Awaited<ReturnType<typeof getChallengeContext>>['challenge']
+) {
 	type MemberStats = {
 		userId: string;
 		name: string;
@@ -160,7 +162,8 @@ function computeAwards(challengeData: Awaited<ReturnType<typeof getChallengeCont
 		const stats = statsByUser.get(userId);
 		if (!stats) continue;
 
-		stats.totalKm += Number(challengeEntry.amount) * (Number(challengeEntry.discipline?.factor) || 1);
+		stats.totalKm +=
+			Number(challengeEntry.amount) * (Number(challengeEntry.discipline?.factor) || 1);
 		stats.activityCount += 1;
 		stats.activeDays.add(new Date(challengeEntry.date).toISOString().slice(0, 10));
 	}
@@ -297,14 +300,20 @@ export const getHomePageData = query(async () => {
 	return { user, challengesWithLeaderboards, openForEntriesChallenges };
 });
 
-export const getChallengeLayoutData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	return getChallengeContext(clubId, challengeId);
-});
+export const getChallengeLayoutData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		return getChallengeContext(clubId, challengeId);
+	}
+);
 
-export const getChallengeLeaderboardData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	return getChallengeLeaderboardDataWithContext(context);
-});
+export const getChallengeLeaderboardData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		const context = await getChallengeContext(clubId, challengeId);
+		return getChallengeLeaderboardDataWithContext(context);
+	}
+);
 
 export const getChallengeLastActivitiesData = query(
 	challengeRouteSchema,
@@ -314,84 +323,96 @@ export const getChallengeLastActivitiesData = query(
 	}
 );
 
-export const getChallengeAwardsData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	return getChallengeAwardsDataWithContext(context);
-});
+export const getChallengeAwardsData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		const context = await getChallengeContext(clubId, challengeId);
+		return getChallengeAwardsDataWithContext(context);
+	}
+);
 
-export const getChallengeOverviewData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	const [leaderboard, lastActivities, awardsData] = await Promise.all([
-		getChallengeLeaderboardDataWithContext(context),
-		getChallengeLastActivitiesDataWithContext(context),
-		getChallengeAwardsDataWithContext(context)
-	]);
+export const getChallengeOverviewData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		const context = await getChallengeContext(clubId, challengeId);
+		const [leaderboard, lastActivities, awardsData] = await Promise.all([
+			getChallengeLeaderboardDataWithContext(context),
+			getChallengeLastActivitiesDataWithContext(context),
+			getChallengeAwardsDataWithContext(context)
+		]);
 
-	return {
-		...context,
-		leaderboard,
-		lastActivities,
-		daysRemainingForEntry: awardsData.daysRemainingForEntry,
-		awards: awardsData.awards
-	};
-});
+		return {
+			...context,
+			leaderboard,
+			lastActivities,
+			daysRemainingForEntry: awardsData.daysRemainingForEntry,
+			awards: awardsData.awards
+		};
+	}
+);
 
-export const getChallengeActivityData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	const { challenge, user } = context;
+export const getChallengeActivityData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		const context = await getChallengeContext(clubId, challengeId);
+		const { challenge, user } = context;
 
-	const entries = await db.query.entry.findMany({
-		where: {
-			userId: user.id,
-			challengeId: challenge.id
-		},
-		with: {
-			discipline: true
-		},
-		orderBy: { date: 'desc' }
-	});
+		const entries = await db.query.entry.findMany({
+			where: {
+				userId: user.id,
+				challengeId: challenge.id
+			},
+			with: {
+				discipline: true
+			},
+			orderBy: { date: 'desc' }
+		});
 
-	const membership = await db.query.challengeMember.findFirst({
-		where: {
-			userId: user.id,
-			challengeId: challenge.id
-		},
-		with: {
-			user: true
-		}
-	});
-
-	if (!membership) error(400);
-
-	return { ...context, entries, membership };
-});
-
-export const getChallengeMembersData = query(challengeRouteSchema, async ({ clubId, challengeId }) => {
-	const context = await getChallengeContext(clubId, challengeId);
-	const { challenge } = context;
-
-	const members = await db.query.challengeMember.findMany({
-		where: { challengeId: challenge.id },
-		with: {
-			user: {
-				columns: {
-					name: true,
-					gender: true,
-					role: true,
-					id: true,
-					admin: true
-				}
+		const membership = await db.query.challengeMember.findFirst({
+			where: {
+				userId: user.id,
+				challengeId: challenge.id
+			},
+			with: {
+				user: true
 			}
-		},
-		orderBy(fields, operators) {
-			return operators.asc(fields.joinedAt);
-		}
-	});
+		});
 
-	const admins = await db.query.clubAdmin.findMany({ where: { clubId } });
+		if (!membership) error(400);
 
-	return { ...context, members, admins };
-});
+		return { ...context, entries, membership };
+	}
+);
+
+export const getChallengeMembersData = query(
+	challengeRouteSchema,
+	async ({ clubId, challengeId }) => {
+		const context = await getChallengeContext(clubId, challengeId);
+		const { challenge } = context;
+
+		const members = await db.query.challengeMember.findMany({
+			where: { challengeId: challenge.id },
+			with: {
+				user: {
+					columns: {
+						name: true,
+						gender: true,
+						role: true,
+						id: true,
+						admin: true
+					}
+				}
+			},
+			orderBy(fields, operators) {
+				return operators.asc(fields.joinedAt);
+			}
+		});
+
+		const admins = await db.query.clubAdmin.findMany({ where: { clubId } });
+
+		return { ...context, members, admins };
+	}
+);
 
 export const getChallengeMemberDetailsData = query(
 	challengeMemberRouteSchema,
@@ -426,51 +447,69 @@ export const getLeaderboard = query(
 	}
 );
 
-export const addEntry = form(addEntrySchema, async ({ challengeId, disciplineId, amount, date }) => {
-	const user = requireUser();
+export const addEntry = form(
+	addEntrySchema,
+	async ({ challengeId, disciplineId, amount, date }) => {
+		const user = requireUser();
 
-	const qDiscipline = await db.query.discipline.findFirst({ where: { id: disciplineId } });
-	if (!qDiscipline) error(404, 'Disziplin nicht gefunden');
-	if (challengeId !== qDiscipline.challengeId) error(400, 'Ungültige Challenge für diese Disziplin');
+		const qDiscipline = await db.query.discipline.findFirst({ where: { id: disciplineId } });
+		if (!qDiscipline) error(404, 'Disziplin nicht gefunden');
+		if (challengeId !== qDiscipline.challengeId)
+			error(400, 'Ungültige Challenge für diese Disziplin');
 
-	const qChallenge = await db.query.challenge.findFirst({ where: { id: qDiscipline.challengeId } });
-	if (!qChallenge) error(404, 'Challenge nicht gefunden');
+		const qChallenge = await db.query.challenge.findFirst({
+			where: { id: qDiscipline.challengeId }
+		});
+		if (!qChallenge) error(404, 'Challenge nicht gefunden');
 
-	const membership = await db.query.challengeMember.findFirst({
-		where: { challengeId: qChallenge.id, userId: user.id }
-	});
-	if (!membership) error(403, 'Du bist kein Mitglied dieser Challenge');
+		const membership = await db.query.challengeMember.findFirst({
+			where: { challengeId: qChallenge.id, userId: user.id }
+		});
+		if (!membership) error(403, 'Du bist kein Mitglied dieser Challenge');
 
-	if (!canAddEntries(qChallenge)) error(403, 'Diese Challenge akzeptiert keine Einträge mehr');
+		if (!canAddEntries(qChallenge)) error(403, 'Diese Challenge akzeptiert keine Einträge mehr');
 
-	const entryDate = new Date(date);
-	const challengeStart = new Date(qChallenge.startsAt);
-	challengeStart.setUTCHours(0, 0, 0, 0);
-	const challengeEnd = new Date(qChallenge.endsAt);
-	challengeEnd.setUTCHours(23, 59, 59, 999);
+		const entryDate = new Date(date);
+		const challengeStart = new Date(qChallenge.startsAt);
+		challengeStart.setUTCHours(0, 0, 0, 0);
+		const challengeEnd = new Date(qChallenge.endsAt);
+		challengeEnd.setUTCHours(23, 59, 59, 999);
 
-	if (entryDate < challengeStart || entryDate > challengeEnd) {
-		error(
-			400,
-			`Die Aktivität muss zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(qChallenge.endsAt)} stattgefunden haben`
-		);
+		if (entryDate < challengeStart || entryDate > challengeEnd) {
+			error(
+				400,
+				`Die Aktivität muss zwischen ${prettyDate(qChallenge.startsAt)} und ${prettyDate(qChallenge.endsAt)} stattgefunden haben`
+			);
+		}
+
+		await db.insert(entry).values({
+			amount: amount.toString(),
+			challengeId: qChallenge.id,
+			date: new Date(date),
+			disciplineId,
+			userId: user.id
+		});
+
+		await getChallengeLayoutData({
+			clubId: qChallenge.clubId,
+			challengeId: qChallenge.id
+		}).refresh();
+		await getChallengeLeaderboardData({
+			clubId: qChallenge.clubId,
+			challengeId: qChallenge.id
+		}).refresh();
+		await getChallengeLastActivitiesData({
+			clubId: qChallenge.clubId,
+			challengeId: qChallenge.id
+		}).refresh();
+		await getChallengeAwardsData({
+			clubId: qChallenge.clubId,
+			challengeId: qChallenge.id
+		}).refresh();
+		await getHomeActiveChallengesData().refresh();
+		await getHomeOpenEntriesData().refresh();
 	}
-
-	await db.insert(entry).values({
-		amount: amount.toString(),
-		challengeId: qChallenge.id,
-		date: new Date(date),
-		disciplineId,
-		userId: user.id
-	});
-
-	await getChallengeLayoutData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
-	await getChallengeLeaderboardData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
-	await getChallengeLastActivitiesData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
-	await getChallengeAwardsData({ clubId: qChallenge.clubId, challengeId: qChallenge.id }).refresh();
-	await getHomeActiveChallengesData().refresh();
-	await getHomeOpenEntriesData().refresh();
-});
+);
 
 export const deleteChallenge = command(clubChallengeInput, async ({ clubId, challengeId }) => {
 	const user = requireUser();
@@ -485,24 +524,27 @@ export const deleteChallenge = command(clubChallengeInput, async ({ clubId, chal
 	redirect(302, `/clubs/${qChallenge.clubId}`);
 });
 
-export const editChallenge = form(editChallengeSchema, async ({ clubId, challengeId, name, endsAt, startsAt }) => {
-	const user = requireUser();
-	const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
-	if (!qChallenge) error(404, 'Challenge existiert nicht');
-	if (qChallenge.clubId !== clubId) error(404, 'Challenge existiert nicht');
+export const editChallenge = form(
+	editChallengeSchema,
+	async ({ clubId, challengeId, name, endsAt, startsAt }) => {
+		const user = requireUser();
+		const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+		if (!qChallenge) error(404, 'Challenge existiert nicht');
+		if (qChallenge.clubId !== clubId) error(404, 'Challenge existiert nicht');
 
-	const isAdmin = await checkAdmin(qChallenge.clubId, user.id);
-	if (!isAdmin) error(401, 'Nicht erlaubt');
+		const isAdmin = await checkAdmin(qChallenge.clubId, user.id);
+		if (!isAdmin) error(401, 'Nicht erlaubt');
 
-	await db
-		.update(challenge)
-		.set({
-			name,
-			endsAt: new Date(endsAt),
-			startsAt: new Date(startsAt)
-		})
-		.where(eq(challenge.id, qChallenge.id));
-});
+		await db
+			.update(challenge)
+			.set({
+				name,
+				endsAt: new Date(endsAt),
+				startsAt: new Date(startsAt)
+			})
+			.where(eq(challenge.id, qChallenge.id));
+	}
+);
 
 export const leaveChallenge = command(challengeInput, async ({ challengeId }) => {
 	const user = requireUser();
@@ -523,39 +565,50 @@ export const joinChallenge = command(clubChallengeInput, async ({ clubId, challe
 	});
 	if (!clubRel) error(401, 'Du bist kein Mitglied des Clubs');
 
+	const existingMembership = await db.query.challengeMember.findFirst({
+		where: { AND: [{ userId: user.id }, { challengeId }] }
+	});
+	if (existingMembership) error(409, 'Du bist bereits Mitglied dieser Challenge');
+
 	await db.insert(challengeMember).values({ challengeId, userId: user.id });
 });
 
-export const addDisciplines = form(addDisciplinesSchema, async ({ challengeId, discipline: items }) => {
-	const user = requireUser();
-	const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
-	if (!qChallenge) error(404, 'Challenge nicht gefunden');
+export const addDisciplines = form(
+	addDisciplinesSchema,
+	async ({ challengeId, discipline: items }) => {
+		const user = requireUser();
+		const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+		if (!qChallenge) error(404, 'Challenge nicht gefunden');
 
-	if (!(await checkAdmin(qChallenge.clubId, user.id))) error(401, 'Nicht erlaubt');
+		if (!(await checkAdmin(qChallenge.clubId, user.id))) error(401, 'Nicht erlaubt');
 
-	for (const d of items) {
-		await db.insert(discipline).values({
-			factor: d.multiplier.toString(),
-			name: d.name,
-			challengeId
-		});
+		for (const d of items) {
+			await db.insert(discipline).values({
+				factor: d.multiplier.toString(),
+				name: d.name,
+				challengeId
+			});
+		}
 	}
-});
+);
 
-export const deleteDiscipline = command(deleteDisciplineSchema, async ({ challengeId, disciplineId }) => {
-	const user = requireUser();
-	const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
-	if (!qChallenge) error(404, 'Challenge nicht gefunden');
+export const deleteDiscipline = command(
+	deleteDisciplineSchema,
+	async ({ challengeId, disciplineId }) => {
+		const user = requireUser();
+		const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+		if (!qChallenge) error(404, 'Challenge nicht gefunden');
 
-	if (!(await checkAdmin(qChallenge.clubId, user.id))) error(401, 'Nicht erlaubt');
+		if (!(await checkAdmin(qChallenge.clubId, user.id))) error(401, 'Nicht erlaubt');
 
-	const qDiscipline = await db.query.discipline.findFirst({
-		where: { AND: [{ id: disciplineId }, { challengeId }] }
-	});
-	if (!qDiscipline) error(404, 'Disziplin nicht gefunden');
+		const qDiscipline = await db.query.discipline.findFirst({
+			where: { AND: [{ id: disciplineId }, { challengeId }] }
+		});
+		if (!qDiscipline) error(404, 'Disziplin nicht gefunden');
 
-	await db.delete(discipline).where(eq(discipline.id, qDiscipline.id));
-});
+		await db.delete(discipline).where(eq(discipline.id, qDiscipline.id));
+	}
+);
 
 export const deleteEntry = command(deleteEntrySchema, async ({ challengeId, entryId }) => {
 	const user = requireUser();
@@ -569,11 +622,14 @@ export const deleteEntry = command(deleteEntrySchema, async ({ challengeId, entr
 	await db.delete(entry).where(eq(entry.id, qEntry.id));
 });
 
-export const getDaysRemainingForChallengeEntries = query(challengeInput, async ({ challengeId }) => {
-	const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
-	if (!qChallenge) error(404);
-	return {
-		canAddEntries: canAddEntries(qChallenge),
-		daysRemaining: getDaysRemainingForEntry(qChallenge)
-	};
-});
+export const getDaysRemainingForChallengeEntries = query(
+	challengeInput,
+	async ({ challengeId }) => {
+		const qChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+		if (!qChallenge) error(404);
+		return {
+			canAddEntries: canAddEntries(qChallenge),
+			daysRemaining: getDaysRemainingForEntry(qChallenge)
+		};
+	}
+);

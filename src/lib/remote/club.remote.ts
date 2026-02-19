@@ -143,25 +143,28 @@ export const joinClubByCode = query(z.object({ code: z.string() }), async ({ cod
 		});
 	}
 
-	redirect(302, `/clubs/${qClub.clubId}`);
+	return { clubId: qClub.clubId };
 });
 
-export const createChallengeInClub = form(createChallengeFormSchema, async ({ clubId, name, startsAt, endsAt }) => {
-	const user = requireUser();
-	if (!user.superUser) error(401, 'Nicht erlaubt.');
+export const createChallengeInClub = form(
+	createChallengeFormSchema,
+	async ({ clubId, name, startsAt, endsAt }) => {
+		const user = requireUser();
+		if (!user.superUser) error(401, 'Nicht erlaubt.');
 
-	const [{ id: challengeId }] = await db
-		.insert(challenge)
-		.values({
-			name,
-			startsAt: new Date(startsAt),
-			endsAt: new Date(endsAt),
-			clubId
-		})
-		.returning({ id: challenge.id });
+		const [{ id: challengeId }] = await db
+			.insert(challenge)
+			.values({
+				name,
+				startsAt: new Date(startsAt),
+				endsAt: new Date(endsAt),
+				clubId
+			})
+			.returning({ id: challenge.id });
 
-	redirect(302, `/clubs/${clubId}/challenge/${challengeId}`);
-});
+		redirect(302, `/clubs/${clubId}/challenge/${challengeId}`);
+	}
+);
 
 export const getInviteCode = command(clubIdSchema, async ({ clubId }) => {
 	const user = requireUser();
@@ -202,6 +205,16 @@ export const leaveClub = command(clubIdSchema, async ({ clubId }) => {
 	});
 
 	if (!qClubMember) error(404, 'Du bist kein Mitglied dieses Clubs');
+
+	const isAdmin = await checkAdmin(clubId, user.id);
+	if (isAdmin) {
+		const otherAdmins = await db.query.clubAdmin.findMany({
+			where: { clubId }
+		});
+		if (otherAdmins.length <= 1) {
+			error(400, 'Du kannst den Club nicht als letzter Admin verlassen');
+		}
+	}
 
 	await db.delete(clubMember).where(eq(clubMember.id, qClubMember.id));
 

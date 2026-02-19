@@ -32,7 +32,7 @@
 	} from '$lib/remote/club.remote';
 
 	const clubId = $derived(page.params.clubId ?? '');
-	const clubData = getClubPageData({ clubId });
+	const clubData = $derived(getClubPageData({ clubId }));
 	const data = $derived(await clubData);
 	let { qClub: club } = $derived(data);
 

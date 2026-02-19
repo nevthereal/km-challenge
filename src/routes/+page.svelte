@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import EntryForm from '$lib/components/EntryForm.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';

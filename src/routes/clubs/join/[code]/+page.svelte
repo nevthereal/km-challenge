@@ -8,8 +8,10 @@
 
 	onMount(async () => {
 		try {
-			await joinClubByCode({ code: page.params.code });
-			await goto('/clubs');
+			const code = page.params.code;
+			if (!code) throw new Error('No code provided');
+			const { clubId } = await joinClubByCode({ code });
+			await goto(`/clubs/${clubId}`);
 		} catch {
 			joinError = 'Club-Beitritt fehlgeschlagen. Bitte prüfe den Einladungslink.';
 		}

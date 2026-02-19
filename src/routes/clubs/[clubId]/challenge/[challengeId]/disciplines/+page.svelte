@@ -5,7 +5,6 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Trash2 } from '@lucide/svelte';
-	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 
 	const data = await getChallengeLayoutData({
@@ -48,7 +47,7 @@
 									<AlertDialog.Action
 										onclick={async () => {
 											await deleteDiscipline({ challengeId: challenge.id, disciplineId: d.id });
-											await invalidateAll();
+											await getChallengeLayoutData({ clubId: page.params.clubId ?? '', challengeId: page.params.challengeId ?? '' }).refresh();
 										}}
 										class={buttonVariants({ variant: 'destructive' })}
 										>Continue</AlertDialog.Action

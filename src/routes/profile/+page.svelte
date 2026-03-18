@@ -2,10 +2,9 @@
 	import NiceList from '$lib/components/NiceList.svelte';
 	import type { ListItems } from '$lib/components/NiceList.svelte';
 	import { prettyDate } from '$lib/utils';
+	import { getProfileData } from '$lib/remote/profile.remote';
 
-	let { data } = $props();
-
-	const { user } = data;
+	const { user } = await getProfileData();
 
 	const listItems: ListItems = [
 		{

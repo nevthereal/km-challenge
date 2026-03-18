@@ -2,9 +2,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { CirclePlus, PlusCircle } from '@lucide/svelte';
+	import { getClubsPageData } from '$lib/remote/club.remote';
 
-	let { data } = $props();
-
+	const data = await getClubsPageData();
 	const { usersClubs } = data;
 </script>
 

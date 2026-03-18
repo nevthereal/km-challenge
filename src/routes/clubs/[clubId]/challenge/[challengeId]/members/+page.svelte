@@ -1,7 +1,14 @@
 <script lang="ts">
-	let { data } = $props();
+	import { page } from '$app/state';
+	import { getChallengeMembersData } from '$lib/remote/challenge.remote';
 
-	let { members, challengePath, admins } = $derived(data);
+	const params = $derived(page.params);
+	const clubId = $derived(params.clubId ?? '');
+	const challengeId = $derived(params.challengeId ?? '');
+	const data = $derived(await getChallengeMembersData({ clubId, challengeId }));
+	const members = $derived(data.members);
+	const challengePath = $derived(data.challengePath);
+	const admins = $derived(data.admins);
 </script>
 
 <main>

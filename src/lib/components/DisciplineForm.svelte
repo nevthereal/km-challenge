@@ -1,24 +1,23 @@
 <script lang="ts">
+	import { MinusCircle, PlusCircle } from '@lucide/svelte';
+	import {
+		addDisciplines,
+		getChallengeAwardsData,
+		getChallengeLayoutData,
+		getChallengeLastActivitiesData,
+		getChallengeLeaderboardData
+	} from '$lib/remote/challenge.remote';
 	import { Button } from './ui/button';
+	import * as Field from './ui/field';
 	import { Input } from './ui/input';
 	import * as Sheet from './ui/sheet';
-	import * as Form from './ui/form';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { addDisciplines } from '$lib/zod';
-	import { MinusCircle, PlusCircle } from '@lucide/svelte';
 
-	let { formData }: { formData: SuperValidated<Infer<typeof addDisciplines>> } = $props();
+	let { challengeId, clubId }: { challengeId: string; clubId: string } = $props();
 
 	let sheetOpen = $state(false);
+	let rows = $state([{ name: '', multiplier: 1 }]);
 
-	const disciplineForm = superForm(formData, {
-		dataType: 'json',
-		onResult: ({ result }) => {
-			if (result.type === 'success') sheetOpen = !sheetOpen;
-		}
-	});
-
-	const { enhance, form, constraints } = disciplineForm;
+	let disciplineForm = $derived(addDisciplines.for(challengeId));
 </script>
 
 <Sheet.Root bind:open={sheetOpen}>
@@ -28,58 +27,62 @@
 	<Sheet.Content>
 		<Sheet.Header>
 			<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
-			<form method="post" action="?/addDiscipline" use:enhance>
-				<Form.Fieldset form={disciplineForm} name="discipline">
-					{#each $form.discipline as _, i}
-						<div class="flex">
-							<div class="flex gap-4">
-								<Form.Control>
-									{#snippet children({ props })}
-										<div class="flex flex-col gap-2">
-											<Form.Label>Name</Form.Label>
-											<Input
-												{...$constraints.discipline?.name}
-												type="text"
-												{...props}
-												bind:value={$form.discipline[i].name}
-											/>
-										</div>
-									{/snippet}
-								</Form.Control>
+			<form
+				{...disciplineForm.enhance(async ({ submit }) => {
+					try {
+						await submit().updates(
+							getChallengeLayoutData({ clubId, challengeId }),
+							getChallengeLeaderboardData({ clubId, challengeId }),
+							getChallengeLastActivitiesData({ clubId, challengeId }),
+							getChallengeAwardsData({ clubId, challengeId })
+						);
+					} catch {
+						return;
+					}
 
-								<Form.Control>
-									{#snippet children({ props })}
-										<div class="flex flex-col gap-2">
-											<Form.Label>Multiplikator</Form.Label>
-											<Input
-												{...$constraints.discipline?.multiplier}
-												type="number"
-												{...props}
-												bind:value={$form.discipline[i].multiplier}
-											/>
-										</div>
-									{/snippet}
-								</Form.Control>
-								<Form.FieldErrors />
-							</div>
-							<Button
-								type="button"
-								variant="destructive"
-								class="mt-auto"
-								onclick={() => {
-									$form.discipline = $form.discipline.filter((_, index) => index !== i);
-								}}><MinusCircle /></Button
-							>
-						</div>
-					{/each}
-					<Button
-						type="button"
-						variant="outline"
-						onclick={() => ($form.discipline = [...$form.discipline, { multiplier: 1, name: '' }])}
-						><PlusCircle /> Eine mehr</Button
-					>
-				</Form.Fieldset>
-				<Form.Button class="mt-4" type="submit">Speichern</Form.Button>
+					const issues = disciplineForm.fields.allIssues?.() ?? [];
+					if (issues.length === 0) {
+						sheetOpen = false;
+						rows = [{ name: '', multiplier: 1 }];
+					}
+				})}
+			>
+				<input hidden {...disciplineForm.fields.challengeId.as('text')} />
+				{#each rows as row, i}
+					<div class="mb-3 flex gap-4">
+						<Field.Field class="flex-1">
+							<Field.FieldLabel for={`discipline-name-${i}`}>Name</Field.FieldLabel>
+							<Input id={`discipline-name-${i}`} name={`discipline[${i}].name`} bind:value={row.name} />
+						</Field.Field>
+						<Field.Field class="w-40">
+							<Field.FieldLabel for={`discipline-multiplier-${i}`}>Multiplikator</Field.FieldLabel>
+							<Input
+								id={`discipline-multiplier-${i}`}
+								type="number"
+								step="0.1"
+								name={`n:discipline[${i}].multiplier`}
+								bind:value={row.multiplier}
+							/>
+						</Field.Field>
+						<Button
+							type="button"
+							variant="destructive"
+							class="mt-auto"
+							onclick={() => {
+								rows = rows.filter((_, index) => index !== i);
+							}}><MinusCircle /></Button
+						>
+					</div>
+				{/each}
+				<Field.FieldError issues={disciplineForm.fields.allIssues()} />
+				<Button
+					type="button"
+					variant="outline"
+					onclick={() => {
+						rows = [...rows, { multiplier: 1, name: '' }];
+					}}><PlusCircle /> Eine mehr</Button
+				>
+				<Button class="mt-4" type="submit">Speichern</Button>
 			</form>
 		</Sheet.Header>
 	</Sheet.Content>

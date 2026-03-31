@@ -1,21 +1,34 @@
 <script lang="ts">
 	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
+	import { deleteEntryCommand, getChallengeOverview, getChallengePageContext, getUserChallengeActivity } from '$lib/remote/challenges.remote';
 	import * as Card from '$lib/components/ui/card';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from './ui/button/button.svelte';
 	import { Trash } from '@lucide/svelte';
-	import { enhance } from '$app/forms';
 
 	interface Props {
 		entry: typeof dbEntry.$inferSelect;
 		discipline: typeof dbDiscipline.$inferSelect | null;
 		edit: boolean;
-		challengePath: string;
+		clubId: string;
 	}
 
-	let { entry, discipline, edit, challengePath }: Props = $props();
+	let { entry, discipline, edit, clubId }: Props = $props();
 
 	let open = $state(false);
+
+	async function onDelete() {
+		await deleteEntryCommand({
+			challengeId: entry.challengeId,
+			entryId: entry.id
+		}).updates(
+			getChallengePageContext({ clubId, challengeId: entry.challengeId }),
+			getChallengeOverview({ clubId, challengeId: entry.challengeId }),
+			getUserChallengeActivity({ clubId, challengeId: entry.challengeId })
+		);
+
+		open = false;
+	}
 </script>
 
 <Card.Root>
@@ -37,8 +50,6 @@
 	</Card.Content>
 </Card.Root>
 
-<form use:enhance method="post" id="deleteForm" action="{challengePath}/activity/?/delete"></form>
-
 {#snippet deleteDialog()}
 	<AlertDialog.Root bind:open>
 		<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive', size: 'icon' })}>
@@ -53,12 +64,8 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-				<AlertDialog.Action
-					value={entry.id}
-					name="id"
-					form="deleteForm"
-					onclick={() => (open = false)}
-					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
+				<AlertDialog.Action class={buttonVariants({ variant: 'destructive' })} onclick={onDelete}
+					>Löschen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>

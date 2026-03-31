@@ -1,17 +1,20 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { getSessionState } from '$lib/remote/session.remote';
 	import { LogOut, User } from '@lucide/svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { dev } from '$app/environment';
 
-	let { children, data } = $props();
+	let { children } = $props();
 
-	let { session } = data;
+	const sessionState = getSessionState();
+	const { session, user } = await sessionState;
 
 	async function signOut() {
 		await authClient(page.url.origin).signOut();
@@ -26,28 +29,28 @@
 {/if}
 <nav class="flex items-center justify-between p-6">
 	<div class="flex gap-4">
-		<a href="/" class="text-4xl font-bold">Start</a>
+		<a href={resolve('/')} class="text-4xl font-bold">Start</a>
 		<div class="flex">
-			<a href="/clubs" class="my-auto text-lg font-semibold">Clubs</a>
+			<a href={resolve('/clubs')} class="my-auto text-lg font-semibold">Clubs</a>
 		</div>
 	</div>
-	{#if !session}
-		<Button href="/signin">Anmelden</Button>
+	{#if !session || !user}
+		<Button href={resolve('/signin')}>Anmelden</Button>
 	{:else}
 		<div class="flex gap-2">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class={buttonVariants({ variant: 'default' })}>
 					<User /><span class="max-md:hidden">
-						{session.user.name}
+						{user.name}
 					</span>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Group>
 						<DropdownMenu.GroupHeading>Profil</DropdownMenu.GroupHeading>
 						<DropdownMenu.Separator />
-						<DropdownMenu.Item><a class="w-full" href="/profile">Übersicht</a></DropdownMenu.Item>
+						<DropdownMenu.Item><a class="w-full" href={resolve('/profile')}>Übersicht</a></DropdownMenu.Item>
 						<DropdownMenu.Item
-							><a class="w-full" href="/profile/edit">Bearbeiten</a></DropdownMenu.Item
+							><a class="w-full" href={resolve('/profile/edit')}>Bearbeiten</a></DropdownMenu.Item
 						>
 						<Button class="m-2" variant="destructive" onclick={signOut}
 							><LogOut /><span> Ausloggen </span>

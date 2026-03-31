@@ -1,27 +1,21 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
+	import * as Field from '$lib/components/ui/field';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
+	import { createClubForm, getCreateClubPage } from '$lib/remote/clubs.remote';
 
-	let { data } = $props();
-
-	const form = superForm(data.form);
-
-	const { enhance, form: formFields } = form;
+	const createClubPage = getCreateClubPage();
+	await createClubPage;
 </script>
 
 <h1 class="h1">Club Erstellen</h1>
-<form method="POST" use:enhance class="max-w-sm">
-	<Form.Field {form} name="name">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Name</Form.Label>
-				<Input {...props} bind:value={$formFields.name} />
-			{/snippet}
-		</Form.Control>
-		<Form.Description />
-		<Form.FieldErrors />
-	</Form.Field>
+<form {...createClubForm} class="max-w-sm">
+	<Field.Field>
+		<Field.Label for="club-name">Name</Field.Label>
+		<Input id="club-name" {...createClubForm.fields.name.as('text')} />
+		{#each createClubForm.fields.name.issues() as issue, index (`create-club-name-${index}-${issue.message}`)}
+			<Field.Error>{issue.message}</Field.Error>
+		{/each}
+	</Field.Field>
 	<Button type="submit">Erstellen</Button>
 </form>

@@ -4,10 +4,10 @@ import { gender, roles } from './db/schema';
 export const createChallenge = z
 	.object({
 		name: z.string().min(3),
-		startsAt: z.date(),
-		endsAt: z.date()
+		startsAt: z.iso.date(),
+		endsAt: z.iso.date()
 	})
-	.refine((data) => data.endsAt > data.startsAt, {
+	.refine((data) => new Date(data.endsAt) > new Date(data.startsAt), {
 		message: 'endsAt must be after startsAt',
 		path: ['endsAt']
 	});
@@ -39,4 +39,16 @@ export const newEntry = z.object({
 
 export const editClub = z.object({
 	name: z.string().min(5)
+});
+
+export const createClub = z.object({
+	name: z.string().min(5)
+});
+
+export const joinClubByCode = z.object({
+	code: z.string().min(6)
+});
+
+export const entrySubmission = newEntry.extend({
+	challengeId: z.string().min(1)
 });

@@ -1,24 +1,47 @@
 <script lang="ts">
+	import { MinusCircle, PlusCircle } from '@lucide/svelte';
+	import { addDisciplinesForm, getChallengePageContext } from '$lib/remote/challenges.remote';
 	import { Button } from './ui/button';
+	import * as Field from './ui/field';
 	import { Input } from './ui/input';
 	import * as Sheet from './ui/sheet';
-	import * as Form from './ui/form';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { addDisciplines } from '$lib/zod';
-	import { MinusCircle, PlusCircle } from '@lucide/svelte';
 
-	let { formData }: { formData: SuperValidated<Infer<typeof addDisciplines>> } = $props();
+	let { challengeId, clubId }: { challengeId: string; clubId: string } = $props();
 
 	let sheetOpen = $state(false);
+	let primedChallengeId = $state<string | null>(null);
 
-	const disciplineForm = superForm(formData, {
-		dataType: 'json',
-		onResult: ({ result }) => {
-			if (result.type === 'success') sheetOpen = !sheetOpen;
+	const disciplineForm = $derived(addDisciplinesForm.for(challengeId));
+
+	function resetDefaults() {
+		disciplineForm.fields.set({
+			discipline: [
+				{
+					name: '',
+					multiplier: 1
+				}
+			]
+		});
+	}
+
+	$effect(() => {
+		if (primedChallengeId !== challengeId) {
+			resetDefaults();
+			primedChallengeId = challengeId;
 		}
 	});
 
-	const { enhance, form, constraints } = disciplineForm;
+	const disciplines = $derived(disciplineForm.fields.discipline.value() ?? []);
+
+	async function onsubmit({ form, submit }: { form: HTMLFormElement; submit: any }) {
+		await submit().updates(getChallengePageContext({ clubId, challengeId }));
+
+		if ((disciplineForm.fields.allIssues()?.length ?? 0) === 0) {
+			sheetOpen = false;
+			form.reset();
+			resetDefaults();
+		}
+	}
 </script>
 
 <Sheet.Root bind:open={sheetOpen}>
@@ -28,59 +51,65 @@
 	<Sheet.Content>
 		<Sheet.Header>
 			<Sheet.Title>Diszipline hinzufügen</Sheet.Title>
-			<form method="post" action="?/addDiscipline" use:enhance>
-				<Form.Fieldset form={disciplineForm} name="discipline">
-					{#each $form.discipline as _, i}
-						<div class="flex">
-							<div class="flex gap-4">
-								<Form.Control>
-									{#snippet children({ props })}
-										<div class="flex flex-col gap-2">
-											<Form.Label>Name</Form.Label>
-											<Input
-												{...$constraints.discipline?.name}
-												type="text"
-												{...props}
-												bind:value={$form.discipline[i].name}
-											/>
-										</div>
-									{/snippet}
-								</Form.Control>
+		</Sheet.Header>
 
-								<Form.Control>
-									{#snippet children({ props })}
-										<div class="flex flex-col gap-2">
-											<Form.Label>Multiplikator</Form.Label>
-											<Input
-												{...$constraints.discipline?.multiplier}
-												type="number"
-												{...props}
-												bind:value={$form.discipline[i].multiplier}
-											/>
-										</div>
-									{/snippet}
-								</Form.Control>
-								<Form.FieldErrors />
-							</div>
-							<Button
-								type="button"
-								variant="destructive"
-								class="mt-auto"
-								onclick={() => {
-									$form.discipline = $form.discipline.filter((_, index) => index !== i);
-								}}><MinusCircle /></Button
-							>
-						</div>
-					{/each}
+		<form {...disciplineForm.enhance(onsubmit)} class="mt-6 space-y-4">
+			{#each disciplines as _, i (i)}
+				<div class="flex items-end gap-4">
+					<div class="grid flex-1 gap-4 md:grid-cols-2">
+						<Field.Field>
+							<Field.Label for="discipline-name-{challengeId}-{i}">Name</Field.Label>
+							<Input
+								id="discipline-name-{challengeId}-{i}"
+								{...disciplineForm.fields.discipline[i].name.as('text')}
+							/>
+							{#each disciplineForm.fields.discipline[i].name.issues() as issue, index (`discipline-name-${challengeId}-${i}-${index}-${issue.message}`)}
+								<Field.Error>{issue.message}</Field.Error>
+							{/each}
+						</Field.Field>
+
+						<Field.Field>
+							<Field.Label for="discipline-multiplier-{challengeId}-{i}">Multiplikator</Field.Label>
+							<Input
+								id="discipline-multiplier-{challengeId}-{i}"
+								step="0.1"
+								{...disciplineForm.fields.discipline[i].multiplier.as('number')}
+							/>
+							{#each disciplineForm.fields.discipline[i].multiplier.issues() as issue, index (`discipline-multiplier-${challengeId}-${i}-${index}-${issue.message}`)}
+								<Field.Error>{issue.message}</Field.Error>
+							{/each}
+						</Field.Field>
+					</div>
+
 					<Button
 						type="button"
-						variant="outline"
-						onclick={() => ($form.discipline = [...$form.discipline, { multiplier: 1, name: '' }])}
-						><PlusCircle /> Eine mehr</Button
+						variant="destructive"
+						onclick={() => {
+							disciplineForm.fields.discipline.set(
+								disciplines.filter((_, index) => index !== i)
+							);
+						}}
 					>
-				</Form.Fieldset>
-				<Form.Button class="mt-4" type="submit">Speichern</Form.Button>
-			</form>
-		</Sheet.Header>
+						<MinusCircle />
+					</Button>
+				</div>
+			{/each}
+
+			<div class="flex gap-3">
+				<Button
+					type="button"
+					variant="outline"
+					onclick={() => {
+						disciplineForm.fields.discipline.set([
+							...disciplines,
+							{ multiplier: 1, name: '' }
+						]);
+					}}
+				>
+					<PlusCircle /> Eine mehr
+				</Button>
+				<Button type="submit">Speichern</Button>
+			</div>
+		</form>
 	</Sheet.Content>
 </Sheet.Root>

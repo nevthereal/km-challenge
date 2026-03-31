@@ -1,1 +1,0 @@
-ALTER TABLE "entry" ADD COLUMN "date" date NOT NULL;

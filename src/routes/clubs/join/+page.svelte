@@ -1,46 +1,29 @@
 <script lang="ts">
-	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
-	import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'bits-ui';
-	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
+	import * as Field from '$lib/components/ui/field';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import { getJoinClubPage, joinClubByCodeForm } from '$lib/remote/clubs.remote';
 
-	let { data } = $props();
-
-	const form = superForm(data.form);
-
-	const { form: formFields, enhance, submit } = form;
-
-	$effect(() => {
-		if ($formFields.code.length === 6) {
-			submit();
-		}
-	});
+	const joinClubPage = getJoinClubPage();
+	await joinClubPage;
 </script>
 
 <main class="flex flex-col items-center">
 	<h1 class="h1 mb-4">Club beitreten</h1>
-	<form method="POST" class="flex flex-col items-center space-y-6" use:enhance>
-		<Form.Field {form} name="code">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Einladungscode</Form.Label>
-					<InputOTP.Root
-						{...props}
-						class="mt-6"
-						bind:value={$formFields.code}
-						maxlength={6}
-						pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-					>
-						{#snippet children({ cells })}
-							<InputOTP.Group>
-								{#each cells as cell}
-									<InputOTP.Slot {cell} />
-								{/each}
-							</InputOTP.Group>
-						{/snippet}
-					</InputOTP.Root>
-				{/snippet}
-			</Form.Control>
-		</Form.Field>
+	<form {...joinClubByCodeForm} class="flex w-full max-w-sm flex-col space-y-6">
+		<Field.Field>
+			<Field.Label for="join-code">Einladungscode</Field.Label>
+			<Input
+				id="join-code"
+				class="text-center font-mono tracking-[0.35em]"
+				maxlength={6}
+				placeholder="ABC123"
+				{...joinClubByCodeForm.fields.code.as('text')}
+			/>
+			{#each joinClubByCodeForm.fields.code.issues() as issue, index (`join-club-code-${index}-${issue.message}`)}
+				<Field.Error>{issue.message}</Field.Error>
+			{/each}
+		</Field.Field>
+		<Button type="submit">Weiter</Button>
 	</form>
 </main>

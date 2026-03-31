@@ -1,1 +1,0 @@
-ALTER TABLE "user" ADD COLUMN "completed_setup" boolean DEFAULT false;

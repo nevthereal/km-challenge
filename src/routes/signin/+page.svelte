@@ -17,7 +17,7 @@
 		onclick={async () => {
 			loading = true;
 			const editString = `${page.url.origin}/profile/edit`;
-			await authClient(page.url.origin).signIn.social({
+			await authClient.signIn.social({
 				provider: 'google',
 				callbackURL: redirectUrl || '/',
 				newUserCallbackURL:

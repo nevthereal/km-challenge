@@ -6,7 +6,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { authClient } from '$lib/auth/client';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { page } from '$app/state';
+
 	import { dev } from '$app/environment';
 
 	let { children, data } = $props();
@@ -14,7 +14,7 @@
 	let { session } = data;
 
 	async function signOut() {
-		await authClient(page.url.origin).signOut();
+		await authClient.signOut();
 		location.reload();
 	}
 </script>

@@ -27,5 +27,5 @@ export const updateProfile = form(userSetup, async ({ role, username: name, gend
 
 	const redirectUrl = getRequestEvent().url.searchParams.get('redirect');
 
-	redirect(302, redirectUrl || '/profile');
+	redirect(303, redirectUrl || '/profile');
 });

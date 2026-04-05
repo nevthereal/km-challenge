@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowLeft } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
 	import { getChallengeMember } from '$lib/remote/challenges.remote';
@@ -32,7 +33,7 @@
 
 	<div class="mb-4 flex">
 		<a
-			href="{data.challengePath}/members"
+			href={resolve('/clubs/[clubId]/challenge/[challengeId]/members', { clubId, challengeId })}
 			class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 			><ArrowLeft strokeWidth={3} /> Alle Mitglieder</a
 		>
@@ -51,7 +52,7 @@
 	</h2>
 	<div class="mt-4 flex flex-col gap-4">
 		{#each data.member.user?.entries ?? [] as entry (entry.id)}
-			<EntryCard {entry} {clubId} discipline={entry.discipline} edit={false} />
+			<EntryCard {entry} discipline={entry.discipline} edit={false} />
 		{:else}
 			<p class="font-mono italic font-bold">Noch keine Aktivität</p>
 		{/each}

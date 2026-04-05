@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { MinusCircle, PlusCircle } from '@lucide/svelte';
-	import { addDisciplinesForm, getChallengePageContext } from '$lib/remote/challenges.remote';
+	import { addDisciplinesForm } from '$lib/remote/challenges.remote';
 	import { Button } from './ui/button';
 	import * as Field from './ui/field';
 	import { Input } from './ui/input';
@@ -34,7 +34,7 @@
 	const disciplines = $derived(disciplineForm.fields.discipline.value() ?? []);
 
 	async function onsubmit({ form, submit }: { form: HTMLFormElement; submit: any }) {
-		await submit().updates(getChallengePageContext({ clubId, challengeId }));
+		await submit();
 
 		if ((disciplineForm.fields.allIssues()?.length ?? 0) === 0) {
 			sheetOpen = false;

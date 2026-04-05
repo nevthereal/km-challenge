@@ -35,7 +35,7 @@
 	</h2>
 	<div class="mt-4 flex flex-col gap-4">
 		{#each data.entries as entry (entry.id)}
-			<EntryCard {entry} {clubId} discipline={entry.discipline} edit />
+			<EntryCard {entry} discipline={entry.discipline} edit />
 		{:else}
 			<p class="font-mono italic font-bold">Noch keine Aktivität</p>
 		{/each}

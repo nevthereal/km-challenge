@@ -1,4 +1,4 @@
-import { command, form, query } from '$app/server';
+import { command, form, getRequestEvent, query } from '$app/server';
 import { canAddEntries, getDaysRemainingForEntry, prettyDate } from '$lib/utils';
 import { checkAdmin, db, getLeaderBoard } from '$lib/db';
 import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
@@ -6,7 +6,6 @@ import { addDisciplines, createChallenge, entrySubmission } from '$lib/zod';
 import { getCurrentUser, requireCompletedProfile } from '$lib/server/request-user';
 import { and, eq, getColumns, gte, lte } from 'drizzle-orm';
 import { error, invalid, redirect } from '@sveltejs/kit';
-import { getRequestEvent } from '$app/server';
 import { z } from 'zod';
 
 const challengeParamsSchema = z.object({
@@ -390,7 +389,7 @@ export const createChallengeForm = form(createChallenge, async ({ name, startsAt
 		})
 		.returning({ id: challenge.id });
 
-	redirect(302, `/clubs/${clubId}/challenge/${challengeId}`);
+	redirect(303, `/clubs/${clubId}/challenge/${challengeId}`);
 });
 
 export const editChallengeForm = form(createChallenge, async ({ name, startsAt, endsAt }) => {
@@ -423,6 +422,8 @@ export const editChallengeForm = form(createChallenge, async ({ name, startsAt, 
 			startsAt: new Date(startsAt)
 		})
 		.where(eq(challenge.id, currentChallenge.id));
+
+	void getChallengePageContext({ clubId, challengeId }).refresh();
 });
 
 export const createEntryForm = form(
@@ -443,6 +444,13 @@ export const createEntryForm = form(
 		const currentChallenge = await db.query.challenge.findFirst({
 			where: {
 				id: challengeId
+			},
+			with: {
+				members: {
+					columns: {
+						id: true
+					}
+				}
 			}
 		});
 
@@ -486,6 +494,27 @@ export const createEntryForm = form(
 			disciplineId,
 			userId: user.id
 		});
+
+		void getHomeDashboard().refresh();
+		void getChallengePageContext({
+			clubId: currentChallenge.clubId,
+			challengeId
+		}).refresh();
+		void getChallengeOverview({
+			clubId: currentChallenge.clubId,
+			challengeId
+		}).refresh();
+		void getUserChallengeActivity({
+			clubId: currentChallenge.clubId,
+			challengeId
+		}).refresh();
+
+		const memberCount = currentChallenge.members?.length ?? 0;
+
+		void getLeaderboard({ challengeId, limit: 5 }).refresh();
+		if (memberCount > 0 && memberCount !== 5) {
+			void getLeaderboard({ challengeId, limit: memberCount }).refresh();
+		}
 	}
 );
 
@@ -508,6 +537,8 @@ export const addDisciplinesForm = form(addDisciplines, async ({ discipline: disc
 			challengeId
 		});
 	}
+
+	void getChallengePageContext({ clubId, challengeId }).refresh();
 });
 
 export const deleteChallengeCommand = command(
@@ -531,11 +562,11 @@ export const deleteChallengeCommand = command(
 
 		await db.delete(challenge).where(eq(challenge.id, currentChallenge.id));
 
-		return { redirect: `/clubs/${clubId}` };
+		return { clubId };
 	}
 );
 
-export const leaveChallengeCommand = command(challengeParamsSchema, async ({ challengeId }) => {
+export const leaveChallengeCommand = command(challengeParamsSchema, async ({ clubId, challengeId }) => {
 	const user = requireCompletedProfile();
 
 	const membership = await db.query.challengeMember.findFirst({
@@ -549,6 +580,8 @@ export const leaveChallengeCommand = command(challengeParamsSchema, async ({ cha
 	}
 
 	await db.delete(challengeMember).where(eq(challengeMember.id, membership.id));
+
+	void getChallengePageContext({ clubId, challengeId }).refresh();
 });
 
 export const joinChallengeCommand = command(
@@ -574,6 +607,8 @@ export const joinChallengeCommand = command(
 				userId: user.id
 			});
 		}
+
+		void getChallengePageContext({ clubId, challengeId }).refresh();
 	}
 );
 
@@ -597,11 +632,14 @@ export const deleteDisciplineCommand = command(
 		}
 
 		await db.delete(discipline).where(eq(discipline.id, currentDiscipline.id));
+
+		void getChallengePageContext({ clubId, challengeId }).refresh();
 	}
 );
 
 export const deleteEntryCommand = command(deleteEntrySchema, async ({ challengeId, entryId }) => {
 	const user = requireCompletedProfile();
+	const clubId = getRequestEvent().params.clubId;
 
 	const currentEntry = await db.query.entry.findFirst({
 		where: {
@@ -619,4 +657,10 @@ export const deleteEntryCommand = command(deleteEntrySchema, async ({ challengeI
 	}
 
 	await db.delete(entry).where(eq(entry.id, currentEntry.id));
+
+	if (clubId) {
+		void getChallengePageContext({ clubId, challengeId }).refresh();
+		void getChallengeOverview({ clubId, challengeId }).refresh();
+		void getUserChallengeActivity({ clubId, challengeId }).refresh();
+	}
 });

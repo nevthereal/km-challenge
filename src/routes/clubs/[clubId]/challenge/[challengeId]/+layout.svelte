@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -40,12 +41,24 @@
 		}
 	});
 
-	const paths = [
-		{ name: 'Übersicht', href: '' },
-		{ name: 'Diszipline', href: '/disciplines' },
-		{ name: 'Mitglieder', href: '/members' },
-		{ name: 'Deine Aktivität', href: '/activity' }
-	];
+	const paths = $derived([
+		{
+			name: 'Übersicht',
+			href: resolve('/clubs/[clubId]/challenge/[challengeId]', { clubId, challengeId })
+		},
+		{
+			name: 'Diszipline',
+			href: resolve('/clubs/[clubId]/challenge/[challengeId]/disciplines', { clubId, challengeId })
+		},
+		{
+			name: 'Mitglieder',
+			href: resolve('/clubs/[clubId]/challenge/[challengeId]/members', { clubId, challengeId })
+		},
+		{
+			name: 'Deine Aktivität',
+			href: resolve('/clubs/[clubId]/challenge/[challengeId]/activity', { clubId, challengeId })
+		}
+	]);
 
 	async function onEditSubmit({ submit }: { submit: any }) {
 		await submit();
@@ -58,30 +71,28 @@
 	async function onDeleteChallenge() {
 		const result = await deleteChallengeCommand({ clubId, challengeId });
 
-		if (result.redirect) {
-			await goto(result.redirect);
-		}
+		await goto(resolve('/clubs/[clubId]', { clubId: result.clubId }));
 	}
 
 	async function onLeaveChallenge() {
-		await leaveChallengeCommand({ clubId, challengeId }).updates(challengePage);
+		await leaveChallengeCommand({ clubId, challengeId });
 	}
 
 	async function onJoinChallenge() {
-		await joinChallengeCommand({ clubId, challengeId }).updates(challengePage);
+		await joinChallengeCommand({ clubId, challengeId });
 	}
 </script>
 
 <svelte:boundary>
 	{@const data = await challengePage}
-	{@const { challenge, currentUserChallenge, clubAdmin: isAdmin, challengePath } = data}
+	{@const { challenge, currentUserChallenge, clubAdmin: isAdmin } = data}
 	{@const active = isChallengeActive(challenge)}
 	{@const canStillAddEntries = canAddEntries(challenge)}
 	{@const daysRemaining = canStillAddEntries ? getDaysRemainingForEntry(challenge) : 0}
 
 	<nav class="mb-4 flex gap-4">
 		<a
-			href="/clubs/{challenge.clubId}"
+			href={resolve('/clubs/[clubId]', { clubId: challenge.clubId })}
 			class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 			><ArrowLeft strokeWidth={3} /> Zum Club</a
 		>
@@ -206,9 +217,9 @@
 					<a
 						class={cn(
 							'p-2 font-bold',
-							page.url.pathname === `${challengePath}${path.href}` && 'bg-muted rounded-b-md'
+							page.url.pathname === path.href && 'bg-muted rounded-b-md'
 						)}
-						href="{challengePath}{path.href}">{path.name}</a
+						href={path.href}>{path.name}</a
 					>
 				{/each}
 			</ul>

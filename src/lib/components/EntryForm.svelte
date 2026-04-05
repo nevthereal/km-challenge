@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PlusCircle } from '@lucide/svelte';
-	import { createEntryForm, getChallengeOverview, getChallengePageContext, getHomeDashboard, getLeaderboard, getUserChallengeActivity } from '$lib/remote/challenges.remote';
+	import { createEntryForm } from '$lib/remote/challenges.remote';
 	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
@@ -41,11 +41,9 @@
 	}
 
 	function resetDefaults() {
-		entryForm.fields.set({
-			challengeId: challenge.id,
-			disciplineId: disciplines[0]?.id ?? '',
-			date: getDefaultDate()
-		});
+		entryForm.fields.challengeId.set(challenge.id);
+		entryForm.fields.disciplineId.set(disciplines[0]?.id ?? '');
+		entryForm.fields.date.set(getDefaultDate());
 	}
 
 	$effect(() => {
@@ -56,19 +54,8 @@
 	});
 
 	const active = $derived(canAddEntries(challenge));
-	const leaderboardLimit = $derived(
-		Array.isArray(challenge.members) && challenge.members.length > 0 ? challenge.members.length : 5
-	);
-
 	async function onsubmit({ form, submit }: { form: HTMLFormElement; submit: any }) {
-		await submit().updates(
-			getHomeDashboard(),
-			getChallengePageContext({ clubId: challenge.clubId, challengeId: challenge.id }),
-			getChallengeOverview({ clubId: challenge.clubId, challengeId: challenge.id }),
-			getUserChallengeActivity({ clubId: challenge.clubId, challengeId: challenge.id }),
-			getLeaderboard({ challengeId: challenge.id, limit: 5 }),
-			getLeaderboard({ challengeId: challenge.id, limit: leaderboardLimit })
-		);
+		await submit();
 
 		if ((entryForm.fields.allIssues()?.length ?? 0) === 0) {
 			dialogOpen = false;

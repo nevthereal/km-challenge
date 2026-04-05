@@ -79,31 +79,6 @@ export const getJoinClubPage = query(async () => {
 	return { user };
 });
 
-export const acceptInvite = query(z.string().min(6), async (code) => {
-	const user = requireCompletedProfile();
-
-	const invite = await db.query.inviteCode.findFirst({
-		where: { code }
-	});
-
-	if (!invite) {
-		error(404, 'Einladungscode ungültig');
-	}
-
-	const alreadyJoined = await db.query.clubMember.findFirst({
-		where: { AND: [{ clubId: invite.clubId }, { userId: user.id }] }
-	});
-
-	if (!alreadyJoined) {
-		await db.insert(clubMember).values({
-			clubId: invite.clubId,
-			userId: user.id
-		});
-	}
-
-	redirect(302, `/clubs/${invite.clubId}`);
-});
-
 export const createClubForm = form(createClub, async ({ name }) => {
 	const user = requireCompletedProfile();
 
@@ -128,11 +103,11 @@ export const createClubForm = form(createClub, async ({ name }) => {
 		userId: user.id
 	});
 
-	redirect(302, `/clubs/${createdClub.id}`);
+	redirect(303, `/clubs/${createdClub.id}`);
 });
 
 export const joinClubByCodeForm = form(joinClubByCode, async ({ code }) => {
-	redirect(302, `/clubs/join/${code}`);
+	redirect(303, `/clubs/join/${code}`);
 });
 
 export const editClubForm = form(editClub, async ({ name }) => {
@@ -163,6 +138,8 @@ export const editClubForm = form(editClub, async ({ name }) => {
 			name
 		})
 		.where(eq(club.id, currentClub.id));
+
+	void getClubPage(clubId).refresh();
 });
 
 export const generateInviteCode = command(clubIdSchema, async (clubId) => {

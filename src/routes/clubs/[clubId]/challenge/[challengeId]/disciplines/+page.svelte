@@ -21,7 +21,7 @@
 			clubId,
 			challengeId,
 			disciplineId: selectedDiscipline.id
-		}).updates(challengePage);
+		});
 
 		selectedDiscipline = null;
 		disciplineDialogOpen = false;

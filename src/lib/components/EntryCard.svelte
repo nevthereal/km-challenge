@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
-	import { deleteEntryCommand, getChallengeOverview, getChallengePageContext, getUserChallengeActivity } from '$lib/remote/challenges.remote';
+	import { deleteEntryCommand } from '$lib/remote/challenges.remote';
 	import * as Card from '$lib/components/ui/card';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from './ui/button/button.svelte';
@@ -10,10 +10,9 @@
 		entry: typeof dbEntry.$inferSelect;
 		discipline: typeof dbDiscipline.$inferSelect | null;
 		edit: boolean;
-		clubId: string;
 	}
 
-	let { entry, discipline, edit, clubId }: Props = $props();
+	let { entry, discipline, edit }: Props = $props();
 
 	let open = $state(false);
 
@@ -21,11 +20,7 @@
 		await deleteEntryCommand({
 			challengeId: entry.challengeId,
 			entryId: entry.id
-		}).updates(
-			getChallengePageContext({ clubId, challengeId: entry.challengeId }),
-			getChallengeOverview({ clubId, challengeId: entry.challengeId }),
-			getUserChallengeActivity({ clubId, challengeId: entry.challengeId })
-		);
+		});
 
 		open = false;
 	}

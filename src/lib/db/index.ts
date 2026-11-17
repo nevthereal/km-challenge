@@ -1,18 +1,19 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { DATABASE_URL } from '$env/static/private';
+import { DATABASE_URL } from '$app/env/private';
 import relations from './relations';
-import { sql, eq, desc, getColumns } from 'drizzle-orm';
+import { sql, eq, desc } from 'drizzle-orm';
 import * as schema from './schema';
 
 export const db = drizzle(DATABASE_URL, {
-	casing: 'snake_case',
-	schema,
 	relations
 });
 
 export const getLeaderBoard = db
 	.select({
-		...getColumns(schema.user),
+		id: schema.user.id,
+		name: schema.user.name,
+		gender: schema.user.gender,
+		role: schema.user.role,
 		score:
 			sql<number>`round(sum(${schema.entry.amount} * COALESCE(${schema.discipline.factor}, 1)), 2)`.as(
 				'score'

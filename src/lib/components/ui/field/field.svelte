@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, type WithElementRef } from '$lib/utils.js';
+	import { cn, type WithElementRef } from '#lib/utils.js';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	let {
@@ -19,11 +19,7 @@
 	bind:this={ref}
 	data-slot="field"
 	data-orientation={orientation}
-	class={cn(
-		'flex gap-2',
-		orientation === 'horizontal' ? 'items-center' : 'flex-col',
-		className
-	)}
+	class={cn('flex gap-2', orientation === 'horizontal' ? 'items-center' : 'flex-col', className)}
 	{...restProps}
 >
 	{@render children?.()}

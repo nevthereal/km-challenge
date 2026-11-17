@@ -1,6 +1,6 @@
 import { getRequestEvent } from '$app/server';
-import { redirect } from '@sveltejs/kit';
-import type { User } from '$lib/auth';
+import { error, redirect } from '@sveltejs/kit';
+import type { User } from '#lib/auth/index.ts';
 
 type AppUser = User & {
 	superUser: boolean;
@@ -21,24 +21,30 @@ export function getCurrentUser() {
 	return locals.user ? decorateUser(locals.user) : null;
 }
 
-export function requireUser() {
-	const event = getRequestEvent();
+export function requireUser(returnTo = '/profile') {
 	const user = getCurrentUser();
 
 	if (!user) {
-		redirect(302, `/signin?redirect=${event.url.pathname}`);
+		redirect(302, `/signin?redirect=${encodeURIComponent(returnTo)}`);
 	}
 
 	return user;
 }
 
-export function requireCompletedProfile() {
-	const event = getRequestEvent();
-	const user = requireUser();
+export function requireCompletedProfile(returnTo = '/clubs') {
+	const user = requireUser(returnTo);
 
 	if (!user.completedProfile) {
-		redirect(302, `/profile/edit?redirect=${event.url.pathname}`);
+		redirect(302, `/profile/edit?redirect=${encodeURIComponent(returnTo)}`);
 	}
 
+	return user;
+}
+
+// Commands cannot redirect; report authentication failures as HTTP errors.
+export function requireCommandUser() {
+	const user = getCurrentUser();
+	if (!user) error(401, 'Bitte zuerst anmelden');
+	if (!user.completedProfile) error(403, 'Bitte zuerst das Profil vervollständigen');
 	return user;
 }

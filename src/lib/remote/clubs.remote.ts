@@ -1,9 +1,9 @@
 import { command, form, getRequestEvent, query } from '$app/server';
 import { error, redirect } from '@sveltejs/kit';
-import { checkAdmin, db } from '$lib/db';
-import { club, clubAdmin, clubMember, inviteCode } from '$lib/db/schema';
-import { createClub, editClub, joinClubByCode } from '$lib/zod';
-import { requireCompletedProfile } from '$lib/server/request-user';
+import { checkAdmin, db } from '#lib/db/index.ts';
+import { club, clubAdmin, clubMember, inviteCode } from '#lib/db/schema.ts';
+import { createClub, editClub, joinClubByCode } from '#lib/zod.ts';
+import { requireCompletedProfile, requireCommandUser } from '#lib/server/request-user.ts';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -138,12 +138,10 @@ export const editClubForm = form(editClub, async ({ name }) => {
 			name
 		})
 		.where(eq(club.id, currentClub.id));
-
-	void getClubPage(clubId).refresh();
 });
 
 export const generateInviteCode = command(clubIdSchema, async (clubId) => {
-	const user = requireCompletedProfile();
+	const user = requireCommandUser();
 
 	if (!(await checkAdmin(clubId, user.id))) {
 		error(401, 'Nicht erlaubt.');
@@ -160,7 +158,7 @@ export const generateInviteCode = command(clubIdSchema, async (clubId) => {
 });
 
 export const deleteClubCommand = command(clubIdSchema, async (clubId) => {
-	const user = requireCompletedProfile();
+	const user = requireCommandUser();
 
 	const currentClub = await db.query.club.findFirst({
 		where: { id: clubId }
@@ -176,11 +174,13 @@ export const deleteClubCommand = command(clubIdSchema, async (clubId) => {
 
 	await db.delete(club).where(eq(club.id, currentClub.id));
 
+	void getClubsPage().refresh();
+
 	return { redirect: '/clubs' };
 });
 
 export const leaveClubCommand = command(clubIdSchema, async (clubId) => {
-	const user = requireCompletedProfile();
+	const user = requireCommandUser();
 
 	const membership = await db.query.clubMember.findFirst({
 		where: { clubId, userId: user.id }
@@ -191,6 +191,8 @@ export const leaveClubCommand = command(clubIdSchema, async (clubId) => {
 	}
 
 	await db.delete(clubMember).where(eq(clubMember.id, membership.id));
+
+	void getClubsPage().refresh();
 
 	return { redirect: '/clubs' };
 });

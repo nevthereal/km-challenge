@@ -1,10 +1,8 @@
 import { form, query } from '$app/server';
 import { redirect } from '@sveltejs/kit';
-import { db } from '$lib/db';
-import { user as userTable } from '$lib/db/schema';
-import { userSetup } from '$lib/zod';
-import { requireUser } from '$lib/server/request-user';
-import { eq } from 'drizzle-orm';
+import { auth } from '#lib/auth/index.ts';
+import { userSetup } from '#lib/zod.ts';
+import { requireUser } from '#lib/server/request-user.ts';
 import { getRequestEvent } from '$app/server';
 
 export const getProfile = query(async () => {
@@ -14,18 +12,22 @@ export const getProfile = query(async () => {
 });
 
 export const updateProfile = form(userSetup, async ({ role, username: name, gender }) => {
-	const currentUser = requireUser();
-
-	await db
-		.update(userTable)
-		.set({
-			role,
-			name,
-			gender
-		})
-		.where(eq(userTable.id, currentUser.id));
+	requireUser();
+	const event = getRequestEvent();
+	await auth.api.updateUser({
+		headers: event.request.headers,
+		body: { role, name, gender }
+	});
 
 	const redirectUrl = getRequestEvent().url.searchParams.get('redirect');
 
-	redirect(303, redirectUrl || '/profile');
+	let destination = '/profile';
+	try {
+		const target = new URL(redirectUrl || destination, event.url);
+		if (target.origin === event.url.origin)
+			destination = target.pathname + target.search + target.hash;
+	} catch {
+		// Invalid return URLs fall back to the profile page.
+	}
+	redirect(303, destination);
 });

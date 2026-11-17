@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { ChartContainer, type ChartConfig } from '$lib/components/ui/chart';
+	import { ChartContainer, type ChartConfig } from '#lib/components/ui/chart/index.ts';
 	import { LineChart } from 'layerchart';
 	import { onMount } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	type ChartEntry = {
 		date: Date | string;
@@ -44,7 +45,7 @@
 	});
 
 	const chartData: ChartPoint[] = $derived.by(() => {
-		const groupedByDay = new Map<string, { kilometres: number; points: number }>();
+		const groupedByDay = new SvelteMap<string, { kilometres: number; points: number }>();
 
 		for (const entry of entries ?? []) {
 			const date = new Date(entry.date);

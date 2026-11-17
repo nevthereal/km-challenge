@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
-	import { deleteEntryCommand } from '$lib/remote/challenges.remote';
-	import * as Card from '$lib/components/ui/card';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { refreshAll } from '$app/navigation';
+	import { entry as dbEntry, discipline as dbDiscipline } from '#lib/db/schema.ts';
+	import { deleteEntryCommand } from '#lib/remote/challenges.remote.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import * as AlertDialog from '#lib/components/ui/alert-dialog/index.ts';
 	import { buttonVariants } from './ui/button/button.svelte';
 	import { Trash } from '@lucide/svelte';
 
@@ -21,6 +22,8 @@
 			challengeId: entry.challengeId,
 			entryId: entry.id
 		});
+
+		await refreshAll();
 
 		open = false;
 	}

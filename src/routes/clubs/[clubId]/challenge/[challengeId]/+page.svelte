@@ -1,11 +1,12 @@
 <script lang="ts">
-	import EntryForm from '$lib/components/EntryForm.svelte';
-	import Leaderboard from '$lib/components/Leaderboard.svelte';
+	import { resolve } from '$app/paths';
+	import EntryForm from '#lib/components/EntryForm.svelte';
+	import Leaderboard from '#lib/components/Leaderboard.svelte';
 	import { page } from '$app/state';
-	import { getChallengeOverview, getChallengePageContext } from '$lib/remote/challenges.remote';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { prettyDate } from '$lib/utils';
-	import EntryMetricsChart from '$lib/components/EntryMetricsChart.svelte';
+	import { getChallengeOverview, getChallengePageContext } from '#lib/remote/challenges.remote.ts';
+	import Badge from '#lib/components/ui/badge/badge.svelte';
+	import { prettyDate } from '#lib/utils.ts';
+	import EntryMetricsChart from '#lib/components/EntryMetricsChart.svelte';
 
 	const clubId = $derived(page.params.clubId ?? '');
 	const challengeId = $derived(page.params.challengeId ?? '');
@@ -16,7 +17,7 @@
 <svelte:boundary>
 	{@const pageData = await challengePage}
 	{@const overview = await challengeOverview}
-	{@const { challenge, challengePath } = pageData}
+	{@const { challenge } = pageData}
 
 	<main class="grow">
 		<section class="mb-8">
@@ -68,8 +69,13 @@
 							)}</Badge
 						>
 						<span class="font-medium"
-							><a class="underline" href="{challengePath}/members/{activity.userId}"
-								>{activity.user?.name ?? 'Unbekannter/Gelöschter Benutzer'}</a
+							><a
+								class="underline"
+								href={resolve('/clubs/[clubId]/challenge/[challengeId]/members/[memberId]', {
+									clubId,
+									challengeId,
+									memberId: activity.userId
+								})}>{activity.user?.name ?? 'Unbekannter/Gelöschter Benutzer'}</a
 							></span
 						>
 						{activity.amount}km ({pointString}) in {activity.discipline

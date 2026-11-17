@@ -13,7 +13,7 @@ export const createChallenge = z
 	});
 
 export const userSetup = z.object({
-	username: z.string(),
+	username: z.string().trim().min(1),
 	role: z.enum(roles.enumValues, { message: 'Kategorie ungültig' }),
 	gender: z.enum(gender.enumValues, { message: 'Geschlecht ungültig' })
 });
@@ -21,14 +21,16 @@ export const userSetup = z.object({
 export const addDisciplines = z.object({
 	discipline: z
 		.object({
-			name: z.string(),
+			name: z.string().trim().min(1),
 			multiplier: z
 				.number({
 					error: (issue) => (issue.input === undefined ? 'This field is required' : 'Not a string')
 				})
+				.positive()
 				.multipleOf(0.1)
 		})
 		.array()
+		.min(1)
 });
 
 export const newEntry = z.object({

@@ -2,16 +2,28 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Field from '$lib/components/ui/field';
-	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { deleteChallengeCommand, editChallengeForm, getChallengePageContext, joinChallengeCommand, leaveChallengeCommand } from '$lib/remote/challenges.remote';
+	import * as AlertDialog from '#lib/components/ui/alert-dialog/index.ts';
+	import * as Dialog from '#lib/components/ui/dialog/index.ts';
+	import * as Field from '#lib/components/ui/field/index.ts';
+	import Button, { buttonVariants } from '#lib/components/ui/button/button.svelte';
+	import {
+		deleteChallengeCommand,
+		editChallengeForm,
+		getChallengePageContext,
+		joinChallengeCommand,
+		leaveChallengeCommand
+	} from '#lib/remote/challenges.remote.ts';
 	import { ArrowLeft, DoorOpen, LogOut, Pencil, Trash2 } from '@lucide/svelte';
-	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import { cn, getDaysRemainingForEntry, isChallengeActive, canAddEntries, prettyDate } from '$lib/utils';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import ClubAdmin from '#lib/components/ClubAdmin.svelte';
+	import {
+		cn,
+		getDaysRemainingForEntry,
+		isChallengeActive,
+		canAddEntries,
+		prettyDate
+	} from '#lib/utils.ts';
+	import Badge from '#lib/components/ui/badge/badge.svelte';
+	import Input from '#lib/components/ui/input/input.svelte';
 
 	let { children } = $props();
 
@@ -60,8 +72,10 @@
 		}
 	]);
 
-	async function onEditSubmit({ submit }: { submit: any }) {
-		await submit();
+	async function onEditSubmit(
+		form: Parameters<Parameters<typeof editChallengeForm.enhance>[0]>[0]
+	) {
+		await form.submit();
 
 		if ((challengeEditForm.fields.allIssues()?.length ?? 0) === 0) {
 			editDialogOpen = false;
@@ -147,7 +161,10 @@
 							<Dialog.Header>
 								<Dialog.Title>Challenge bearbeiten</Dialog.Title>
 							</Dialog.Header>
-							<form {...challengeEditForm.enhance(onEditSubmit)} class="flex max-w-xl flex-col gap-4">
+							<form
+								{...challengeEditForm.enhance(onEditSubmit)}
+								class="flex max-w-xl flex-col gap-4"
+							>
 								<Field.Field>
 									<Field.Label for="edit-challenge-name">Name</Field.Label>
 									<Input id="edit-challenge-name" {...challengeEditForm.fields.name.as('text')} />
@@ -159,7 +176,10 @@
 								<div class="grid gap-4 md:grid-cols-2">
 									<Field.Field>
 										<Field.Label for="edit-challenge-start">Start</Field.Label>
-										<Input id="edit-challenge-start" {...challengeEditForm.fields.startsAt.as('date')} />
+										<Input
+											id="edit-challenge-start"
+											{...challengeEditForm.fields.startsAt.as('date')}
+										/>
 										{#each challengeEditForm.fields.startsAt.issues() as issue, index (`edit-challenge-start-${index}-${issue.message}`)}
 											<Field.Error>{issue.message}</Field.Error>
 										{/each}
@@ -167,7 +187,10 @@
 
 									<Field.Field>
 										<Field.Label for="edit-challenge-end">Ende</Field.Label>
-										<Input id="edit-challenge-end" {...challengeEditForm.fields.endsAt.as('date')} />
+										<Input
+											id="edit-challenge-end"
+											{...challengeEditForm.fields.endsAt.as('date')}
+										/>
 										{#each challengeEditForm.fields.endsAt.issues() as issue, index (`edit-challenge-end-${index}-${issue.message}`)}
 											<Field.Error>{issue.message}</Field.Error>
 										{/each}
@@ -210,17 +233,17 @@
 		<p class="text-muted-foreground">Du bist kein Mitglied dieser Challenge.</p>
 	{:else}
 		<nav
-			class="my-2 overflow-x-auto border-t-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+			class="my-2 [scrollbar-width:none] overflow-x-auto border-t-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
 		>
 			<ul class="flex whitespace-nowrap">
 				{#each paths as path (path.href)}
+					<!-- href was already resolved when constructing paths. -->
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
-						class={cn(
-							'p-2 font-bold',
-							page.url.pathname === path.href && 'bg-muted rounded-b-md'
-						)}
+						class={cn('p-2 font-bold', page.url.pathname === path.href && 'bg-muted rounded-b-md')}
 						href={path.href}>{path.name}</a
 					>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				{/each}
 			</ul>
 		</nav>

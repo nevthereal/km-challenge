@@ -23,11 +23,18 @@ export default ts.config(
 		}
 	},
 	{
-		files: ['**/*.svelte'],
+		rules: {
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+			]
+		},
+		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 
 		languageOptions: {
 			parserOptions: {
-				parser: ts.parser
+				parser: ts.parser,
+				svelteConfig: { compilerOptions: { experimental: { async: true } } }
 			}
 		}
 	}

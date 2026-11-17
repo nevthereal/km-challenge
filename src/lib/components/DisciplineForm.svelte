@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { MinusCircle, PlusCircle } from '@lucide/svelte';
-	import { addDisciplinesForm } from '$lib/remote/challenges.remote';
+	import { addDisciplinesForm } from '#lib/remote/challenges.remote.ts';
 	import { Button } from './ui/button';
 	import * as Field from './ui/field';
 	import { Input } from './ui/input';
 	import * as Sheet from './ui/sheet';
 
-	let { challengeId, clubId }: { challengeId: string; clubId: string } = $props();
+	let { challengeId }: { challengeId: string; clubId: string } = $props();
 
 	let sheetOpen = $state(false);
 	let primedChallengeId = $state<string | null>(null);
@@ -33,12 +33,12 @@
 
 	const disciplines = $derived(disciplineForm.fields.discipline.value() ?? []);
 
-	async function onsubmit({ form, submit }: { form: HTMLFormElement; submit: any }) {
-		await submit();
+	async function onsubmit(form: Parameters<Parameters<typeof addDisciplinesForm.enhance>[0]>[0]) {
+		await form.submit();
 
 		if ((disciplineForm.fields.allIssues()?.length ?? 0) === 0) {
 			sheetOpen = false;
-			form.reset();
+			form.element.reset();
 			resetDefaults();
 		}
 	}
@@ -85,9 +85,7 @@
 						type="button"
 						variant="destructive"
 						onclick={() => {
-							disciplineForm.fields.discipline.set(
-								disciplines.filter((_, index) => index !== i)
-							);
+							disciplineForm.fields.discipline.set(disciplines.filter((_, index) => index !== i));
 						}}
 					>
 						<MinusCircle />
@@ -100,10 +98,7 @@
 					type="button"
 					variant="outline"
 					onclick={() => {
-						disciplineForm.fields.discipline.set([
-							...disciplines,
-							{ multiplier: 1, name: '' }
-						]);
+						disciplineForm.fields.discipline.set([...disciplines, { multiplier: 1, name: '' }]);
 					}}
 				>
 					<PlusCircle /> Eine mehr

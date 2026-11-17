@@ -1,19 +1,26 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import * as Field from '$lib/components/ui/field';
+	import ClubAdmin from '#lib/components/ClubAdmin.svelte';
+	import * as Field from '#lib/components/ui/field/index.ts';
 	import { toast } from 'svelte-sonner';
-	import { deleteClubCommand, editClubForm, generateInviteCode, getClubPage, leaveClubCommand } from '$lib/remote/clubs.remote';
-	import { createChallengeForm } from '$lib/remote/challenges.remote';
-	import * as Card from '$lib/components/ui/card';
-	import { Input } from '$lib/components/ui/input';
-	import { cn, isChallengeActive, isChallengePast, prettyDate } from '$lib/utils';
-	import * as Sheet from '$lib/components/ui/sheet';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import {
+		deleteClubCommand,
+		editClubForm,
+		generateInviteCode,
+		getClubPage,
+		leaveClubCommand
+	} from '#lib/remote/clubs.remote.ts';
+	import { createChallengeForm } from '#lib/remote/challenges.remote.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { cn, isChallengeActive, isChallengePast, prettyDate } from '#lib/utils.ts';
+	import * as Sheet from '#lib/components/ui/sheet/index.ts';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
+	import { Button, buttonVariants } from '#lib/components/ui/button/index.ts';
+	import * as Dialog from '#lib/components/ui/dialog/index.ts';
+	import * as AlertDialog from '#lib/components/ui/alert-dialog/index.ts';
 	import { ArrowLeft, Ellipsis, Link, LogOut, Pencil, PlusCircle, Trash2 } from '@lucide/svelte';
 
 	const clubId = $derived(page.params.clubId ?? '');
@@ -53,7 +60,7 @@
 		const result = await deleteClubCommand(clubId);
 
 		if (result.redirect) {
-			await goto(result.redirect);
+			await goto(resolve('/clubs'));
 		}
 	}
 
@@ -61,12 +68,12 @@
 		const result = await leaveClubCommand(clubId);
 
 		if (result.redirect) {
-			await goto(result.redirect);
+			await goto(resolve('/clubs'));
 		}
 	}
 
-	async function onEditClubSubmit({ submit }: { submit: any }) {
-		await submit();
+	async function onEditClubSubmit(form: Parameters<Parameters<typeof editClubForm.enhance>[0]>[0]) {
+		await form.submit();
 
 		if ((editClub.fields.allIssues()?.length ?? 0) === 0) {
 			editDialogOpen = false;
@@ -82,7 +89,9 @@
 	{@const pastChallenges = club.challenges.filter((challenge) => isChallengePast(challenge))}
 
 	<nav class="mb-4 flex">
-		<a href="/clubs" class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
+		<a
+			href={resolve('/clubs')}
+			class="text-muted-foreground flex items-center gap-2 text-xl font-bold"
 			><ArrowLeft strokeWidth={3} /> Alle Clubs</a
 		>
 	</nav>
@@ -135,7 +144,9 @@
 											</Dialog.Description>
 										</Dialog.Header>
 										{#if !inviteCode}
-											<Button variant="outline" onclick={onGenerateInvite}><Link /> Generieren</Button>
+											<Button variant="outline" onclick={onGenerateInvite}
+												><Link /> Generieren</Button
+											>
 										{:else}
 											<div class="flex gap-4">
 												<Input value={inviteUrl} readonly />
@@ -182,8 +193,8 @@
 										<AlertDialog.Header>
 											<AlertDialog.Title>Club "{club.name}" löschen?</AlertDialog.Title>
 											<AlertDialog.Description>
-												Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion kann
-												nicht rückgängig gemacht werden.
+												Diese Aktion wird den Club mit all seinen Inhalten löschen. Diese Aktion
+												kann nicht rückgängig gemacht werden.
 											</AlertDialog.Description>
 										</AlertDialog.Header>
 										<AlertDialog.Footer>
@@ -258,7 +269,12 @@
 			</ClubAdmin>
 
 			{#each activeChallenges as challenge (challenge.id)}
-				<a href="/clubs/{club.id}/challenge/{challenge.id}">
+				<a
+					href={resolve('/clubs/[clubId]/challenge/[challengeId]', {
+						clubId: club.id,
+						challengeId: challenge.id
+					})}
+				>
 					<Card.Root>
 						<Card.Header>
 							<Card.Title>{challenge.name}</Card.Title>
@@ -282,7 +298,12 @@
 			<h2 class="mt-8 mb-4 text-2xl font-bold">Vergangene Challenges</h2>
 			<div class="grid gap-4 md:grid-cols-3">
 				{#each pastChallenges as challenge (challenge.id)}
-					<a href="/clubs/{club.id}/challenge/{challenge.id}">
+					<a
+						href={resolve('/clubs/[clubId]/challenge/[challengeId]', {
+							clubId: club.id,
+							challengeId: challenge.id
+						})}
+					>
 						<Card.Root class="opacity-75 duration-200 ease-in-out hover:opacity-100">
 							<Card.Header>
 								<Card.Title>{challenge.name}</Card.Title>

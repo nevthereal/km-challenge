@@ -1,5 +1,5 @@
-import { building, dev } from '$app/environment';
-import { auth } from '$lib/auth';
+import { building, dev } from '$app/env';
+import { auth } from '#lib/auth/index.ts';
 import { redirect } from '@sveltejs/kit';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 
@@ -7,7 +7,9 @@ export async function handle({ event, resolve }) {
 	const host = event.request.headers.get('host');
 
 	if (host === 'km-challenge.com' && !dev) {
-		throw redirect(301, `https://www.km-challenge.com${event.url.pathname}${event.url.search}`);
+		throw redirect(301, `https://www.km-challenge.com${event.url.pathname}${event.url.search}`, {
+			external: true
+		});
 	}
 
 	const session = await auth.api.getSession({

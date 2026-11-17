@@ -1,10 +1,14 @@
 <script lang="ts">
+	import { refreshAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import ClubAdmin from '$lib/components/ClubAdmin.svelte';
-	import DisciplineForm from '$lib/components/DisciplineForm.svelte';
-	import { deleteDisciplineCommand, getChallengePageContext } from '$lib/remote/challenges.remote';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { buttonVariants } from '$lib/components/ui/button';
+	import ClubAdmin from '#lib/components/ClubAdmin.svelte';
+	import DisciplineForm from '#lib/components/DisciplineForm.svelte';
+	import {
+		deleteDisciplineCommand,
+		getChallengePageContext
+	} from '#lib/remote/challenges.remote.ts';
+	import * as AlertDialog from '#lib/components/ui/alert-dialog/index.ts';
+	import { buttonVariants } from '#lib/components/ui/button/index.ts';
 	import { Trash2 } from '@lucide/svelte';
 
 	const clubId = $derived(page.params.clubId ?? '');
@@ -22,6 +26,8 @@
 			challengeId,
 			disciplineId: selectedDiscipline.id
 		});
+
+		await refreshAll();
 
 		selectedDiscipline = null;
 		disciplineDialogOpen = false;
@@ -79,8 +85,9 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-				<AlertDialog.Action class={buttonVariants({ variant: 'destructive' })} onclick={onDeleteDiscipline}
-					>Löschen</AlertDialog.Action
+				<AlertDialog.Action
+					class={buttonVariants({ variant: 'destructive' })}
+					onclick={onDeleteDiscipline}>Löschen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>

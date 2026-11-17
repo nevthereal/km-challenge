@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import EntryCard from '$lib/components/EntryCard.svelte';
-	import type { ListItems } from '$lib/components/NiceList.svelte';
-	import NiceList from '$lib/components/NiceList.svelte';
-	import { getUserChallengeActivity } from '$lib/remote/challenges.remote';
-	import { prettyDate } from '$lib/utils';
+	import EntryCard from '#lib/components/EntryCard.svelte';
+	import type { ListItems } from '#lib/components/NiceList.svelte';
+	import NiceList from '#lib/components/NiceList.svelte';
+	import { getUserChallengeActivity } from '#lib/remote/challenges.remote.ts';
+	import { prettyDate } from '#lib/utils.ts';
 
 	const clubId = $derived(page.params.clubId ?? '');
 	const challengeId = $derived(page.params.challengeId ?? '');
@@ -37,7 +37,7 @@
 		{#each data.entries as entry (entry.id)}
 			<EntryCard {entry} discipline={entry.discipline} edit />
 		{:else}
-			<p class="font-mono italic font-bold">Noch keine Aktivität</p>
+			<p class="font-mono font-bold italic">Noch keine Aktivität</p>
 		{/each}
 	</div>
 

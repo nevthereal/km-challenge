@@ -1,8 +1,9 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table';
-	import { getLeaderboard } from '$lib/remote/challenges.remote';
-	import type { challenge } from '$lib/db/schema';
-	import { cn } from '$lib/utils';
+	import { resolve } from '$app/paths';
+	import * as Table from '#lib/components/ui/table/index.ts';
+	import { getLeaderboard } from '#lib/remote/challenges.remote.ts';
+	import type { challenge } from '#lib/db/schema.ts';
+	import { cn } from '#lib/utils.ts';
 	import { Skeleton } from './ui/skeleton';
 
 	let {
@@ -45,8 +46,11 @@
 					<Table.Cell class="font-medium"
 						><a
 							class="flex items-center gap-1 font-bold hover:underline"
-							href="/clubs/{currentChallenge.clubId}/challenge/{currentChallenge.id}/members/{competitor.id}"
-							>{competitor.name}</a
+							href={resolve('/clubs/[clubId]/challenge/[challengeId]/members/[memberId]', {
+								clubId: currentChallenge.clubId,
+								challengeId: currentChallenge.id,
+								memberId: competitor.id
+							})}>{competitor.name}</a
 						></Table.Cell
 					>
 					<Table.Cell>{competitor.score}</Table.Cell>
@@ -61,7 +65,7 @@
 			{:else}
 				<Table.Row>
 					<Table.Cell colspan={6} class="text-center">
-						<p class="text-lg font-bold text-destructive">Noch keine Einträge</p>
+						<p class="text-destructive text-lg font-bold">Noch keine Einträge</p>
 					</Table.Cell>
 				</Table.Row>
 			{/each}

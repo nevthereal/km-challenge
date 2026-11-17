@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as Field from '$lib/components/ui/field';
-	import { Input } from '$lib/components/ui/input/';
-	import { gender, roles } from '$lib/db/schema';
-	import { Button } from '$lib/components/ui/button/';
-	import { getProfile, updateProfile } from '$lib/remote/profile.remote';
+	import * as Field from '#lib/components/ui/field/index.ts';
+	import { Input } from '#lib/components/ui/input//index.ts';
+	import { gender, roles } from '#lib/db/schema.ts';
+	import { Button } from '#lib/components/ui/button//index.ts';
+	import { getProfile, updateProfile } from '#lib/remote/profile.remote.ts';
 
 	type RoleValue = (typeof roles.enumValues)[number];
 	type GenderValue = (typeof gender.enumValues)[number];
@@ -32,7 +32,7 @@
 		<Field.Label for="role">Kategorie</Field.Label>
 		<select
 			id="role"
-			class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
+			class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
 			{...updateProfile.fields.role.as('select')}
 		>
 			{#each roles.enumValues as role (role)}
@@ -48,11 +48,11 @@
 		<Field.Label for="gender">Geschlecht</Field.Label>
 		<select
 			id="gender"
-			class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
+			class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
 			{...updateProfile.fields.gender.as('select')}
 		>
 			{#each gender.enumValues as value (value)}
-				<option value={value}>{value}</option>
+				<option {value}>{value}</option>
 			{/each}
 		</select>
 		{#each updateProfile.fields.gender.issues() as issue, index (`profile-gender-${index}-${issue.message}`)}

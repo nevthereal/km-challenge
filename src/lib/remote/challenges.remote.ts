@@ -1,12 +1,17 @@
 import { command, form, getRequestEvent, query } from '$app/server';
-import { canAddEntries, getDaysRemainingForEntry, prettyDate } from '$lib/utils';
-import { checkAdmin, db, getLeaderBoard } from '$lib/db';
-import { challenge, challengeMember, clubMember, discipline, entry } from '$lib/db/schema';
-import { addDisciplines, createChallenge, entrySubmission } from '$lib/zod';
-import { getCurrentUser, requireCompletedProfile } from '$lib/server/request-user';
+import { canAddEntries, getDaysRemainingForEntry, prettyDate } from '#lib/utils.ts';
+import { checkAdmin, db, getLeaderBoard } from '#lib/db/index.ts';
+import { challenge, challengeMember, discipline, entry } from '#lib/db/schema.ts';
+import { addDisciplines, createChallenge, entrySubmission } from '#lib/zod.ts';
+import {
+	getCurrentUser,
+	requireCompletedProfile,
+	requireCommandUser
+} from '#lib/server/request-user.ts';
 import { and, eq, getColumns, gte, lte } from 'drizzle-orm';
 import { error, invalid, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import { getClubPage, getClubsPage } from './clubs.remote';
 
 const challengeParamsSchema = z.object({
 	clubId: z.string().min(1),
@@ -19,7 +24,7 @@ const memberParamsSchema = challengeParamsSchema.extend({
 
 const leaderboardSchema = z.object({
 	challengeId: z.string().min(1),
-	limit: z.number().int().positive()
+	limit: z.number().int().nonnegative()
 });
 
 const deleteDisciplineSchema = z.object({
@@ -33,19 +38,21 @@ const deleteEntrySchema = z.object({
 	entryId: z.string().min(1)
 });
 
-async function loadChallengeContext({
-	clubId,
-	challengeId
-}: z.infer<typeof challengeParamsSchema>) {
-	const user = requireCompletedProfile();
+async function loadChallengeContext(
+	{ clubId, challengeId }: z.infer<typeof challengeParamsSchema>,
+	isCommand = false
+) {
+	const user = isCommand
+		? requireCommandUser()
+		: requireCompletedProfile(`/clubs/${clubId}/challenge/${challengeId}`);
 
 	const currentChallenge = await db.query.challenge.findFirst({
-		where: { id: challengeId },
+		where: { id: challengeId, clubId },
 		with: {
 			members: true,
 			entries: {
 				with: {
-					user: true,
+					user: { columns: { id: true, name: true, gender: true, role: true } },
 					discipline: true
 				}
 			},
@@ -66,6 +73,7 @@ async function loadChallengeContext({
 	});
 
 	if (!currentUserClub) {
+		if (isCommand) error(403, 'Du bist kein Mitglied des Clubs');
 		redirect(302, '/clubs');
 	}
 
@@ -156,6 +164,7 @@ export const getHomeDashboard = query(async () => {
 });
 
 export const getLeaderboard = query.batch(leaderboardSchema, async (inputs) => {
+	const user = requireCompletedProfile();
 	const limits = new Map<string, number>();
 
 	for (const input of inputs) {
@@ -166,7 +175,14 @@ export const getLeaderboard = query.batch(leaderboardSchema, async (inputs) => {
 
 	await Promise.all(
 		Array.from(limits.entries()).map(async ([challengeId, limit]) => {
-			leaderboards.set(challengeId, await getLeaderBoard.execute({ challengeId, limit }));
+			const currentChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+			if (!currentChallenge) error(404, 'Challenge nicht gefunden');
+			const membership = await db.query.clubMember.findFirst({
+				where: { clubId: currentChallenge.clubId, userId: user.id }
+			});
+			if (!membership) error(403, 'Du bist kein Mitglied des Clubs');
+			const rows = await getLeaderBoard.execute({ challengeId, limit });
+			leaderboards.set(challengeId, rows);
 		})
 	);
 
@@ -189,7 +205,7 @@ export const getChallengeOverview = query(challengeParamsSchema, async (params) 
 			return operators.desc(fields.createdAt);
 		},
 		with: {
-			user: true,
+			user: { columns: { id: true, name: true, gender: true, role: true } },
 			discipline: true
 		}
 	});
@@ -314,6 +330,7 @@ export const getChallengeMember = query(memberParamsSchema, async (params) => {
 		where: { AND: [{ userId: params.memberId }, { challengeId: params.challengeId }] },
 		with: {
 			user: {
+				columns: { id: true, name: true, gender: true, role: true },
 				with: {
 					entries: {
 						where: {
@@ -356,7 +373,7 @@ export const getUserChallengeActivity = query(challengeParamsSchema, async (para
 			challengeId: challenge.id
 		},
 		with: {
-			user: true
+			user: { columns: { id: true, name: true, gender: true, role: true } }
 		}
 	});
 
@@ -375,7 +392,7 @@ export const createChallengeForm = form(createChallenge, async ({ name, startsAt
 		error(400, 'Club fehlt');
 	}
 
-	if (!user.superUser) {
+	if (!user.superUser || !(await checkAdmin(clubId, user.id))) {
 		error(401, 'Nicht erlaubt.');
 	}
 
@@ -402,7 +419,8 @@ export const editChallengeForm = form(createChallenge, async ({ name, startsAt, 
 
 	const currentChallenge = await db.query.challenge.findFirst({
 		where: {
-			id: challengeId
+			id: challengeId,
+			clubId
 		}
 	});
 
@@ -422,8 +440,6 @@ export const editChallengeForm = form(createChallenge, async ({ name, startsAt, 
 			startsAt: new Date(startsAt)
 		})
 		.where(eq(challenge.id, currentChallenge.id));
-
-	void getChallengePageContext({ clubId, challengeId }).refresh();
 });
 
 export const createEntryForm = form(
@@ -437,7 +453,7 @@ export const createEntryForm = form(
 			}
 		});
 
-		if (!currentDiscipline) {
+		if (!currentDiscipline || currentDiscipline.challengeId !== challengeId) {
 			invalid(issue.disciplineId('Disziplin wählen'));
 		}
 
@@ -494,27 +510,6 @@ export const createEntryForm = form(
 			disciplineId,
 			userId: user.id
 		});
-
-		void getHomeDashboard().refresh();
-		void getChallengePageContext({
-			clubId: currentChallenge.clubId,
-			challengeId
-		}).refresh();
-		void getChallengeOverview({
-			clubId: currentChallenge.clubId,
-			challengeId
-		}).refresh();
-		void getUserChallengeActivity({
-			clubId: currentChallenge.clubId,
-			challengeId
-		}).refresh();
-
-		const memberCount = currentChallenge.members?.length ?? 0;
-
-		void getLeaderboard({ challengeId, limit: 5 }).refresh();
-		if (memberCount > 0 && memberCount !== 5) {
-			void getLeaderboard({ challengeId, limit: memberCount }).refresh();
-		}
 	}
 );
 
@@ -526,29 +521,30 @@ export const addDisciplinesForm = form(addDisciplines, async ({ discipline: disc
 		error(400, 'Challenge fehlt');
 	}
 
+	await loadChallengeContext({ clubId, challengeId });
+
 	if (!(await checkAdmin(clubId, user.id))) {
 		error(401, 'Nicht erlaubt');
 	}
 
-	for (const currentDiscipline of disciplines) {
-		await db.insert(discipline).values({
+	await db.insert(discipline).values(
+		disciplines.map((currentDiscipline) => ({
 			factor: currentDiscipline.multiplier.toString(),
 			name: currentDiscipline.name,
 			challengeId
-		});
-	}
-
-	void getChallengePageContext({ clubId, challengeId }).refresh();
+		}))
+	);
 });
 
 export const deleteChallengeCommand = command(
 	challengeParamsSchema,
 	async ({ clubId, challengeId }) => {
-		const user = requireCompletedProfile();
+		const user = requireCommandUser();
 
 		const currentChallenge = await db.query.challenge.findFirst({
 			where: {
-				id: challengeId
+				id: challengeId,
+				clubId
 			}
 		});
 
@@ -562,32 +558,47 @@ export const deleteChallengeCommand = command(
 
 		await db.delete(challenge).where(eq(challenge.id, currentChallenge.id));
 
+		void getClubsPage().refresh();
+		void getClubPage(clubId).refresh();
+		void getHomeDashboard().refresh();
+
 		return { clubId };
 	}
 );
 
-export const leaveChallengeCommand = command(challengeParamsSchema, async ({ clubId, challengeId }) => {
-	const user = requireCompletedProfile();
+export const leaveChallengeCommand = command(
+	challengeParamsSchema,
+	async ({ clubId, challengeId }) => {
+		const user = requireCommandUser();
 
-	const membership = await db.query.challengeMember.findFirst({
-		where: {
-			AND: [{ challengeId }, { userId: user.id }]
+		await loadChallengeContext({ clubId, challengeId }, true);
+
+		const membership = await db.query.challengeMember.findFirst({
+			where: {
+				AND: [{ challengeId }, { userId: user.id }]
+			}
+		});
+
+		if (!membership) {
+			error(404, 'Du bist kein Mitglied dieser Challenge');
 		}
-	});
 
-	if (!membership) {
-		error(404, 'Du bist kein Mitglied dieser Challenge');
+		await db.delete(challengeMember).where(eq(challengeMember.id, membership.id));
+
+		void getChallengePageContext({ clubId, challengeId }).refresh();
+		void getChallengeMembers({ clubId, challengeId }).refresh();
+		void getHomeDashboard().refresh();
+		void getClubsPage().refresh();
+		void getClubPage(clubId).refresh();
 	}
-
-	await db.delete(challengeMember).where(eq(challengeMember.id, membership.id));
-
-	void getChallengePageContext({ clubId, challengeId }).refresh();
-});
+);
 
 export const joinChallengeCommand = command(
 	challengeParamsSchema,
 	async ({ clubId, challengeId }) => {
-		const user = requireCompletedProfile();
+		const user = requireCommandUser();
+
+		await loadChallengeContext({ clubId, challengeId }, true);
 
 		const clubRelation = await db.query.clubMember.findFirst({
 			where: { AND: [{ userId: user.id }, { clubId }] }
@@ -609,13 +620,19 @@ export const joinChallengeCommand = command(
 		}
 
 		void getChallengePageContext({ clubId, challengeId }).refresh();
+		void getChallengeMembers({ clubId, challengeId }).refresh();
+		void getHomeDashboard().refresh();
+		void getClubsPage().refresh();
+		void getClubPage(clubId).refresh();
 	}
 );
 
 export const deleteDisciplineCommand = command(
 	deleteDisciplineSchema,
 	async ({ clubId, challengeId, disciplineId }) => {
-		const user = requireCompletedProfile();
+		const user = requireCommandUser();
+
+		await loadChallengeContext({ clubId, challengeId }, true);
 
 		if (!(await checkAdmin(clubId, user.id))) {
 			error(401, 'Nicht erlaubt');
@@ -627,19 +644,18 @@ export const deleteDisciplineCommand = command(
 			}
 		});
 
-		if (!currentDiscipline) {
+		if (!currentDiscipline || currentDiscipline.challengeId !== challengeId) {
 			error(404, 'Disziplin nicht gefunden');
 		}
 
 		await db.delete(discipline).where(eq(discipline.id, currentDiscipline.id));
-
-		void getChallengePageContext({ clubId, challengeId }).refresh();
 	}
 );
 
 export const deleteEntryCommand = command(deleteEntrySchema, async ({ challengeId, entryId }) => {
-	const user = requireCompletedProfile();
-	const clubId = getRequestEvent().params.clubId;
+	const user = requireCommandUser();
+	const currentChallenge = await db.query.challenge.findFirst({ where: { id: challengeId } });
+	if (!currentChallenge) error(404, 'Challenge nicht gefunden');
 
 	const currentEntry = await db.query.entry.findFirst({
 		where: {
@@ -657,10 +673,4 @@ export const deleteEntryCommand = command(deleteEntrySchema, async ({ challengeI
 	}
 
 	await db.delete(entry).where(eq(entry.id, currentEntry.id));
-
-	if (clubId) {
-		void getChallengePageContext({ clubId, challengeId }).refresh();
-		void getChallengeOverview({ clubId, challengeId }).refresh();
-		void getUserChallengeActivity({ clubId, challengeId }).refresh();
-	}
 });

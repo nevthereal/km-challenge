@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Field from '$lib/components/ui/field';
-	import { Input } from '$lib/components/ui/input';
-	import { Button } from '$lib/components/ui/button';
-	import { createClubForm, getCreateClubPage } from '$lib/remote/clubs.remote';
+	import * as Field from '#lib/components/ui/field/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { createClubForm, getCreateClubPage } from '#lib/remote/clubs.remote.ts';
 
 	const createClubPage = getCreateClubPage();
 	await createClubPage;

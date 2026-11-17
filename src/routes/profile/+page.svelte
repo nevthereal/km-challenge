@@ -1,12 +1,12 @@
 <script lang="ts">
-	import NiceList from '$lib/components/NiceList.svelte';
-	import type { ListItems } from '$lib/components/NiceList.svelte';
-	import { getProfile } from '$lib/remote/profile.remote';
-	import { prettyDate } from '$lib/utils';
+	import NiceList from '#lib/components/NiceList.svelte';
+	import type { ListItems } from '#lib/components/NiceList.svelte';
+	import { getProfile } from '#lib/remote/profile.remote.ts';
+	import { prettyDate } from '#lib/utils.ts';
 
 	const profile = getProfile();
-	const data = await profile;
-	const listItems = [
+	const data = $derived(await profile);
+	const listItems = $derived([
 		{
 			name: 'Name',
 			content: data.user.name
@@ -19,7 +19,7 @@
 			name: 'Email',
 			content: data.user.email
 		}
-	] satisfies ListItems;
+	] satisfies ListItems);
 </script>
 
 <h1 class="h1">Übersicht</h1>

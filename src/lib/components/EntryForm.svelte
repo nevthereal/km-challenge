@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { PlusCircle } from '@lucide/svelte';
-	import { createEntryForm } from '$lib/remote/challenges.remote';
-	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
+	import { createEntryForm } from '#lib/remote/challenges.remote.ts';
+	import { challenge as challengeTable, discipline as disciplineTable } from '#lib/db/schema.ts';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import * as Field from './ui/field';
 	import { Input } from './ui/input';
-	import { canAddEntries, cn } from '$lib/utils';
+	import { canAddEntries, cn } from '#lib/utils.ts';
 
 	type ChallengeLike = typeof challengeTable.$inferSelect & {
 		members?: unknown[];
@@ -54,12 +54,12 @@
 	});
 
 	const active = $derived(canAddEntries(challenge));
-	async function onsubmit({ form, submit }: { form: HTMLFormElement; submit: any }) {
-		await submit();
+	async function onsubmit(form: Parameters<Parameters<typeof createEntryForm.enhance>[0]>[0]) {
+		await form.submit();
 
 		if ((entryForm.fields.allIssues()?.length ?? 0) === 0) {
 			dialogOpen = false;
-			form.reset();
+			form.element.reset();
 			resetDefaults();
 		}
 	}
@@ -83,7 +83,7 @@
 		</Dialog.Header>
 
 		<form {...entryForm.enhance(onsubmit)} class="space-y-4 text-left">
-			<input hidden name="challengeId" value={entryForm.fields.challengeId.value() ?? challenge.id} />
+			<input {...entryForm.fields.challengeId.as('hidden', challenge.id)} />
 
 			<p class="text-muted-foreground text-sm text-balance max-md:text-center">
 				Bitte Kilometer roh eintragen, die Punkte werden später verrechnet.
@@ -106,7 +106,7 @@
 					<Field.Label for="entry-discipline-{challenge.id}">Disziplin</Field.Label>
 					<select
 						id="entry-discipline-{challenge.id}"
-						class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
+						class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
 						{...entryForm.fields.disciplineId.as('select')}
 					>
 						<option value="" disabled={disciplines.length > 0}>Disziplin wählen</option>
@@ -133,9 +133,7 @@
 				{/each}
 			</Field.Field>
 
-			<Button type="submit" disabled={disciplines.length === 0}>
-				Hinzufügen
-			</Button>
+			<Button type="submit" disabled={disciplines.length === 0}>Hinzufügen</Button>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>

@@ -1,20 +1,22 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { getSessionState } from '$lib/remote/session.remote';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
+	import { Button, buttonVariants } from '#lib/components/ui/button/index.ts';
+	import { getSessionState } from '#lib/remote/session.remote.ts';
 	import { LogOut, User } from '@lucide/svelte';
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import { authClient } from '$lib/auth/client';
-	import { Toaster } from '$lib/components/ui/sonner';
+	import { authClient } from '#lib/auth/client.ts';
+	import { Toaster } from '#lib/components/ui/sonner/index.ts';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { dev } from '$app/environment';
+	import { dev } from '$app/env';
 
 	let { children } = $props();
 
 	const sessionState = getSessionState();
-	const { session, user } = await sessionState;
+	const sessionData = $derived(await sessionState);
+	const session = $derived(sessionData.session);
+	const user = $derived(sessionData.user);
 
 	async function signOut() {
 		await authClient(page.url.origin).signOut();
@@ -31,11 +33,11 @@
 	<div class="flex gap-4">
 		<a href={resolve('/')} class="text-4xl font-bold">Start</a>
 		<div class="flex">
-			<a href={resolve('/clubs')} class="my-auto text-lg font-semibold">Clubs</a>
+			<a href={resolve('clubs')} class="my-auto text-lg font-semibold">Clubs</a>
 		</div>
 	</div>
 	{#if !session || !user}
-		<Button href={resolve('/signin')}>Anmelden</Button>
+		<Button href={resolve('signin')}>Anmelden</Button>
 	{:else}
 		<div class="flex gap-2">
 			<DropdownMenu.Root>
@@ -48,13 +50,15 @@
 					<DropdownMenu.Group>
 						<DropdownMenu.GroupHeading>Profil</DropdownMenu.GroupHeading>
 						<DropdownMenu.Separator />
-						<DropdownMenu.Item><a class="w-full" href={resolve('/profile')}>Übersicht</a></DropdownMenu.Item>
 						<DropdownMenu.Item
-							><a class="w-full" href={resolve('/profile/edit')}>Bearbeiten</a></DropdownMenu.Item
+							><a class="w-full" href={resolve('profile')}>Übersicht</a></DropdownMenu.Item
+						>
+						<DropdownMenu.Item
+							><a class="w-full" href={resolve('profile/edit')}>Bearbeiten</a></DropdownMenu.Item
 						>
 						<Button class="m-2" variant="destructive" onclick={signOut}
-							><LogOut /><span> Ausloggen </span>
-						</Button>
+							><LogOut /><span>Ausloggen</span></Button
+						>
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>

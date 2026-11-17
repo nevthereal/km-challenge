@@ -2,11 +2,11 @@
 	import { ArrowLeft } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import NiceList, { type ListItems } from '$lib/components/NiceList.svelte';
-	import { getChallengeMember } from '$lib/remote/challenges.remote';
-	import { prettyDate } from '$lib/utils';
-	import EntryCard from '$lib/components/EntryCard.svelte';
-	import EntryMetricsChart from '$lib/components/EntryMetricsChart.svelte';
+	import NiceList, { type ListItems } from '#lib/components/NiceList.svelte';
+	import { getChallengeMember } from '#lib/remote/challenges.remote.ts';
+	import { prettyDate } from '#lib/utils.ts';
+	import EntryCard from '#lib/components/EntryCard.svelte';
+	import EntryMetricsChart from '#lib/components/EntryMetricsChart.svelte';
 
 	const clubId = $derived(page.params.clubId ?? '');
 	const challengeId = $derived(page.params.challengeId ?? '');
@@ -45,7 +45,10 @@
 		<NiceList {listItems} />
 	</div>
 
-	<EntryMetricsChart title="Fortschritt (Kilometer, Punkte)" entries={data.member.user?.entries ?? []} />
+	<EntryMetricsChart
+		title="Fortschritt (Kilometer, Punkte)"
+		entries={data.member.user?.entries ?? []}
+	/>
 
 	<h2 class="h2 my-4">
 		Einträge ({data.member.user?.entries.length ?? 0}):
@@ -54,7 +57,7 @@
 		{#each data.member.user?.entries ?? [] as entry (entry.id)}
 			<EntryCard {entry} discipline={entry.discipline} edit={false} />
 		{:else}
-			<p class="font-mono italic font-bold">Noch keine Aktivität</p>
+			<p class="font-mono font-bold italic">Noch keine Aktivität</p>
 		{/each}
 	</div>
 

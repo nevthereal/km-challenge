@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { getChallengeMembers } from '$lib/remote/challenges.remote';
+	import { getChallengeMembers } from '#lib/remote/challenges.remote.ts';
 
 	const clubId = $derived(page.params.clubId ?? '');
 	const challengeId = $derived(page.params.challengeId ?? '');
@@ -16,7 +17,14 @@
 				{@const { user } = member}
 				{#if user}
 					<li>
-						<a class="link" href="{data.challengePath}/members/{user.id}">
+						<a
+							class="link"
+							href={resolve('/clubs/[clubId]/challenge/[challengeId]/members/[memberId]', {
+								clubId,
+								challengeId,
+								memberId: user.id
+							})}
+						>
 							{user.name}
 							{#if data.admins.some((admin) => admin.userId === user.id)}
 								<span>(Admin)</span>

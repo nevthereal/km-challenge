@@ -1,8 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/db';
-import { clubMember } from '$lib/db/schema';
-import { requireCompletedProfile } from '$lib/server/request-user';
+import { db } from '#lib/db/index.ts';
+import { clubMember } from '#lib/db/schema.ts';
+import { requireCompletedProfile } from '#lib/server/request-user.ts';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireCompletedProfile();

@@ -15,9 +15,9 @@
 </script>
 
 <ul class={className}>
-	{#each listItems as item}
+	{#each listItems as item (item.name)}
 		<li>
-			<span class="font-medium text-muted-foreground">{item.name}:</span>
+			<span class="text-muted-foreground font-medium">{item.name}:</span>
 			<span class="font-medium">{item.content}</span>
 		</li>
 	{/each}

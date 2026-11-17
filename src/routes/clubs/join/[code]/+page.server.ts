@@ -5,7 +5,7 @@ import { clubMember } from '#lib/db/schema.ts';
 import { requireCompletedProfile } from '#lib/server/request-user.ts';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const user = requireCompletedProfile();
+	const user = requireCompletedProfile(`/clubs/join/${encodeURIComponent(params.code)}`);
 
 	const invite = await db.query.inviteCode.findFirst({
 		where: { code: params.code }

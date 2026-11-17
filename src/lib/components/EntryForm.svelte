@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getEntryDefaultDate, toUtcDateInputValue } from '#lib/date-input.ts';
 	import { PlusCircle } from '@lucide/svelte';
 	import { createEntryForm } from '#lib/remote/challenges.remote.ts';
 	import { challenge as challengeTable, discipline as disciplineTable } from '#lib/db/schema.ts';
@@ -25,25 +26,10 @@
 
 	const entryForm = $derived(createEntryForm.for(challenge.id));
 
-	function toDateInputValue(date: Date) {
-		const offset = date.getTimezoneOffset() * 60_000;
-		return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-	}
-
-	function getDefaultDate() {
-		const today = new Date();
-		const startsAt = new Date(challenge.startsAt);
-		const endsAt = new Date(challenge.endsAt);
-
-		if (today < startsAt) return toDateInputValue(startsAt);
-		if (today > endsAt) return toDateInputValue(endsAt);
-		return toDateInputValue(today);
-	}
-
 	function resetDefaults() {
 		entryForm.fields.challengeId.set(challenge.id);
 		entryForm.fields.disciplineId.set(disciplines[0]?.id ?? '');
-		entryForm.fields.date.set(getDefaultDate());
+		entryForm.fields.date.set(getEntryDefaultDate(challenge.startsAt, challenge.endsAt));
 	}
 
 	$effect(() => {
@@ -124,8 +110,8 @@
 				<Field.Label for="entry-date-{challenge.id}">Datum der Aktivität</Field.Label>
 				<Input
 					id="entry-date-{challenge.id}"
-					min={toDateInputValue(new Date(challenge.startsAt))}
-					max={toDateInputValue(new Date(challenge.endsAt))}
+					min={toUtcDateInputValue(challenge.startsAt)}
+					max={toUtcDateInputValue(challenge.endsAt)}
 					{...entryForm.fields.date.as('date')}
 				/>
 				{#each entryForm.fields.date.issues() as issue, index (`entry-date-${challenge.id}-${index}-${issue.message}`)}

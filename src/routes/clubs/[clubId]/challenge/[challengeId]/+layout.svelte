@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { toUtcDateInputValue } from '#lib/date-input.ts';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
@@ -37,17 +38,12 @@
 	let leaveDialogOpen = $state(false);
 	let primedChallengeId = $state<string | null>(null);
 
-	function toDateInputValue(date: Date) {
-		const offset = date.getTimezoneOffset() * 60_000;
-		return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-	}
-
 	$effect(() => {
 		if (challengePage.current && primedChallengeId !== challengePage.current.challenge.id) {
 			challengeEditForm.fields.set({
 				name: challengePage.current.challenge.name,
-				startsAt: toDateInputValue(new Date(challengePage.current.challenge.startsAt)),
-				endsAt: toDateInputValue(new Date(challengePage.current.challenge.endsAt))
+				startsAt: toUtcDateInputValue(challengePage.current.challenge.startsAt),
+				endsAt: toUtcDateInputValue(challengePage.current.challenge.endsAt)
 			});
 			primedChallengeId = challengePage.current.challenge.id;
 		}

@@ -192,3 +192,34 @@ test('command auth guards return errors instead of redirects', () => {
 	event.locals.user = { id: 'user', role: null, gender: null };
 	assert.throws(() => guards.requireCommandUser(), { status: 403 });
 });
+
+for (const [user, destination] of [
+	[null, '/signin'],
+	[{ id: 'user', role: null, gender: null }, '/profile/edit']
+]) {
+	test(`invitation survives the ${destination} redirect`, async () => {
+		const guards = load('src/lib/server/request-user.ts', {
+			'$app/server': { getRequestEvent: () => ({ locals: { user } }) },
+			'@sveltejs/kit': { redirect: http, error: http }
+		});
+		const route = load('src/routes/clubs/join/[code]/+page.server.ts', {
+			'@sveltejs/kit': { redirect: http, error: http },
+			'#lib/db/index.ts': {
+				db: new Proxy(
+					{},
+					{
+						get() {
+							throw Error('Database reached before authentication');
+						}
+					}
+				)
+			},
+			'#lib/db/schema.ts': {},
+			'#lib/server/request-user.ts': guards
+		});
+		await assert.rejects(route.load({ params: { code: '123456' } }), {
+			status: 302,
+			message: `${destination}?redirect=${encodeURIComponent('/clubs/join/123456')}`
+		});
+	});
+}

@@ -27,4 +27,4 @@ jobs:
       - name: Push database schema (Drizzle)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: bun db:push --force
+        run: bun run push --force

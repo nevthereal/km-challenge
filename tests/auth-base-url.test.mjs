@@ -19,7 +19,7 @@ for (const origin of ['http://localhost:5173', 'http://localhost:5174', 'http://
 }
 
 test('production uses the canonical origin without an environment variable', () => {
-	assert.equal(getAuthBaseURL(false), 'https://www.km-challenge.com');
+	assert.equal(getAuthBaseURL(false).fallback, 'https://www.km-challenge.com');
 });
 
 test('an explicit origin overrides development and production defaults', () => {
@@ -34,3 +34,18 @@ test('development auth rejects unlisted request hosts', async () => {
 		/not in the allowed hosts list/
 	);
 });
+
+for (const host of [
+	'km-challenge.com',
+	'www.km-challenge.com',
+	'km-challenge-preview.vercel.app'
+]) {
+	test(`production auth accepts ${host}`, async () => {
+		const auth = betterAuth({ baseURL: getAuthBaseURL(false), secret });
+		const response = await auth.handler(new Request(`https://${host}/api/auth/get-session`));
+		assert.equal(response.status, 200);
+		assert.equal(await response.json(), null);
+		const context = await auth.$context;
+		assert.ok(context.trustedOrigins.includes('https://*.vercel.app'));
+	});
+}

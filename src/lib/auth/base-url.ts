@@ -9,5 +9,9 @@ export function getAuthBaseURL(dev: boolean, override?: string) {
 		};
 	}
 
-	return 'https://www.km-challenge.com';
+	return {
+		allowedHosts: ['km-challenge.com', 'www.km-challenge.com', '*.vercel.app'],
+		protocol: 'https' as const,
+		fallback: 'https://www.km-challenge.com'
+	};
 }

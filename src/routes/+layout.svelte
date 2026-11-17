@@ -8,7 +8,6 @@
 	import { authClient } from '#lib/auth/client.ts';
 	import { Toaster } from '#lib/components/ui/sonner/index.ts';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
 	import { dev } from '$app/env';
 
 	let { children } = $props();
@@ -19,7 +18,7 @@
 	const user = $derived(sessionData.user);
 
 	async function signOut() {
-		await authClient(page.url.origin).signOut();
+		await authClient.signOut();
 		location.reload();
 	}
 </script>

@@ -1,6 +1,6 @@
 import { generateCode, generateNumber } from '@nevthereal/random-utils';
 import {
-	pgTable,
+	pgTableCreator,
 	text,
 	timestamp,
 	boolean,
@@ -9,6 +9,9 @@ import {
 	date,
 	index
 } from 'drizzle-orm/pg-core';
+
+// Keep the existing database column names with Drizzle's table-level casing API.
+const pgTable = pgTableCreator((name) => name, 'snake_case');
 
 export const challenge = pgTable(
 	'challenge',

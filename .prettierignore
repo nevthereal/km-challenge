@@ -2,3 +2,9 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Dependency source references and generated output
+opensrc/
+bun.lock
+.svelte-kit/
+build/

@@ -1,26 +1,25 @@
 <script lang="ts">
-	import NiceList from '$lib/components/NiceList.svelte';
-	import type { ListItems } from '$lib/components/NiceList.svelte';
-	import { prettyDate } from '$lib/utils';
+	import NiceList from '#lib/components/NiceList.svelte';
+	import type { ListItems } from '#lib/components/NiceList.svelte';
+	import { getProfile } from '#lib/remote/profile.remote.ts';
+	import { prettyDate } from '#lib/utils.ts';
 
-	let { data } = $props();
-
-	const { user } = data;
-
-	const listItems: ListItems = [
+	const profile = getProfile();
+	const data = $derived(await profile);
+	const listItems = $derived([
 		{
 			name: 'Name',
-			content: user.name
+			content: data.user.name
 		},
 		{
 			name: 'Beigetreten',
-			content: prettyDate(user.createdAt)
+			content: prettyDate(data.user.createdAt)
 		},
 		{
 			name: 'Email',
-			content: user.email
+			content: data.user.email
 		}
-	];
+	] satisfies ListItems);
 </script>
 
 <h1 class="h1">Übersicht</h1>

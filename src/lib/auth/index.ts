@@ -1,11 +1,21 @@
 import { betterAuth } from 'better-auth';
+import { dev } from '$app/env';
+import { getAuthBaseURL } from './base-url';
+import { sveltekitCookies } from 'better-auth/svelte-kit';
+import { getRequestEvent } from '$app/server';
 import * as schema from '../db/schema';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../db';
-import { BETTER_AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
+import {
+	BETTER_AUTH_URL,
+	BETTER_AUTH_SECRET,
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET
+} from '$app/env/private';
 
 export const auth = betterAuth({
-	baseURL: { allowedHosts: ['localhost:*', 'km-challenge.com', ' *.vercel.app'] },
+	plugins: [sveltekitCookies(getRequestEvent)],
+	baseURL: getAuthBaseURL(dev, BETTER_AUTH_URL),
 	database: drizzleAdapter(db, {
 		provider: 'pg',
 		schema

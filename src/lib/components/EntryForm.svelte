@@ -1,83 +1,54 @@
 <script lang="ts">
-	import { CalendarIcon, PlusCircle } from '@lucide/svelte';
+	import { getEntryDefaultDate, toUtcDateInputValue } from '#lib/date-input.ts';
+	import { PlusCircle } from '@lucide/svelte';
+	import { createEntryForm } from '#lib/remote/challenges.remote.ts';
+	import { challenge as challengeTable, discipline as disciplineTable } from '#lib/db/schema.ts';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
-	import * as Form from './ui/form';
-	import * as Select from './ui/select';
+	import * as Field from './ui/field';
 	import { Input } from './ui/input';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { newEntry } from '$lib/zod';
-	import { challenge as challengeTable, discipline as disciplineTable } from '$lib/db/schema';
-	import * as Popover from './ui/popover';
-	import { cn, canAddEntries } from '$lib/utils';
+	import { canAddEntries, cn } from '#lib/utils.ts';
 
-	import {
-		DateFormatter,
-		getLocalTimeZone,
-		parseDate,
-		today,
-		type DateValue
-	} from '@internationalized/date';
-	import { Calendar } from './ui/calendar';
-
-	/**
-	 * Calculate the max date for activity (must be within challenge period, not grace period)
-	 */
-	function getMaxDateForEntry(endsAt: Date): DateValue {
-		return parseDate(endsAt.toISOString().split('T')[0]);
-	}
+	type ChallengeLike = typeof challengeTable.$inferSelect & {
+		members?: unknown[];
+	};
 
 	interface Props {
-		formData: SuperValidated<Infer<typeof newEntry>>;
-		disciplines: (typeof disciplineTable.$inferSelect)[];
-		challenge: typeof challengeTable.$inferSelect;
+		disciplines: Array<typeof disciplineTable.$inferSelect>;
+		challenge: ChallengeLike;
 		classNames?: string;
 	}
 
-	let { formData, disciplines, challenge, classNames }: Props = $props();
+	let { disciplines, challenge, classNames }: Props = $props();
 
 	let dialogOpen = $state(false);
+	let primedChallengeId = $state<string | null>(null);
 
-	const entryForm = superForm(formData, {
-		onResult: ({ result }) => {
-			if (result.type === 'success') {
-				dialogOpen = false;
-				resetForm();
-			}
-		},
-		id: `entry-${challenge.id}`,
-		multipleSubmits: 'prevent'
-	});
+	const entryForm = $derived(createEntryForm.for(challenge.id));
 
-	const { enhance, form, constraints, reset } = entryForm;
-
-	function resetForm() {
-		reset();
+	function resetDefaults() {
+		entryForm.fields.challengeId.set(challenge.id);
+		entryForm.fields.disciplineId.set(disciplines[0]?.id ?? '');
+		entryForm.fields.date.set(getEntryDefaultDate(challenge.startsAt, challenge.endsAt));
 	}
 
-	const df = new DateFormatter('de', {
-		dateStyle: 'long'
-	});
-
-	let value = $state<DateValue | undefined>();
-
 	$effect(() => {
-		value = today(getLocalTimeZone());
+		if (primedChallengeId !== challenge.id) {
+			resetDefaults();
+			primedChallengeId = challenge.id;
+		}
 	});
 
-	$effect(() => {
-		value = $form.date ? parseDate($form.date.toString()) : undefined;
-	});
+	const active = $derived(canAddEntries(challenge));
+	async function onsubmit(form: Parameters<Parameters<typeof createEntryForm.enhance>[0]>[0]) {
+		await form.submit();
 
-	let placeholder = $state<DateValue>();
-
-	function getDiscipline(id: string) {
-		let qDiscipline = disciplines.find((d) => d.id === id);
-
-		if (!qDiscipline) return null;
-		return `${qDiscipline.name} (x${qDiscipline.factor})`;
+		if ((entryForm.fields.allIssues()?.length ?? 0) === 0) {
+			dialogOpen = false;
+			form.element.reset();
+			resetDefaults();
+		}
 	}
-	const active = canAddEntries(challenge);
 </script>
 
 <Dialog.Root bind:open={dialogOpen}>
@@ -88,103 +59,67 @@
 			'disabled:cursor-not-allowed max-md:my-auto',
 			classNames
 		)}
-		><PlusCircle />
+	>
+		<PlusCircle />
 		{active ? 'Neuer Eintrag' : 'Challenge Inaktiv'}
 	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="h2">Neuer Eintrag</Dialog.Title>
-			<!-- <SuperDebug data={$form} /> -->
-			<form
-				use:enhance
-				action="/clubs/{challenge.clubId}/challenge/{challenge.id}?/newEntry"
-				method="post"
-				class="text-left"
-			>
-				<p class="text-muted-foreground mb-4 text-sm text-balance max-md:text-center">
-					Bitte Kilometer roh eintragen, die Punkte werden später verrechnet
-				</p>
-
-				<div class="mb-2 flex gap-4">
-					<Form.Field form={entryForm} name="amount" class="w-24 md:w-32">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Kilometer</Form.Label>
-								<Input
-									{...props}
-									{...$constraints.amount}
-									step="0.01"
-									type="number"
-									bind:value={$form.amount}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field form={entryForm} name="disciplineId" class="grow">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Disziplin</Form.Label>
-								<Select.Root type="single" bind:value={$form.disciplineId} name={props.name}>
-									<Select.Trigger {...props}>
-										{$form.disciplineId ? getDiscipline($form.disciplineId) : 'Disziplin Wählen'}
-									</Select.Trigger>
-									<Select.Content>
-										{#each disciplines as discipline}
-											<Select.Item
-												value={discipline.id}
-												label="{discipline.name} (x{discipline.factor})"
-											/>
-										{/each}
-									</Select.Content>
-								</Select.Root>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-
-				<Form.Field form={entryForm} name="date" class="flex flex-col">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>Datum der Aktivität</Form.Label>
-							<Popover.Root>
-								<Popover.Trigger
-									{...props}
-									class={cn(
-										buttonVariants({ variant: 'outline' }),
-										'justify-start text-left font-normal md:grow',
-										!value && 'text-muted-foreground'
-									)}
-								>
-									{value ? df.format(value.toDate(getLocalTimeZone())) : 'Datum wählen'}
-									<CalendarIcon class="ml-auto size-4 opacity-50" />
-								</Popover.Trigger>
-								<Popover.Content side="top">
-									<Calendar
-										type="single"
-										value={value as DateValue}
-										bind:placeholder
-										minValue={parseDate(challenge.startsAt.toISOString().split('T')[0])}
-										maxValue={parseDate(challenge.endsAt.toISOString().split('T')[0])}
-										calendarLabel="Tag des Eintrags"
-										onValueChange={(v) => {
-											if (v) {
-												$form.date = v.toString();
-											} else {
-												$form.date = '';
-											}
-										}}
-									/>
-								</Popover.Content>
-							</Popover.Root>
-							<Form.FieldErrors />
-							<input hidden value={$form.date} name={props.name} />
-						{/snippet}
-					</Form.Control>
-				</Form.Field>
-				<Button type="submit" class="mt-2">Hinzufügen</Button>
-			</form>
 		</Dialog.Header>
+
+		<form {...entryForm.enhance(onsubmit)} class="space-y-4 text-left">
+			<input {...entryForm.fields.challengeId.as('hidden', challenge.id)} />
+
+			<p class="text-muted-foreground text-sm text-balance max-md:text-center">
+				Bitte Kilometer roh eintragen, die Punkte werden später verrechnet.
+			</p>
+
+			<div class="flex gap-4 max-sm:flex-col">
+				<Field.Field class="w-24 sm:w-32">
+					<Field.Label for="entry-amount-{challenge.id}">Kilometer</Field.Label>
+					<Input
+						id="entry-amount-{challenge.id}"
+						step="0.01"
+						{...entryForm.fields.amount.as('number')}
+					/>
+					{#each entryForm.fields.amount.issues() as issue, index (`entry-amount-${challenge.id}-${index}-${issue.message}`)}
+						<Field.Error>{issue.message}</Field.Error>
+					{/each}
+				</Field.Field>
+
+				<Field.Field class="flex-1">
+					<Field.Label for="entry-discipline-{challenge.id}">Disziplin</Field.Label>
+					<select
+						id="entry-discipline-{challenge.id}"
+						class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+						{...entryForm.fields.disciplineId.as('select')}
+					>
+						<option value="" disabled={disciplines.length > 0}>Disziplin wählen</option>
+						{#each disciplines as discipline (discipline.id)}
+							<option value={discipline.id}>{discipline.name} (x{discipline.factor})</option>
+						{/each}
+					</select>
+					{#each entryForm.fields.disciplineId.issues() as issue, index (`entry-discipline-${challenge.id}-${index}-${issue.message}`)}
+						<Field.Error>{issue.message}</Field.Error>
+					{/each}
+				</Field.Field>
+			</div>
+
+			<Field.Field>
+				<Field.Label for="entry-date-{challenge.id}">Datum der Aktivität</Field.Label>
+				<Input
+					id="entry-date-{challenge.id}"
+					min={toUtcDateInputValue(challenge.startsAt)}
+					max={toUtcDateInputValue(challenge.endsAt)}
+					{...entryForm.fields.date.as('date')}
+				/>
+				{#each entryForm.fields.date.issues() as issue, index (`entry-date-${challenge.id}-${index}-${issue.message}`)}
+					<Field.Error>{issue.message}</Field.Error>
+				{/each}
+			</Field.Field>
+
+			<Button type="submit" disabled={disciplines.length === 0}>Hinzufügen</Button>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>

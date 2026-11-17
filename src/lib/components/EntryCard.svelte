@@ -1,21 +1,32 @@
 <script lang="ts">
-	import { entry as dbEntry, discipline as dbDiscipline } from '$lib/db/schema';
-	import * as Card from '$lib/components/ui/card';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { refreshAll } from '$app/navigation';
+	import { entry as dbEntry, discipline as dbDiscipline } from '#lib/db/schema.ts';
+	import { deleteEntryCommand } from '#lib/remote/challenges.remote.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import * as AlertDialog from '#lib/components/ui/alert-dialog/index.ts';
 	import { buttonVariants } from './ui/button/button.svelte';
 	import { Trash } from '@lucide/svelte';
-	import { enhance } from '$app/forms';
 
 	interface Props {
 		entry: typeof dbEntry.$inferSelect;
 		discipline: typeof dbDiscipline.$inferSelect | null;
 		edit: boolean;
-		challengePath: string;
 	}
 
-	let { entry, discipline, edit, challengePath }: Props = $props();
+	let { entry, discipline, edit }: Props = $props();
 
 	let open = $state(false);
+
+	async function onDelete() {
+		await deleteEntryCommand({
+			challengeId: entry.challengeId,
+			entryId: entry.id
+		});
+
+		await refreshAll();
+
+		open = false;
+	}
 </script>
 
 <Card.Root>
@@ -37,8 +48,6 @@
 	</Card.Content>
 </Card.Root>
 
-<form use:enhance method="post" id="deleteForm" action="{challengePath}/activity/?/delete"></form>
-
 {#snippet deleteDialog()}
 	<AlertDialog.Root bind:open>
 		<AlertDialog.Trigger class={buttonVariants({ variant: 'destructive', size: 'icon' })}>
@@ -53,12 +62,8 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Abbrechen</AlertDialog.Cancel>
-				<AlertDialog.Action
-					value={entry.id}
-					name="id"
-					form="deleteForm"
-					onclick={() => (open = false)}
-					class={buttonVariants({ variant: 'destructive' })}>Löschen</AlertDialog.Action
+				<AlertDialog.Action class={buttonVariants({ variant: 'destructive' })} onclick={onDelete}
+					>Löschen</AlertDialog.Action
 				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>

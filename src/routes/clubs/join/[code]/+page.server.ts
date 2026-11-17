@@ -1,28 +1,30 @@
-import { db } from '$lib/db';
-import { getUser } from '$lib/utils';
-import type { PageServerLoad } from './$types';
-import { clubMember } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { db } from '#lib/db/index.ts';
+import { clubMember } from '#lib/db/schema.ts';
+import { requireCompletedProfile } from '#lib/server/request-user.ts';
 
-export const load: PageServerLoad = async ({ params, locals, url }) => {
-	const user = getUser({ locals, redirectUrl: url.pathname });
+export const load: PageServerLoad = async ({ params }) => {
+	const user = requireCompletedProfile(`/clubs/join/${encodeURIComponent(params.code)}`);
 
-	const qClub = await db.query.inviteCode.findFirst({
+	const invite = await db.query.inviteCode.findFirst({
 		where: { code: params.code }
 	});
 
-	if (!qClub) return error(404, 'Einladungscode ungültig');
+	if (!invite) {
+		error(404, 'Einladungscode ungültig');
+	}
 
 	const alreadyJoined = await db.query.clubMember.findFirst({
-		where: { AND: [{ clubId: qClub.clubId }, { userId: user.id }] }
+		where: { AND: [{ clubId: invite.clubId }, { userId: user.id }] }
 	});
 
 	if (!alreadyJoined) {
 		await db.insert(clubMember).values({
-			clubId: qClub.clubId,
+			clubId: invite.clubId,
 			userId: user.id
 		});
 	}
 
-	return redirect(302, `/clubs/${qClub.clubId}`);
+	redirect(303, `/clubs/${invite.clubId}`);
 };

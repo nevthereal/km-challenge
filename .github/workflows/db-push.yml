@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Generate SvelteKit types
+        run: bunx svelte-kit sync
+
       - name: Push database schema (Drizzle)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

@@ -14,7 +14,7 @@
 		"test:e2e": "playwright test",
 		"test:remote": "node --experimental-strip-types --test tests/*.test.mjs",
 		"test": "npm run test:e2e",
-		"push": "drizzle-kit push --strict",
+		"push": "drizzle-kit push",
 		"generate": "drizzle-kit generate",
 		"studio": "drizzle-kit studio",
 		"start": "PORT=8080 bun ./build"
